@@ -32,7 +32,7 @@ function createWindow() {
     minHeight: 768,
     frame: false,
     titleBarStyle: 'hidden',
-    icon: path.join(process.env.VITE_PUBLIC, 'logo.png'),
+    icon: path.join(process.env.VITE_PUBLIC || '', 'logo.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
     },
@@ -179,7 +179,7 @@ function createWindow() {
     win.loadURL(VITE_DEV_SERVER_URL);
   } else {
     // win.loadFile('dist/index.html')
-    win.loadFile(path.join(process.env.DIST, 'index.html'));
+    win.loadFile(path.join(process.env.DIST || '', 'index.html'));
   }
 }
 
