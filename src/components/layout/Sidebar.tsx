@@ -10,6 +10,7 @@ import {
   Menu,
   PlayCircle,
   Sparkles,
+  Receipt,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
@@ -19,6 +20,7 @@ const menuItems = [
   { icon: Monitor, label: "Systems", path: "/systems" },
   { icon: PlayCircle, label: "Media", path: "/media" },
   { icon: Sparkles, label: "Advanced Tools", path: "/advanced-tools" },
+  { icon: Receipt, label: "My Bills", path: "/my-bills" },
   { icon: Globe, label: "Websites", path: "/websites", count: "Coming" },
   { icon: Settings, label: "Management", path: "/management", count: "Coming" },
 ];

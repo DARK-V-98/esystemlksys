@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft, Receipt, Trash2, Plus, Download, Palette, Upload, RefreshCcw } from 'lucide-react';
+import { ArrowLeft, Receipt, Trash2, Plus, Download, Palette, Upload, RefreshCcw, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -13,6 +13,9 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from 'sonner';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { getAuth, onAuthStateChanged, User as FirebaseUser } from "firebase/auth";
+import { getFirestore, doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { app } from "@/firebase/config";
 
 interface BillItem {
   id: number;
@@ -26,7 +29,7 @@ const initialYourCompany = 'Your Company';
 const initialYourAddress = '123 Street, City, Country';
 const initialClientCompany = 'Client Company';
 const initialClientAddress = '456 Avenue, Town, Country';
-const initialInvoiceNumber = 'INV-001';
+const initialInvoiceNumber = `INV-${Date.now().toString().slice(-6)}`;
 const initialInvoiceDate = new Date().toISOString().slice(0, 10);
 const initialDueDate = new Date(new Date().setDate(new Date().getDate() + 30)).toISOString().slice(0, 10);
 const initialTax = 10;
@@ -46,8 +49,19 @@ export default function BillGeneratorPage() {
   const [tax, setTax] = useState(initialTax);
   const [accentColor, setAccentColor] = useState(initialAccentColor);
 
+  const [user, setUser] = useState<FirebaseUser | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+
   const billPreviewRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const auth = getAuth(app);
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+        setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
 
   // Load data from localStorage on initial render
   useEffect(() => {
@@ -171,6 +185,48 @@ export default function BillGeneratorPage() {
       localStorage.removeItem('billGeneratorData');
       toast.success("Form fields have been reset.");
   }
+  
+  const saveBillToFirestore = async () => {
+    if (!user) {
+        toast.error("You must be logged in to save a bill.");
+        return;
+    }
+    setIsSaving(true);
+    toast.info("Saving bill to your account...");
+
+    const billData = {
+        yourCompany,
+        yourAddress,
+        clientCompany,
+        clientAddress,
+        invoiceNumber,
+        invoiceDate,
+        dueDate,
+        items,
+        tax,
+        accentColor,
+        subtotal,
+        taxAmount,
+        total,
+    };
+    
+    try {
+        const db = getFirestore(app);
+        const billRef = doc(db, 'users', user.uid, 'bills', invoiceNumber);
+        await setDoc(billRef, {
+            id: invoiceNumber,
+            userId: user.uid,
+            data: JSON.stringify(billData),
+            createdAt: serverTimestamp(),
+        });
+        toast.success("Bill saved successfully!");
+    } catch(error) {
+        console.error("Error saving bill:", error);
+        toast.error("Failed to save bill. See console for details.");
+    } finally {
+        setIsSaving(false);
+    }
+  };
 
 
   return (
@@ -193,15 +249,21 @@ export default function BillGeneratorPage() {
       </div>
       
       <div className="bg-card rounded-lg border shadow-sm p-6 space-y-6">
-        <div className="flex justify-between items-center">
+        <div className="flex flex-wrap gap-2 justify-between items-center">
             <Link href="/advanced-tools" className="inline-flex items-center justify-center gap-2 rounded-xl h-12 px-5 text-sm font-bold transition-all duration-200 bg-secondary text-secondary-foreground hover:bg-secondary/80 hover:text-primary">
                 <ArrowLeft className="h-5 w-5" />
                 <span>Back to Advanced Tools</span>
             </Link>
-            <Button onClick={downloadPDF} variant="gradient">
-                <Download className="mr-2 h-5 w-5"/>
-                Download PDF
-            </Button>
+            <div className="flex gap-2">
+                <Button onClick={saveBillToFirestore} disabled={!user || isSaving}>
+                    <Save className="mr-2 h-5 w-5"/>
+                    {isSaving ? 'Saving...' : 'Save Bill'}
+                </Button>
+                <Button onClick={downloadPDF} variant="gradient">
+                    <Download className="mr-2 h-5 w-5"/>
+                    Download PDF
+                </Button>
+            </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
