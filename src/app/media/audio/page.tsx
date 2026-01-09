@@ -9,6 +9,13 @@ import { toast } from '@/components/ui/sonner';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import type { jsmediatags as JsMediaTags } from 'jsmediatags/types';
 
+// jsmediatags will be loaded from a script tag in the layout and attached to the window object
+declare global {
+  interface Window {
+    jsmediatags: JsMediaTags;
+  }
+}
+
 interface PlaylistItem {
   name: string;
   src: string;
@@ -23,13 +30,7 @@ export default function AudioPlayerPage() {
   
   const audioRef = useRef<HTMLAudioElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [jsmediatags, setJsmediatags] = useState<JsMediaTags | null>(null);
-
-  useEffect(() => {
-    // Correctly import the browser version of jsmediatags
-    import('jsmediatags/dist/jsmediatags.min.js').then(mod => setJsmediatags(mod.default));
-  }, []);
-
+  
   useEffect(() => {
     const audio = audioRef.current;
     if (audio) {
@@ -43,7 +44,7 @@ export default function AudioPlayerPage() {
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
-    if (files && jsmediatags) {
+    if (files && window.jsmediatags) {
       const newItems: PlaylistItem[] = Array.from(files).map(file => ({
         name: file.name,
         src: URL.createObjectURL(file),
@@ -52,7 +53,7 @@ export default function AudioPlayerPage() {
       // Read lyrics from files
       newItems.forEach((item, index) => {
         const file = files[index];
-        jsmediatags.read(file, {
+        window.jsmediatags.read(file, {
           onSuccess: function(tag) {
             const lyrics = tag.tags.lyrics;
             if (lyrics) {

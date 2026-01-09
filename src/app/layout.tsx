@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useEffect } from 'react';
 import TitleBar from '@/components/TitleBar';
 import { ThemeProvider } from '@/components/theme-provider';
+import Script from 'next/script';
 
 export default function RootLayout({
   children,
@@ -25,6 +26,10 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="manifest" href="/manifest.json" />
+        <Script
+          src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.5/jsmediatags.min.js"
+          strategy="beforeInteractive"
+        />
       </head>
       <body className="flex flex-col h-screen overflow-hidden">
           <ThemeProvider
