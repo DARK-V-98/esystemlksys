@@ -33,13 +33,6 @@ export function MainLayout({ children }: MainLayoutProps) {
         <main className="flex-grow p-4 sm:p-6 md:p-8">
             {children}
         </main>
-        <footer className="px-4 sm:px-6 md:px-8 pb-4 sm:pb-6 md:pb-8">
-            <div className="rounded-xl bg-secondary p-4 text-center">
-                <p className="text-sm text-muted-foreground">
-                    Powered by <span className="font-black text-gradient">ESYSTEMLK</span> • Multipurpose System
-                </p>
-            </div>
-        </footer>
       </div>
     </div>
   );

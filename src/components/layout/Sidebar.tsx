@@ -18,8 +18,8 @@ const menuItems = [
   { icon: Wrench, label: "Tools", path: "/tools" },
   { icon: Monitor, label: "Systems", path: "/systems" },
   { icon: PlayCircle, label: "Media", path: "/media" },
-  { icon: Globe, label: "Websites", path: "/websites" },
-  { icon: Settings, label: "Management", path: "/management" },
+  { icon: Globe, label: "Websites", path: "/websites", count: "Coming" },
+  { icon: Settings, label: "Management", path: "/management", count: "Coming" },
 ];
 
 export function Sidebar() {
@@ -88,6 +88,16 @@ export function Sidebar() {
           );
         })}
       </nav>
+
+      {/* Footer */}
+        <div className="border-t border-sidebar-border p-4">
+          <div className="rounded-lg bg-secondary p-3 text-center">
+            <p className="text-xs text-muted-foreground">
+              Powered by
+            </p>
+            <p className="text-sm font-black text-gradient">ESYSTEMLK</p>
+          </div>
+        </div>
     </div>
   );
 
