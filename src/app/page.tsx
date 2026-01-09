@@ -1,8 +1,7 @@
 'use client';
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Cpu, Zap, Shield, Wrench, Database, HardDrive, MemoryStick, CornerDownLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Cpu, Zap, Shield, Wrench, HardDrive, MemoryStick } from "lucide-react";
 
 const loadingSteps = [
   "Initializing core modules...",
@@ -18,16 +17,14 @@ export default function SplashScreen() {
   const [phase, setPhase] = useState(0);
   const [progress, setProgress] = useState(0);
   const [loadingText, setLoadingText] = useState(loadingSteps[0]);
-  const [showEnterButton, setShowEnterButton] = useState(false);
   const router = useRouter();
 
   const handleNavigation = useCallback(() => {
-    // Always navigate to auth page from splash as per requirement
     router.push("/auth");
   }, [router]);
 
   useEffect(() => {
-    // Phase transitions for a 6-second animation
+    // Phase transitions for animation
     const phases = [
       { delay: 200, next: 1 },   // Logo appears
       { delay: 1200, next: 2 },  // Text appears
@@ -38,7 +35,7 @@ export default function SplashScreen() {
       setTimeout(() => setPhase(next), delay);
     });
 
-    // Progress bar animation over ~4 seconds
+    // Progress bar animation
     const progressInterval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
@@ -60,27 +57,18 @@ export default function SplashScreen() {
       }
     }, 600);
 
-    // Show enter button after 6 seconds
-    const enterTimeout = setTimeout(() => {
-      setShowEnterButton(true);
+    // Automatically navigate after 6 seconds
+    const navigationTimeout = setTimeout(() => {
+      handleNavigation();
     }, 6000);
 
 
-    // Keyboard listener for Enter/Space
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (showEnterButton && (event.key === 'Enter' || event.key === ' ')) {
-        handleNavigation();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-
     return () => {
-      clearTimeout(enterTimeout);
+      clearTimeout(navigationTimeout);
       clearInterval(progressInterval);
       clearInterval(textInterval);
-      window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [router, handleNavigation, showEnterButton]);
+  }, [router, handleNavigation]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-black">
@@ -122,7 +110,7 @@ export default function SplashScreen() {
       </div>
 
       {/* Main Content */}
-      <div className={`relative z-10 flex flex-col items-center transition-opacity duration-500 ${showEnterButton ? 'opacity-20 blur-md' : 'opacity-100'}`}>
+      <div className={`relative z-10 flex flex-col items-center transition-opacity duration-500`}>
         {/* Logo Container */}
         <div 
           className={`relative transition-all duration-1000 ${
@@ -211,21 +199,6 @@ export default function SplashScreen() {
         </div>
       </div>
 
-       {/* Enter Button */}
-        {showEnterButton && (
-            <div className="absolute z-20 flex flex-col items-center animate-fade-in" style={{animationDuration: '1s'}}>
-                <button
-                    onClick={handleNavigation}
-                    className="w-80 h-20 text-3xl font-black text-white rounded-2xl border-2 border-primary bg-primary/20 shadow-glow-intense animate-pulse-glow neon-border transition-all duration-300 hover:bg-primary/30 hover:shadow-red-500/80"
-                >
-                    Enter
-                </button>
-            </div>
-        )}
-
-      {/* Fade out overlay - Removed to keep splash visible */}
-      
-
       {/* Custom styles */}
       <style jsx>{`
         @keyframes scanLineX {
@@ -240,22 +213,7 @@ export default function SplashScreen() {
           from { opacity: 0; transform: translateY(10px) }
           to { opacity: 1; transform: translateY(0) }
         }
-        .animate-fade-in {
-            animation: fadeIn 0.5s ease-out forwards;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        .neon-border {
-            box-shadow: 0 0 5px hsl(var(--primary)),
-                        0 0 10px hsl(var(--primary)),
-                        0 0 20px hsl(var(--primary)),
-                        inset 0 0 5px hsl(var(--primary));
-        }
       `}</style>
     </div>
   );
 }
-
-    
