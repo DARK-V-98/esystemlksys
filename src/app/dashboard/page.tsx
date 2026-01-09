@@ -28,6 +28,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import PingMonitor from "@/components/PingMonitor";
 
 
 const menuCards = [
@@ -132,31 +133,34 @@ export default function DashboardPage() {
                         Your complete PC toolkit is ready. Select a category to get started.
                     </p>
                 </div>
-                 <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                    <Button
-                        variant="outline"
-                        size="icon"
-                        className="overflow-hidden rounded-full h-12 w-12 gradient-primary text-primary-foreground shadow-glow"
-                    >
-                        <User className="h-6 w-6" />
-                    </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-64">
-                    <DropdownMenuLabel>
-                        <p className="font-bold truncate">{user?.displayName || user?.email}</p>
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground font-normal">
-                            <Shield className="h-3 w-3 text-success"/>
-                            <span className="capitalize">{userRole || 'User'}</span>
-                        </div>
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer">
-                        <LogOut className="mr-2 h-4 w-4" />
-                        Sign Out
-                    </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                <div className="flex items-center gap-4">
+                  <PingMonitor />
+                  <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                      <Button
+                          variant="outline"
+                          size="icon"
+                          className="overflow-hidden rounded-full h-12 w-12 gradient-primary text-primary-foreground shadow-glow"
+                      >
+                          <User className="h-6 w-6" />
+                      </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-64">
+                      <DropdownMenuLabel>
+                          <p className="font-bold truncate">{user?.displayName || user?.email}</p>
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground font-normal">
+                              <Shield className="h-3 w-3 text-success"/>
+                              <span className="capitalize">{userRole || 'User'}</span>
+                          </div>
+                      </DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer">
+                          <LogOut className="mr-2 h-4 w-4" />
+                          Sign Out
+                      </DropdownMenuItem>
+                      </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
             </div>
           </div>
 
