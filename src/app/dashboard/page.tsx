@@ -29,6 +29,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import PingMonitor from "@/components/PingMonitor";
+import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 
 
 const menuCards = [
@@ -135,6 +136,7 @@ export default function DashboardPage() {
                 </div>
                 <div className="flex items-center gap-4">
                   <PingMonitor />
+                  <ThemeSwitcher />
                   <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                       <Button

@@ -9,6 +9,7 @@ import { Cpu, Eye, EyeOff, Mail, Lock, User, Zap, Shield, Layers } from "lucide-
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, onAuthStateChanged } from "firebase/auth";
 import { getFirestore, doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { app } from "@/firebase/config";
+import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -94,7 +95,10 @@ export default function Auth() {
   return (
     <div className="flex min-h-screen">
       {/* Left Panel - Branding */}
-      <div className="hidden w-1/2 flex-col justify-between gradient-dark p-12 lg:flex overflow-hidden">
+      <div className="hidden w-1/2 flex-col justify-between gradient-dark p-12 lg:flex overflow-hidden relative">
+        <div className="absolute top-8 right-8">
+            <ThemeSwitcher />
+        </div>
         <div className="animate-slide-up" style={{animationDelay: '100ms'}}>
             <div className="flex items-center gap-3">
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl gradient-primary shadow-glow-intense animate-pulse-glow">
@@ -143,7 +147,10 @@ export default function Auth() {
       </div>
 
       {/* Right Panel - Auth Form */}
-      <div className="flex w-full items-center justify-center bg-background p-8 lg:w-1/2">
+      <div className="flex w-full items-center justify-center bg-background p-8 lg:w-1/2 relative">
+        <div className="absolute top-8 right-8 lg:hidden">
+            <ThemeSwitcher />
+        </div>
         <div className="w-full max-w-md space-y-8">
           {/* Mobile Logo */}
           <div className="flex items-center justify-center gap-3 lg:hidden animate-fade-in">
