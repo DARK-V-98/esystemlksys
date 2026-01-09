@@ -1,5 +1,4 @@
 'use client'
-import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -26,12 +25,14 @@ export default function RootLayout({
       <head>
         <link rel="manifest" href="/manifest.json" />
       </head>
-      <body>
+      <body className="flex flex-col h-screen">
           <TitleBar />
           <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            {children}
+            <div className="flex-grow overflow-y-auto">
+              <Toaster />
+              <Sonner />
+              {children}
+            </div>
           </TooltipProvider>
       </body>
     </html>
