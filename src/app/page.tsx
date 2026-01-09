@@ -1,7 +1,8 @@
 'use client';
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Cpu, Zap, Shield, Wrench, Database, HardDrive, MemoryStick } from "lucide-react";
+import { Cpu, Zap, Shield, Wrench, Database, HardDrive, MemoryStick, CornerDownLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const loadingSteps = [
   "Initializing core modules...",
@@ -10,13 +11,20 @@ const loadingSteps = [
   "Defragmenting memory nodes...",
   "Calibrating performance metrics...",
   "Finalizing interface...",
+  "Ready for entry.",
 ];
 
 export default function SplashScreen() {
   const [phase, setPhase] = useState(0);
   const [progress, setProgress] = useState(0);
   const [loadingText, setLoadingText] = useState(loadingSteps[0]);
+  const [showEnterButton, setShowEnterButton] = useState(false);
   const router = useRouter();
+
+  const handleNavigation = useCallback(() => {
+    // Always navigate to auth page from splash as per requirement
+    router.push("/auth");
+  }, [router]);
 
   useEffect(() => {
     // Phase transitions for a 6-second animation
@@ -24,7 +32,6 @@ export default function SplashScreen() {
       { delay: 200, next: 1 },   // Logo appears
       { delay: 1200, next: 2 },  // Text appears
       { delay: 2200, next: 3 },  // Loading bar and icons appear
-      { delay: 5500, next: 4 },  // Fade out
     ];
 
     phases.forEach(({ delay, next }) => {
@@ -53,19 +60,27 @@ export default function SplashScreen() {
       }
     }, 600);
 
-
-    // Navigate after splash
-    const timer = setTimeout(() => {
-      const isAuthenticated = localStorage.getItem("isAuthenticated");
-      router.push(isAuthenticated ? "/dashboard" : "/auth");
+    // Show enter button after 6 seconds
+    const enterTimeout = setTimeout(() => {
+      setShowEnterButton(true);
     }, 6000);
 
+
+    // Keyboard listener for Enter/Space
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (showEnterButton && (event.key === 'Enter' || event.key === ' ')) {
+        handleNavigation();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+
     return () => {
-      clearTimeout(timer);
+      clearTimeout(enterTimeout);
       clearInterval(progressInterval);
       clearInterval(textInterval);
+      window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [router]);
+  }, [router, handleNavigation, showEnterButton]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-black">
@@ -107,7 +122,7 @@ export default function SplashScreen() {
       </div>
 
       {/* Main Content */}
-      <div className="relative z-10 flex flex-col items-center">
+      <div className={`relative z-10 flex flex-col items-center transition-opacity duration-500 ${showEnterButton ? 'opacity-20 blur-md' : 'opacity-100'}`}>
         {/* Logo Container */}
         <div 
           className={`relative transition-all duration-1000 ${
@@ -196,12 +211,25 @@ export default function SplashScreen() {
         </div>
       </div>
 
-      {/* Fade out overlay */}
-      <div 
-        className={`absolute inset-0 bg-black transition-opacity duration-500 ${
-          phase >= 4 ? 'opacity-100' : 'opacity-0 pointer-events-none'
-        }`}
-      />
+       {/* Enter Button */}
+        {showEnterButton && (
+            <div className="absolute z-20 flex flex-col items-center animate-fade-in" style={{animationDuration: '1s'}}>
+                 <h2 className="text-4xl font-black text-white neon-text mb-6">Press Enter to Start</h2>
+                <Button 
+                    variant="gradient" 
+                    size="xl" 
+                    onClick={handleNavigation}
+                    className="w-64 font-bold text-lg animate-pulse-glow"
+                >
+                    <CornerDownLeft className="mr-3 h-6 w-6"/>
+                    Enter System
+                </Button>
+                <p className="text-muted-foreground mt-4 text-sm">Or press Spacebar</p>
+            </div>
+        )}
+
+      {/* Fade out overlay - Removed to keep splash visible */}
+      
 
       {/* Custom styles */}
       <style jsx>{`
@@ -216,6 +244,13 @@ export default function SplashScreen() {
         @keyframes icon-fade-in {
           from { opacity: 0; transform: translateY(10px) }
           to { opacity: 1; transform: translateY(0) }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
       `}</style>
     </div>
