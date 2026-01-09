@@ -13,7 +13,8 @@ import {
   User,
   Shield,
   LogOut,
-  PlayCircle
+  PlayCircle,
+  Menu
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getAuth, onAuthStateChanged, User as FirebaseUser, signOut } from "firebase/auth";
@@ -39,35 +40,32 @@ const menuCards = [
     title: "Tools",
     description: "File converters, text utilities, image editors",
     path: "/tools",
-    count: "20+",
   },
   {
     icon: Monitor,
     title: "Systems",
     description: "PC optimization, disk cleanup, RAM boost",
     path: "/systems",
-    count: "18+",
   },
   {
     icon: PlayCircle,
     title: "Media Player",
     description: "Play local audio and video files",
     path: "/media",
-    count: "New",
   },
   {
     icon: Globe,
     title: "Websites",
     description: "SEO tools, web scrapers, meta analyzers",
     path: "/websites",
-    count: "Coming",
+    count: "Coming"
   },
   {
     icon: Settings,
     title: "Management",
     description: "Account settings, preferences, usage stats",
     path: "/management",
-    count: "Coming",
+    count: "Coming"
   },
 ];
 
@@ -116,10 +114,8 @@ export default function DashboardPage() {
 
 
   return (
-      <div className="flex flex-col">
-        <div className="flex-grow space-y-8 animate-fade-in">
-          {/* Header */}
-          <div className="relative overflow-hidden gradient-dark p-6 md:p-8">
+      <div className="flex flex-col gap-6">
+        <div className="relative overflow-hidden gradient-dark p-6 md:p-8">
             <div className="absolute -right-20 -top-20 h-60 w-60 rounded-full bg-primary/20 blur-3xl" />
             <div className="absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-primary/10 blur-2xl" />
             <div className="relative flex justify-between items-start">
@@ -165,28 +161,27 @@ export default function DashboardPage() {
                   </DropdownMenu>
                 </div>
             </div>
-          </div>
-
-          {/* Menu Grid */}
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-            {menuCards.map((card, index) => (
-              <Link
-                key={card.path}
-                href={card.count === 'Coming' ? `/coming-soon?title=${card.title}` : card.path}
-                className="group animate-slide-up"
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                <div className="system-card rounded-xl p-4 shadow-card h-full flex flex-col items-center justify-center text-center aspect-square">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-lg gradient-primary shadow-glow transition-all duration-300 group-hover:shadow-glow-intense group-hover:scale-110">
-                        <card.icon className="h-6 w-6 text-primary-foreground" />
+        </div>
+        <div className="bg-card rounded-lg border shadow-sm p-6">
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                {menuCards.map((card, index) => (
+                <Link
+                    key={card.path}
+                    href={card.count === 'Coming' ? `/coming-soon?title=${card.title}` : card.path}
+                    className="group animate-slide-up"
+                    style={{ animationDelay: `${index * 100}ms` }}
+                >
+                    <div className="system-card rounded-xl p-4 shadow-card h-full flex flex-col items-center justify-center text-center aspect-square">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-lg gradient-primary shadow-glow transition-all duration-300 group-hover:shadow-glow-intense group-hover:scale-110">
+                            <card.icon className="h-6 w-6 text-primary-foreground" />
+                        </div>
+                        <h3 className="mt-3 text-base font-bold text-foreground group-hover:text-primary transition-colors">
+                            {card.title}
+                        </h3>
                     </div>
-                    <h3 className="mt-3 text-base font-bold text-foreground group-hover:text-primary transition-colors">
-                        {card.title}
-                    </h3>
-                </div>
-              </Link>
-            ))}
-          </div>
+                </Link>
+                ))}
+            </div>
         </div>
       </div>
   );

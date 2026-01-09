@@ -24,7 +24,6 @@ export default function VideoPlayerPage() {
 
   return (
     <div className="space-y-6 animate-fade-in">
-       {/* Header */}
       <div className="relative overflow-hidden gradient-dark p-8">
         <div className="absolute -right-20 -top-20 h-60 w-60 rounded-full bg-primary/20 blur-3xl" />
         <div className="relative flex items-center gap-4">
@@ -42,37 +41,39 @@ export default function VideoPlayerPage() {
         </div>
       </div>
 
-      <Link href="/media" className="inline-flex items-center justify-center gap-2 rounded-xl h-12 px-5 text-sm font-bold transition-all duration-200 bg-secondary text-secondary-foreground hover:bg-secondary/80 hover:text-primary">
-          <ArrowLeft className="h-5 w-5" />
-          <span>Back to Media Center</span>
-      </Link>
-      
-      <div className="rounded-xl bg-card border shadow-card p-6 mt-6">
-        <div className="aspect-video bg-black rounded-lg mb-4 flex items-center justify-center overflow-hidden">
-          {videoSrc ? (
-            <video src={videoSrc} controls autoPlay className="w-full h-full" />
-          ) : (
-            <div className="text-center text-muted-foreground">
-                <Video className="h-16 w-16 mx-auto mb-4"/>
-                <h3 className="text-lg font-semibold">No video selected</h3>
-                <p>Click the button below to choose a video file.</p>
+      <div className="bg-card rounded-lg border shadow-sm p-6 space-y-6">
+        <Link href="/media" className="inline-flex items-center justify-center gap-2 rounded-xl h-12 px-5 text-sm font-bold transition-all duration-200 bg-secondary text-secondary-foreground hover:bg-secondary/80 hover:text-primary">
+            <ArrowLeft className="h-5 w-5" />
+            <span>Back to Media Center</span>
+        </Link>
+        
+        <div className="bg-card border shadow-sm p-6">
+            <div className="aspect-video bg-black rounded-lg mb-4 flex items-center justify-center overflow-hidden">
+            {videoSrc ? (
+                <video src={videoSrc} controls autoPlay className="w-full h-full" />
+            ) : (
+                <div className="text-center text-muted-foreground">
+                    <Video className="h-16 w-16 mx-auto mb-4"/>
+                    <h3 className="text-lg font-semibold">No video selected</h3>
+                    <p>Click the button below to choose a video file.</p>
+                </div>
+            )}
             </div>
-          )}
+
+            {videoTitle && <p className="text-center font-semibold mb-4 truncate">{videoTitle}</p>}
+
+            <Input
+            type="file"
+            accept="video/*"
+            onChange={handleFileChange}
+            ref={fileInputRef}
+            className="hidden"
+            />
+            <Button onClick={handleButtonClick} className="w-full" variant="gradient">
+                <Upload className="mr-2 h-5 w-5"/>
+                Choose Video File
+            </Button>
         </div>
-
-        {videoTitle && <p className="text-center font-semibold mb-4 truncate">{videoTitle}</p>}
-
-        <Input
-          type="file"
-          accept="video/*"
-          onChange={handleFileChange}
-          ref={fileInputRef}
-          className="hidden"
-        />
-        <Button onClick={handleButtonClick} className="w-full" variant="gradient">
-            <Upload className="mr-2 h-5 w-5"/>
-            Choose Video File
-        </Button>
       </div>
     </div>
   );

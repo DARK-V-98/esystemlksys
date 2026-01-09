@@ -355,7 +355,6 @@ export default function SystemsPage() {
 
   return (
       <div className="space-y-6 animate-fade-in">
-        {/* Header */}
         <div className="relative overflow-hidden gradient-dark p-8">
           <div className="absolute -right-20 -top-20 h-60 w-60 rounded-full bg-primary/20 blur-3xl" />
           <div className="relative flex items-center gap-4">
@@ -373,81 +372,80 @@ export default function SystemsPage() {
           </div>
         </div>
         
-        {/* Search & Filter */}
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                <Link href="/dashboard" className="flex items-center justify-center gap-2 rounded-xl h-12 px-5 text-sm font-bold transition-all duration-200 bg-secondary text-secondary-foreground hover:bg-secondary/80 hover:text-primary">
-                    <ArrowLeft className="h-5 w-5" />
-                    <span>Main Menu</span>
-                </Link>
-                <div className="relative w-full sm:w-80">
-                    <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
-                    <Input
-                    type="text"
-                    placeholder="Search system tools..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-12 h-12"
-                    />
+        <div className="bg-card rounded-lg border shadow-sm p-6 space-y-6">
+            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                    <Link href="/dashboard" className="flex items-center justify-center gap-2 rounded-xl h-12 px-5 text-sm font-bold transition-all duration-200 bg-secondary text-secondary-foreground hover:bg-secondary/80 hover:text-primary">
+                        <ArrowLeft className="h-5 w-5" />
+                        <span>Main Menu</span>
+                    </Link>
+                    <div className="relative w-full sm:w-80">
+                        <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+                        <Input
+                        type="text"
+                        placeholder="Search system tools..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="pl-12 h-12"
+                        />
+                    </div>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                    {categories.map((category) => (
+                    <button
+                        key={category}
+                        onClick={() => setActiveCategory(category)}
+                        className={`rounded-xl px-5 py-2.5 text-sm font-bold transition-all duration-200 ${
+                        activeCategory === category
+                            ? "gradient-primary text-primary-foreground shadow-glow"
+                            : "bg-secondary text-secondary-foreground hover:bg-secondary/80 hover:text-primary"
+                        }`}
+                    >
+                        {category}
+                    </button>
+                    ))}
                 </div>
             </div>
-            <div className="flex flex-wrap gap-2">
-                {categories.map((category) => (
+            
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            {filteredTools.map((tool, index) => (
                 <button
-                    key={category}
-                    onClick={() => setActiveCategory(category)}
-                    className={`rounded-xl px-5 py-2.5 text-sm font-bold transition-all duration-200 ${
-                    activeCategory === category
-                        ? "gradient-primary text-primary-foreground shadow-glow"
-                        : "bg-secondary text-secondary-foreground hover:bg-secondary/80 hover:text-primary"
-                    }`}
+                key={tool.id}
+                onClick={() => handleToolClick(tool)}
+                className="system-card group rounded-xl p-5 text-left shadow-card animate-slide-up disabled:opacity-60 disabled:cursor-not-allowed"
+                style={{ animationDelay: `${index * 50}ms` }}
+                disabled={tool.status === 'inactive'}
                 >
-                    {category}
+                <div className="flex items-center gap-4">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-all duration-300 group-hover:gradient-primary group-hover:text-primary-foreground group-hover:shadow-glow group-hover:scale-110">
+                    <tool.icon className="h-6 w-6" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between">
+                        <h3 className="font-bold text-foreground group-hover:text-primary transition-colors truncate">
+                        {tool.name}
+                        </h3>
+                        <span className={`h-2.5 w-2.5 rounded-full ${tool.status === 'active' ? 'bg-success' : 'bg-amber-500'} group-disabled:bg-muted-foreground`} />
+                    </div>
+                    <p className="mt-1 text-xs text-muted-foreground line-clamp-1">
+                        {tool.description}
+                    </p>
+                    </div>
+                </div>
                 </button>
-                ))}
+            ))}
             </div>
-        </div>
 
-        {/* Tools Grid */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {filteredTools.map((tool, index) => (
-            <button
-              key={tool.id}
-              onClick={() => handleToolClick(tool)}
-              className="system-card group rounded-xl p-5 text-left shadow-card animate-slide-up disabled:opacity-60 disabled:cursor-not-allowed"
-              style={{ animationDelay: `${index * 50}ms` }}
-              disabled={tool.status === 'inactive'}
-            >
-              <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-all duration-300 group-hover:gradient-primary group-hover:text-primary-foreground group-hover:shadow-glow group-hover:scale-110">
-                  <tool.icon className="h-6 w-6" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center justify-between">
-                     <h3 className="font-bold text-foreground group-hover:text-primary transition-colors truncate">
-                      {tool.name}
-                    </h3>
-                    <span className={`h-2.5 w-2.5 rounded-full ${tool.status === 'active' ? 'bg-success' : 'bg-amber-500'} group-disabled:bg-muted-foreground`} />
-                  </div>
-                  <p className="mt-1 text-xs text-muted-foreground line-clamp-1">
-                    {tool.description}
-                  </p>
-                </div>
-              </div>
-            </button>
-          ))}
+            {filteredTools.length === 0 && (
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+                <Search className="h-12 w-12 text-muted-foreground" />
+                <h3 className="mt-4 text-lg font-bold text-foreground">No tools found</h3>
+                <p className="mt-1 text-muted-foreground">
+                Try adjusting your search or filter criteria
+                </p>
+            </div>
+            )}
         </div>
-
-        {/* Empty State */}
-        {filteredTools.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-12 text-center">
-            <Search className="h-12 w-12 text-muted-foreground" />
-            <h3 className="mt-4 text-lg font-bold text-foreground">No tools found</h3>
-            <p className="mt-1 text-muted-foreground">
-              Try adjusting your search or filter criteria
-            </p>
-          </div>
-        )}
       </div>
   );
 }
