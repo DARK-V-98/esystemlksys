@@ -1,46 +1,69 @@
 'use client';
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Cpu, Zap, Shield, Wrench } from "lucide-react";
+import { Cpu, Zap, Shield, Wrench, Database, HardDrive, MemoryStick } from "lucide-react";
+
+const loadingSteps = [
+  "Initializing core modules...",
+  "Establishing secure connection...",
+  "Loading system utilities...",
+  "Defragmenting memory nodes...",
+  "Calibrating performance metrics...",
+  "Finalizing interface...",
+];
 
 export default function SplashScreen() {
   const [phase, setPhase] = useState(0);
   const [progress, setProgress] = useState(0);
+  const [loadingText, setLoadingText] = useState(loadingSteps[0]);
   const router = useRouter();
 
   useEffect(() => {
-    // Phase transitions
+    // Phase transitions for a 6-second animation
     const phases = [
-      { delay: 500, next: 1 },   // Logo appears
-      { delay: 1500, next: 2 },  // Text appears
-      { delay: 2500, next: 3 },  // Loading bar
-      { delay: 4000, next: 4 },  // Fade out
+      { delay: 200, next: 1 },   // Logo appears
+      { delay: 1200, next: 2 },  // Text appears
+      { delay: 2200, next: 3 },  // Loading bar and icons appear
+      { delay: 5500, next: 4 },  // Fade out
     ];
 
     phases.forEach(({ delay, next }) => {
       setTimeout(() => setPhase(next), delay);
     });
 
-    // Progress bar animation
+    // Progress bar animation over ~4 seconds
     const progressInterval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
           clearInterval(progressInterval);
           return 100;
         }
-        return prev + 2;
+        return prev + 1;
       });
-    }, 50);
+    }, 35);
+
+    // Update loading text
+    let step = 0;
+    const textInterval = setInterval(() => {
+      step++;
+      if (step < loadingSteps.length) {
+        setLoadingText(loadingSteps[step]);
+      } else {
+        clearInterval(textInterval);
+      }
+    }, 600);
+
 
     // Navigate after splash
     const timer = setTimeout(() => {
       const isAuthenticated = localStorage.getItem("isAuthenticated");
       router.push(isAuthenticated ? "/dashboard" : "/auth");
-    }, 4500);
+    }, 6000);
 
     return () => {
       clearTimeout(timer);
       clearInterval(progressInterval);
+      clearInterval(textInterval);
     };
   }, [router]);
 
@@ -52,32 +75,32 @@ export default function SplashScreen() {
         <div 
           className="absolute inset-0 opacity-10"
           style={{
-            backgroundImage: `linear-gradient(hsl(348 100% 50% / 0.3) 1px, transparent 1px),
-                              linear-gradient(90deg, hsl(348 100% 50% / 0.3) 1px, transparent 1px)`,
-            backgroundSize: '50px 50px',
+            backgroundImage: `radial-gradient(circle at center, hsl(348 100% 50% / 0.15) 0%, transparent 50%),
+                              linear-gradient(hsl(348 100% 50% / 0.2) 1px, transparent 1px),
+                              linear-gradient(90deg, hsl(348 100% 50% / 0.2) 1px, transparent 1px)`,
+            backgroundSize: '50px 50px, 50px 50px, 50px 50px',
           }}
         />
         
         {/* Glowing orbs */}
-        <div className="absolute left-1/4 top-1/4 h-96 w-96 rounded-full bg-primary/20 blur-[100px] animate-pulse" />
-        <div className="absolute right-1/4 bottom-1/4 h-80 w-80 rounded-full bg-primary/15 blur-[80px] animate-pulse" style={{ animationDelay: '0.5s' }} />
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[500px] w-[500px] rounded-full bg-primary/10 blur-[120px]" />
+        <div className="absolute left-1/4 top-1/4 h-96 w-96 rounded-full bg-primary/20 blur-[120px] animate-pulse" />
+        <div className="absolute right-1/4 bottom-1/4 h-80 w-80 rounded-full bg-primary/15 blur-[100px] animate-pulse" style={{ animationDelay: '0.5s' }} />
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[500px] w-[500px] rounded-full bg-primary/5 blur-[150px]" />
         
         {/* Scanning lines */}
         <div className="absolute inset-0 overflow-hidden">
           <div 
-            className="absolute h-[2px] w-full bg-gradient-to-r from-transparent via-primary to-transparent opacity-50"
+            className="absolute h-full w-[1px] bg-gradient-to-b from-transparent via-primary to-transparent opacity-30"
             style={{
-              animation: 'scanLine 2s linear infinite',
-              top: '20%',
+              animation: 'scanLineX 3s linear infinite',
+              left: '20%',
             }}
           />
           <div 
-            className="absolute h-[2px] w-full bg-gradient-to-r from-transparent via-primary to-transparent opacity-30"
+            className="absolute h-[1px] w-full bg-gradient-to-r from-transparent via-primary to-transparent opacity-30"
             style={{
-              animation: 'scanLine 2s linear infinite',
-              animationDelay: '0.7s',
-              top: '60%',
+              animation: 'scanLineY 4s linear infinite',
+              top: '40%',
             }}
           />
         </div>
@@ -126,78 +149,73 @@ export default function SplashScreen() {
 
         {/* Feature Icons */}
         <div 
-          className={`mt-10 flex items-center gap-8 transition-all duration-1000 ${
-            phase >= 2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+          className={`mt-10 flex items-center gap-6 transition-all duration-1000 ${
+            phase >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           }`}
           style={{ transitionDelay: '300ms' }}
         >
           {[
             { icon: Wrench, label: "Tools" },
-            { icon: Zap, label: "Fast" },
-            { icon: Shield, label: "Secure" },
+            { icon: HardDrive, label: "Storage" },
+            { icon: MemoryStick, label: "Memory" },
+            { icon: Zap, label: "Performance" },
+            { icon: Shield, label: "Security" },
           ].map((item, index) => (
             <div 
               key={item.label}
               className="flex flex-col items-center gap-2"
-              style={{ animationDelay: `${index * 200}ms` }}
+              style={{ animation: `icon-fade-in 0.5s ease-out ${2.5 + index * 0.1}s forwards`, opacity: 0 }}
             >
               <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-primary/30 bg-primary/10">
                 <item.icon className="h-6 w-6 text-primary" />
               </div>
-              <span className="text-xs font-semibold text-white/50 uppercase tracking-wider">
-                {item.label}
-              </span>
             </div>
           ))}
         </div>
 
         {/* Loading Bar */}
         <div 
-          className={`mt-12 w-80 transition-all duration-500 ${
+          className={`mt-12 w-96 transition-all duration-500 ${
             phase >= 3 ? 'opacity-100' : 'opacity-0'
           }`}
         >
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-semibold text-white/50 uppercase tracking-wider">
-              Initializing System
-            </span>
-            <span className="text-xs font-bold text-primary">
+            <p className="text-xs font-semibold text-white/50 uppercase tracking-wider tabular-nums transition-opacity duration-300">
+              {loadingText}
+            </p>
+            <span className="text-xs font-bold text-primary tabular-nums">
               {progress}%
             </span>
           </div>
-          <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10">
+          <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10 border border-white/20">
             <div 
               className="h-full rounded-full gradient-primary shadow-glow transition-all duration-100"
               style={{ width: `${progress}%` }}
             />
           </div>
-          <p className="mt-3 text-center text-sm text-white/40">
-            Loading components...
-          </p>
         </div>
-
-        {/* Version */}
-        <p 
-          className={`mt-8 text-xs font-medium text-white/30 transition-all duration-500 ${
-            phase >= 2 ? 'opacity-100' : 'opacity-0'
-          }`}
-        >
-          Version 1.0.0 • Powered by ESYSTEMLK
-        </p>
       </div>
 
       {/* Fade out overlay */}
       <div 
-        className={`absolute inset-0 bg-white transition-opacity duration-500 ${
+        className={`absolute inset-0 bg-black transition-opacity duration-500 ${
           phase >= 4 ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
       />
 
       {/* Custom styles */}
       <style jsx>{`
-        @keyframes scanLine {
+        @keyframes scanLineX {
+          0% { transform: translateX(-100vw); }
+          100% { transform: translateX(100vw); }
+        }
+        @keyframes scanLineY {
           0% { transform: translateY(-100vh); }
           100% { transform: translateY(100vh); }
+        }
+        @keyframes icon-fade-in {
+          from { opacity: 0; transform: translateY(10px) }
+          to { opacity: 1; transform: translateY(0) }
         }
       `}</style>
     </div>
