@@ -168,7 +168,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Menu Grid */}
-          <div className="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-5">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
             {menuCards.map((card, index) => (
               <Link
                 key={card.path}
@@ -176,16 +176,13 @@ export default function DashboardPage() {
                 className="group animate-slide-up"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
-                <div className="system-card rounded-2xl p-6 shadow-card h-full flex flex-col items-center justify-center text-center aspect-square">
-                    <div className="flex h-16 w-16 items-center justify-center rounded-2xl gradient-primary shadow-glow transition-all duration-300 group-hover:shadow-glow-intense group-hover:scale-110">
-                        <card.icon className="h-8 w-8 text-primary-foreground" />
+                <div className="system-card rounded-xl p-4 shadow-card h-full flex flex-col items-center justify-center text-center aspect-square">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-lg gradient-primary shadow-glow transition-all duration-300 group-hover:shadow-glow-intense group-hover:scale-110">
+                        <card.icon className="h-6 w-6 text-primary-foreground" />
                     </div>
-                    <h3 className="mt-4 text-lg font-bold text-foreground group-hover:text-primary transition-colors">
+                    <h3 className="mt-3 text-base font-bold text-foreground group-hover:text-primary transition-colors">
                         {card.title}
                     </h3>
-                    <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
-                        {card.description}
-                    </p>
                 </div>
               </Link>
             ))}
