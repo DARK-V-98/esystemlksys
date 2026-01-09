@@ -131,23 +131,19 @@ export default function ToolsPage() {
           {filteredTools.map((tool, index) => (
             <button
               key={tool.id}
-              className="system-card group rounded-xl p-5 text-left shadow-card animate-slide-up"
+              className="system-card group rounded-xl p-5 text-center shadow-card animate-slide-up h-full flex flex-col items-center justify-center"
               style={{ animationDelay: `${index * 50}ms` }}
               onClick={() => toast.info("Coming soon!", { description: `The '${tool.name}' tool is under development.`})}
             >
-              <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-all duration-300 group-hover:gradient-primary group-hover:text-primary-foreground group-hover:shadow-glow group-hover:scale-110">
-                  <tool.icon className="h-6 w-6" />
+                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-all duration-300 group-hover:gradient-primary group-hover:text-primary-foreground group-hover:shadow-glow group-hover:scale-110">
+                  <tool.icon className="h-8 w-8" />
                 </div>
-                <div className="min-w-0 flex-1">
-                  <h3 className="font-bold text-foreground group-hover:text-primary transition-colors truncate">
+                <h3 className="mt-4 font-bold text-foreground group-hover:text-primary transition-colors text-base">
                     {tool.name}
-                  </h3>
-                  <p className="mt-1 text-xs text-muted-foreground line-clamp-1">
+                </h3>
+                <p className="mt-1 text-xs text-muted-foreground line-clamp-2">
                     {tool.description}
-                  </p>
-                </div>
-              </div>
+                </p>
             </button>
           ))}
         </div>
