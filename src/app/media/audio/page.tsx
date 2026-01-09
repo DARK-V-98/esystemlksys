@@ -3,13 +3,16 @@ import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Music, ArrowLeft, Upload, ListMusic, Play, Pause, SkipForward, SkipBack, X, Volume2, VolumeX } from 'lucide-react';
+import { Music, ArrowLeft, Upload, ListMusic, Play, Pause, SkipForward, SkipBack, X, Volume2, VolumeX, Mic2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from '@/components/ui/sonner';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import jsmediatags from 'jsmediatags';
 
 interface PlaylistItem {
   name: string;
   src: string;
+  lyrics?: string;
 }
 
 export default function AudioPlayerPage() {
@@ -39,6 +42,24 @@ export default function AudioPlayerPage() {
         name: file.name,
         src: URL.createObjectURL(file),
       }));
+
+      // Read lyrics from files
+      newItems.forEach((item, index) => {
+        const file = files[index];
+        jsmediatags.read(file, {
+          onSuccess: function(tag) {
+            const lyrics = tag.tags.lyrics;
+            if (lyrics) {
+              const lyricsText = typeof lyrics === 'string' ? lyrics : lyrics.lyrics;
+              setPlaylist(prev => prev.map(p => p.src === item.src ? { ...p, lyrics: lyricsText } : p));
+            }
+          },
+          onError: function(error) {
+            console.log('Error reading tags:', error.type, error.info);
+          }
+        });
+      });
+
       setPlaylist(prev => [...prev, ...newItems]);
       if (currentTrackIndex === null && newItems.length > 0) {
         setCurrentTrackIndex(playlist.length);
@@ -64,33 +85,41 @@ export default function AudioPlayerPage() {
   };
 
   const playNext = () => {
-    if (currentTrackIndex !== null) {
+    if (currentTrackIndex !== null && playlist.length > 0) {
       const nextIndex = (currentTrackIndex + 1) % playlist.length;
       playTrack(nextIndex);
     }
   };
   
   const playPrev = () => {
-    if (currentTrackIndex !== null) {
+    if (currentTrackIndex !== null && playlist.length > 0) {
       const prevIndex = (currentTrackIndex - 1 + playlist.length) % playlist.length;
       playTrack(prevIndex);
     }
   };
   
   const removeFromPlaylist = (index: number) => {
-    setPlaylist(playlist.filter((_, i) => i !== index));
+    const newPlaylist = playlist.filter((_, i) => i !== index);
+    setPlaylist(newPlaylist);
+    
     if (index === currentTrackIndex) {
-        if (playlist.length > 1) {
-            playNext();
+        if (newPlaylist.length > 0) {
+            const nextIndex = index % newPlaylist.length;
+            playTrack(nextIndex);
         } else {
             setCurrentTrackIndex(null);
             setIsPlaying(false);
+            if (audioRef.current) {
+              audioRef.current.src = "";
+            }
         }
     } else if (currentTrackIndex !== null && index < currentTrackIndex) {
         setCurrentTrackIndex(currentTrackIndex - 1);
     }
     toast.info("Track removed from playlist.");
   };
+
+  const currentTrack = currentTrackIndex !== null ? playlist[currentTrackIndex] : null;
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -119,16 +148,20 @@ export default function AudioPlayerPage() {
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-1 rounded-xl bg-card border shadow-card p-6 flex flex-col items-center justify-center text-center">
-                <Music className="h-20 w-20 text-primary mb-4"/>
-                <p className="font-bold text-lg truncate max-w-full">
-                {currentTrackIndex !== null ? playlist[currentTrackIndex].name : 'No Track Selected'}
+                <div className="relative w-40 h-40">
+                    <div className="absolute inset-0 rounded-full bg-primary/10 animate-pulse"/>
+                    <Music className="absolute inset-0 m-auto h-20 w-20 text-primary"/>
+                </div>
+
+                <p className="font-bold text-lg truncate max-w-full mt-6">
+                {currentTrack ? currentTrack.name : 'No Track Selected'}
                 </p>
                 <p className="text-muted-foreground text-sm">
                 {playlist.length} track(s) in playlist
                 </p>
                 <audio
                 ref={audioRef}
-                src={currentTrackIndex !== null ? playlist[currentTrackIndex].src : ''}
+                src={currentTrack ? currentTrack.src : ''}
                 onEnded={playNext}
                 muted={isMuted}
                 />
@@ -150,13 +183,56 @@ export default function AudioPlayerPage() {
                 </div>
             </div>
 
-            <div className="lg:col-span-2 rounded-xl bg-card border shadow-card p-6">
+            <div className="lg:col-span-2 rounded-xl bg-card border shadow-card p-6 flex flex-col">
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="text-xl font-bold flex items-center gap-2"><ListMusic className="h-6 w-6 text-primary"/> Playlist</h2>
                     <Button onClick={handleAddFilesClick}>
                         <Upload className="mr-2 h-5 w-5"/>
                         Add Files
                     </Button>
+                </div>
+                <div className="grid grid-rows-2 gap-4 flex-grow min-h-0">
+                    <ScrollArea className="h-full border rounded-lg">
+                        <div className="p-2 space-y-2">
+                        {playlist.length > 0 ? (
+                            playlist.map((track, index) => (
+                                <div key={index} 
+                                    className={cn("flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors",
+                                        currentTrackIndex === index ? 'bg-primary/10' : 'hover:bg-secondary'
+                                    )}
+                                    onClick={() => playTrack(index)}
+                                >
+                                    <div className="flex items-center gap-3 overflow-hidden">
+                                        <span className={cn("font-semibold text-sm", currentTrackIndex === index && 'text-primary')}>
+                                            {index + 1}.
+                                        </span>
+                                        <p className="font-medium truncate text-sm">{track.name}</p>
+                                    </div>
+                                    <Button onClick={(e) => { e.stopPropagation(); removeFromPlaylist(index); }} variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive flex-shrink-0">
+                                        <X className="h-4 w-4"/>
+                                    </Button>
+                                </div>
+                            ))
+                        ) : (
+                            <div className="text-center py-10 text-muted-foreground h-full flex flex-col justify-center items-center">
+                                <p>Your playlist is empty.</p>
+                                <p>Click "Add Files" to start.</p>
+                            </div>
+                        )}
+                        </div>
+                    </ScrollArea>
+                    <ScrollArea className="h-full border rounded-lg p-4 bg-secondary/30">
+                        <h3 className="text-lg font-bold flex items-center gap-2 mb-2"><Mic2 className="h-5 w-5"/> Lyrics</h3>
+                        {currentTrack?.lyrics ? (
+                            <div className="whitespace-pre-wrap text-sm text-muted-foreground font-medium">
+                                {currentTrack.lyrics}
+                            </div>
+                        ) : (
+                            <div className="text-center py-10 text-muted-foreground h-full flex flex-col justify-center items-center">
+                                <p>{currentTrack ? "No lyrics found for this track." : "Select a track to see lyrics."}</p>
+                            </div>
+                        )}
+                    </ScrollArea>
                 </div>
                 <Input
                     type="file"
@@ -166,33 +242,6 @@ export default function AudioPlayerPage() {
                     ref={fileInputRef}
                     className="hidden"
                 />
-                <div className="max-h-96 overflow-y-auto space-y-2">
-                    {playlist.length > 0 ? (
-                        playlist.map((track, index) => (
-                            <div key={index} 
-                                className={cn("flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors",
-                                    currentTrackIndex === index ? 'bg-primary/10' : 'hover:bg-secondary'
-                                )}
-                                onClick={() => playTrack(index)}
-                            >
-                                <div className="flex items-center gap-3">
-                                    <span className={cn("font-semibold text-sm", currentTrackIndex === index && 'text-primary')}>
-                                        {index + 1}.
-                                    </span>
-                                    <p className="font-medium truncate text-sm">{track.name}</p>
-                                </div>
-                                <Button onClick={(e) => { e.stopPropagation(); removeFromPlaylist(index); }} variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive">
-                                    <X className="h-4 w-4"/>
-                                </Button>
-                            </div>
-                        ))
-                    ) : (
-                        <div className="text-center py-16 text-muted-foreground">
-                            <p>Your playlist is empty.</p>
-                            <p>Click "Add Files" to start.</p>
-                        </div>
-                    )}
-                </div>
             </div>
         </div>
       </div>
