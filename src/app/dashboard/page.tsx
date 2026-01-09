@@ -83,7 +83,7 @@ export default function DashboardPage() {
           {menuCards.map((card, index) => (
             <Link
               key={card.path}
-              href={card.path}
+              href={card.count === 'Coming' ? `/coming-soon?title=${card.title}` : card.path}
               className="group animate-slide-up"
               style={{ animationDelay: `${index * 100}ms` }}
             >
