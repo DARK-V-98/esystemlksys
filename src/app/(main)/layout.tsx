@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { app } from "@/firebase/config";
+import { Cpu } from "lucide-react";
 
 export default function AppLayout({
     children,
@@ -17,17 +18,13 @@ export default function AppLayout({
         const auth = getAuth(app);
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             if (!user) {
-                // If there's no user, redirect to auth page.
-                // This handles the case where a user signs out.
                 router.push("/auth");
             } else {
-                // If there is a user, we can stop loading.
                 localStorage.setItem("isAuthenticated", "true");
                 setLoading(false);
             }
         });
 
-        // Also check local storage for initial fast check
         const isAuthenticated = localStorage.getItem("isAuthenticated");
         if (!isAuthenticated) {
             router.push("/auth");
@@ -35,7 +32,16 @@ export default function AppLayout({
             setLoading(false);
         }
 
-        return () => unsubscribe();
+        // Disable right-click context menu
+        const handleContextMenu = (e: MouseEvent) => {
+            e.preventDefault();
+        };
+        document.addEventListener('contextmenu', handleContextMenu);
+
+        return () => {
+            unsubscribe();
+            document.removeEventListener('contextmenu', handleContextMenu);
+        };
     }, [router]);
 
     if (loading) {
