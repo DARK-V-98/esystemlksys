@@ -1,5 +1,6 @@
 'use client';
 import { useState } from "react";
+import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { 
   FileText, 
@@ -21,7 +22,8 @@ import {
   SplitSquareVertical,
   Stamp,
   Palette,
-  Wrench
+  Wrench,
+  ArrowLeft
 } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
 
@@ -90,36 +92,42 @@ export default function ToolsPage() {
         </div>
 
         {/* Search & Filter */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="relative w-full sm:w-80">
-            <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              type="text"
-              placeholder="Search tools..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-12 h-12"
-            />
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {categories.map((category) => (
-              <button
-                key={category}
-                onClick={() => setActiveCategory(category)}
-                className={`rounded-xl px-5 py-2.5 text-sm font-bold transition-all duration-200 ${
-                  activeCategory === category
-                    ? "gradient-primary text-primary-foreground shadow-glow"
-                    : "bg-secondary text-secondary-foreground hover:bg-secondary/80 hover:text-primary"
-                }`}
-              >
-                {category}
-              </button>
-            ))}
-          </div>
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                <Link href="/dashboard" className="flex items-center justify-center gap-2 rounded-xl h-12 px-5 text-sm font-bold transition-all duration-200 bg-secondary text-secondary-foreground hover:bg-secondary/80 hover:text-primary">
+                    <ArrowLeft className="h-5 w-5" />
+                    <span>Main Menu</span>
+                </Link>
+                <div className="relative w-full sm:w-80">
+                    <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                    type="text"
+                    placeholder="Search tools..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-12 h-12"
+                    />
+                </div>
+            </div>
+            <div className="flex flex-wrap gap-2">
+                {categories.map((category) => (
+                <button
+                    key={category}
+                    onClick={() => setActiveCategory(category)}
+                    className={`rounded-xl px-5 py-2.5 text-sm font-bold transition-all duration-200 ${
+                    activeCategory === category
+                        ? "gradient-primary text-primary-foreground shadow-glow"
+                        : "bg-secondary text-secondary-foreground hover:bg-secondary/80 hover:text-primary"
+                    }`}
+                >
+                    {category}
+                </button>
+                ))}
+            </div>
         </div>
 
         {/* Tools Grid */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filteredTools.map((tool, index) => (
             <button
               key={tool.id}
