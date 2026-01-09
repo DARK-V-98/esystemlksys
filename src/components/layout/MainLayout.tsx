@@ -28,9 +28,9 @@ export function MainLayout({ children }: MainLayoutProps) {
   };
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="min-h-screen bg-background">
       <Sidebar />
-      <div className="flex-1 flex flex-col pl-0 md:pl-64">
+      <div className="flex flex-col md:pl-64">
         <Header onLogout={handleLogout} />
         <main className="flex-grow p-6">
             {children}
