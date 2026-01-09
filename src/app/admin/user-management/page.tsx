@@ -36,6 +36,10 @@ export default function UserManagementPage() {
       const usersData = snapshot.docs.map(doc => ({ uid: doc.id, ...doc.data() } as UserProfile));
       setUsers(usersData);
       setLoading(false);
+    }, (error) => {
+      console.error("Error fetching users:", error);
+      toast.error("Failed to fetch users. Check console for details.");
+      setLoading(false);
     });
     return () => unsubscribe();
   }, [db]);
@@ -64,7 +68,7 @@ export default function UserManagementPage() {
   };
 
   const filteredUsers = users.filter(user =>
-    user.name.toLowerCase().includes(searchQuery.toLowerCase())
+    (user.name || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -123,7 +127,7 @@ export default function UserManagementPage() {
                       filteredUsers.map((user) => (
                         <TableRow key={user.uid}>
                             <TableCell>
-                                <div className="font-medium">{user.name}</div>
+                                <div className="font-medium">{user.name || 'N/A'}</div>
                                 <div className="text-xs text-muted-foreground">{user.email}</div>
                             </TableCell>
                             <TableCell>
@@ -147,8 +151,8 @@ export default function UserManagementPage() {
                             <TableCell className="text-center">
                                 <div className="flex flex-col items-center gap-2">
                                     <Switch
-                                        checked={user.isBanned}
-                                        onCheckedChange={() => handleBanToggle(user.uid, user.isBanned)}
+                                        checked={!!user.isBanned}
+                                        onCheckedChange={() => handleBanToggle(user.uid, !!user.isBanned)}
                                         className="data-[state=checked]:bg-destructive data-[state=unchecked]:bg-success"
                                     />
                                     <Badge variant={user.isBanned ? 'destructive' : 'default'} className={user.isBanned ? '' : 'bg-success'}>
