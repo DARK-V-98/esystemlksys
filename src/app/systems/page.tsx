@@ -1,5 +1,6 @@
 'use client';
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { 
   HardDrive, 
@@ -23,7 +24,8 @@ import {
   Activity,
   CheckCircle,
   XCircle,
-  Loader2
+  Loader2,
+  ArrowLeft
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -173,7 +175,7 @@ export default function SystemsPage() {
         </div>
 
         {/* Quick Actions */}
-        <div className="grid gap-4 md:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {[
             { icon: Trash2, label: "Quick Clean", desc: "Free up space", action: () => handleToolClick(systemTools.find(t => t.id === 1)!) },
             { icon: Zap, label: "Boost PC", desc: "Optimize now", action: () => toast.info("Coming soon!") },
@@ -185,7 +187,7 @@ export default function SystemsPage() {
               onClick={action.action}
               className="group flex items-center gap-4 rounded-xl border-2 border-border bg-card p-4 shadow-card transition-all duration-300 hover:border-primary hover:shadow-glow"
             >
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary transition-all duration-300 group-hover:gradient-primary group-hover:text-primary-foreground group-hover:shadow-glow">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary transition-all duration-300 group-hover:gradient-primary group-hover:text-primary-foreground group-hover:shadow-glow">
                 <action.icon className="h-6 w-6" />
               </div>
               <div className="text-left">
@@ -197,32 +199,38 @@ export default function SystemsPage() {
         </div>
 
         {/* Search & Filter */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="relative w-full sm:w-80">
-            <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              type="text"
-              placeholder="Search system tools..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-12 h-12"
-            />
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {categories.map((category) => (
-              <button
-                key={category}
-                onClick={() => setActiveCategory(category)}
-                className={`rounded-xl px-5 py-2.5 text-sm font-bold transition-all duration-200 ${
-                  activeCategory === category
-                    ? "gradient-primary text-primary-foreground shadow-glow"
-                    : "bg-secondary text-secondary-foreground hover:bg-secondary/80 hover:text-primary"
-                }`}
-              >
-                {category}
-              </button>
-            ))}
-          </div>
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                <Link href="/dashboard" className="flex items-center justify-center gap-2 rounded-xl h-12 px-5 text-sm font-bold transition-all duration-200 bg-secondary text-secondary-foreground hover:bg-secondary/80 hover:text-primary">
+                    <ArrowLeft className="h-5 w-5" />
+                    <span>Main Menu</span>
+                </Link>
+                <div className="relative w-full sm:w-80">
+                    <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                    type="text"
+                    placeholder="Search system tools..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-12 h-12"
+                    />
+                </div>
+            </div>
+            <div className="flex flex-wrap gap-2">
+                {categories.map((category) => (
+                <button
+                    key={category}
+                    onClick={() => setActiveCategory(category)}
+                    className={`rounded-xl px-5 py-2.5 text-sm font-bold transition-all duration-200 ${
+                    activeCategory === category
+                        ? "gradient-primary text-primary-foreground shadow-glow"
+                        : "bg-secondary text-secondary-foreground hover:bg-secondary/80 hover:text-primary"
+                    }`}
+                >
+                    {category}
+                </button>
+                ))}
+            </div>
         </div>
 
         {/* Tools Grid */}
