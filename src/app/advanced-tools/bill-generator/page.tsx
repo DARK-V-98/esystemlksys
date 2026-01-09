@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft, Receipt, Trash2, Plus, Download, Palette, Upload } from 'lucide-react';
+import { ArrowLeft, Receipt, Trash2, Plus, Download, Palette, Upload, RefreshCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -21,21 +21,78 @@ interface BillItem {
   price: number;
 }
 
+const initialItems: BillItem[] = [{ id: 1, description: 'Item Description', quantity: 1, price: 100 }];
+const initialYourCompany = 'Your Company';
+const initialYourAddress = '123 Street, City, Country';
+const initialClientCompany = 'Client Company';
+const initialClientAddress = '456 Avenue, Town, Country';
+const initialInvoiceNumber = 'INV-001';
+const initialInvoiceDate = new Date().toISOString().slice(0, 10);
+const initialDueDate = new Date(new Date().setDate(new Date().getDate() + 30)).toISOString().slice(0, 10);
+const initialTax = 10;
+const initialAccentColor = '#E60023';
+
+
 export default function BillGeneratorPage() {
   const [logo, setLogo] = useState<string | null>(null);
-  const [yourCompany, setYourCompany] = useState('Your Company');
-  const [yourAddress, setYourAddress] = useState('123 Street, City, Country');
-  const [clientCompany, setClientCompany] = useState('Client Company');
-  const [clientAddress, setClientAddress] = useState('456 Avenue, Town, Country');
-  const [invoiceNumber, setInvoiceNumber] = useState('INV-001');
-  const [invoiceDate, setInvoiceDate] = useState(new Date().toISOString().slice(0, 10));
-  const [dueDate, setDueDate] = useState(new Date(new Date().setDate(new Date().getDate() + 30)).toISOString().slice(0, 10));
-  const [items, setItems] = useState<BillItem[]>([{ id: 1, description: 'Item Description', quantity: 1, price: 100 }]);
-  const [tax, setTax] = useState(10);
-  const [accentColor, setAccentColor] = useState('#E60023'); // Default to primary color
+  const [yourCompany, setYourCompany] = useState(initialYourCompany);
+  const [yourAddress, setYourAddress] = useState(initialYourAddress);
+  const [clientCompany, setClientCompany] = useState(initialClientCompany);
+  const [clientAddress, setClientAddress] = useState(initialClientAddress);
+  const [invoiceNumber, setInvoiceNumber] = useState(initialInvoiceNumber);
+  const [invoiceDate, setInvoiceDate] = useState(initialInvoiceDate);
+  const [dueDate, setDueDate] = useState(initialDueDate);
+  const [items, setItems] = useState<BillItem[]>(initialItems);
+  const [tax, setTax] = useState(initialTax);
+  const [accentColor, setAccentColor] = useState(initialAccentColor);
 
   const billPreviewRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Load data from localStorage on initial render
+  useEffect(() => {
+    try {
+        const savedData = localStorage.getItem('billGeneratorData');
+        if (savedData) {
+            const parsedData = JSON.parse(savedData);
+            setYourCompany(parsedData.yourCompany || initialYourCompany);
+            setYourAddress(parsedData.yourAddress || initialYourAddress);
+            setClientCompany(parsedData.clientCompany || initialClientCompany);
+            setClientAddress(parsedData.clientAddress || initialClientAddress);
+            setInvoiceNumber(parsedData.invoiceNumber || initialInvoiceNumber);
+            setInvoiceDate(parsedData.invoiceDate || initialInvoiceDate);
+            setDueDate(parsedData.dueDate || initialDueDate);
+            setItems(parsedData.items && parsedData.items.length > 0 ? parsedData.items : initialItems);
+            setTax(parsedData.tax || initialTax);
+            setAccentColor(parsedData.accentColor || initialAccentColor);
+        }
+    } catch (error) {
+        console.error("Failed to load data from local storage", error);
+        toast.error("Could not load your saved data.");
+    }
+  }, []);
+
+  // Save data to localStorage whenever it changes
+  useEffect(() => {
+    const dataToSave = {
+        yourCompany,
+        yourAddress,
+        clientCompany,
+        clientAddress,
+        invoiceNumber,
+        invoiceDate,
+        dueDate,
+        items,
+        tax,
+        accentColor
+    };
+    try {
+        localStorage.setItem('billGeneratorData', JSON.stringify(dataToSave));
+    } catch (error) {
+        console.error("Failed to save data to local storage", error);
+    }
+  }, [yourCompany, yourAddress, clientCompany, clientAddress, invoiceNumber, invoiceDate, dueDate, items, tax, accentColor]);
+
 
   const subtotal = items.reduce((acc, item) => acc + item.quantity * item.price, 0);
   const taxAmount = (subtotal * tax) / 100;
@@ -99,6 +156,22 @@ export default function BillGeneratorPage() {
     }
   };
 
+  const resetFields = () => {
+      setYourCompany(initialYourCompany);
+      setYourAddress(initialYourAddress);
+      setClientCompany(initialClientCompany);
+      setClientAddress(initialClientAddress);
+      setInvoiceNumber(initialInvoiceNumber);
+      setInvoiceDate(initialInvoiceDate);
+      setDueDate(initialDueDate);
+      setItems(initialItems);
+      setTax(initialTax);
+      setAccentColor(initialAccentColor);
+      setLogo(null);
+      localStorage.removeItem('billGeneratorData');
+      toast.success("Form fields have been reset.");
+  }
+
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -149,6 +222,10 @@ export default function BillGeneratorPage() {
                                 </Label>
                                 <Input id="accent-color" type="color" value={accentColor} onChange={(e) => setAccentColor(e.target.value)} className="h-8 w-12 p-1"/>
                             </div>
+                             <Button onClick={resetFields} className="w-full" variant="outline">
+                                <RefreshCcw className="mr-2 h-4 w-4"/>
+                                Reset Fields
+                            </Button>
                         </div>
                     </div>
                     <Separator/>
