@@ -5,10 +5,10 @@
   "type": "module",
   "main": "dist/electron/main.js",
   "scripts": {
-    "dev": "vite --host",
+    "dev": "next dev",
     "build": "npm run build:frontend && npm run build:electron",
     "build:frontend": "next build",
-    "build:electron": "tsc -p electron/tsconfig.json && vite build --config electron/vite.config.ts",
+    "build:electron": "tsc -p electron/tsconfig.json",
     "start": "electron .",
     "lint": "next lint"
   },
@@ -72,9 +72,6 @@
     "electron-builder": "^24.13.3",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5",
-    "vite": "^5.3.3",
-    "vite-plugin-electron": "^0.28.7",
-    "vite-plugin-electron-renderer": "^0.14.5"
+    "typescript": "^5"
   }
 }
