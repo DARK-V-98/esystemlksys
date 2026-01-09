@@ -141,22 +141,52 @@ const DiskCleaner = ({ onFinish }: { onFinish: () => void }) => {
 };
 
 const DiskAnalyzer = () => {
+    const [diskInfo, setDiskInfo] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchDiskInfo = async () => {
+            if (window.electronAPI) {
+                try {
+                    const info = await window.electronAPI.getDiskInfo();
+                    setDiskInfo(info);
+                } catch (error) {
+                    console.error("Failed to fetch disk info:", error);
+                    setDiskInfo({ error: "Could not fetch disk info." });
+                } finally {
+                    setLoading(false);
+                }
+            } else {
+                 setDiskInfo({ error: "Disk API not available." });
+                 setLoading(false);
+            }
+        };
+        fetchDiskInfo();
+    }, []);
+
+    if (loading) {
+        return <div className="flex justify-center items-center h-[250px]"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
+    }
+    
+    if (diskInfo.error) {
+        return <div className="text-destructive text-center p-4">{diskInfo.error}</div>;
+    }
+
+    const toGB = (bytes:number) => (bytes / 1024**3).toFixed(2);
+    
     const data = [
-        { name: 'Media', size: 450, fill: 'hsl(var(--primary))' },
-        { name: 'Apps', size: 250, fill: 'hsl(var(--primary) / 0.8)' },
-        { name: 'Docs', size: 150, fill: 'hsl(var(--primary) / 0.6)' },
-        { name: 'System', size: 100, fill: 'hsl(var(--primary) / 0.4)' },
-        { name: 'Other', size: 50, fill: 'hsl(var(--primary) / 0.2)' },
+        { name: 'Used', size: parseFloat(toGB(diskInfo.used)), fill: 'hsl(var(--primary))' },
+        { name: 'Free', size: parseFloat(toGB(diskInfo.free)), fill: 'hsl(var(--primary) / 0.4)' },
     ];
 
     return (
         <div>
-            <p className="text-muted-foreground mb-4">Total Disk Usage: 1TB</p>
+            <p className="text-muted-foreground mb-4">Total Disk Size: {toGB(diskInfo.total)} GB</p>
             <div className="h-[250px] w-full">
                 <ResponsiveContainer>
-                    <BarChart data={data} layout="vertical">
+                    <BarChart data={data} layout="vertical" margin={{ left: 10, right: 30 }}>
                         <XAxis type="number" hide />
-                        <YAxis type="category" dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} width={80} />
+                        <YAxis type="category" dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} width={50} />
                         <Tooltip cursor={{ fill: 'hsl(var(--secondary))' }} contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }} formatter={(value) => `${value} GB`}/>
                         <Bar dataKey="size" fill="hsl(var(--primary))" background={{ fill: 'hsl(var(--secondary))' }} radius={[4, 4, 4, 4]} />
                     </BarChart>
@@ -167,44 +197,50 @@ const DiskAnalyzer = () => {
 };
 
 const RamOptimizer = ({ onFinish }: { onFinish: () => void }) => {
-    const [progress, setProgress] = useState(0);
-    const [status, setStatus] = useState("Analyzing memory usage...");
-    const [ramFreed, setRamFreed] = useState(0);
-    const [isOptimizing, setIsOptimizing] = useState(true);
+    const [memInfo, setMemInfo] = useState<any>(null);
 
     useEffect(() => {
-        const interval = setInterval(() => {
-            setProgress(prev => {
-                const newProgress = prev + Math.random() * 15;
-                if (newProgress >= 100) {
-                    clearInterval(interval);
-                    setStatus("Memory optimization complete!");
-                    setIsOptimizing(false);
-                    toast.success(`RAM Optimized! Freed ${ramFreed.toFixed(0)} MB.`);
-                    return 100;
-                }
-                if (newProgress > 30) {
-                    setStatus("Closing background processes...");
-                    setRamFreed(f => f + Math.random() * 50);
-                }
-                return newProgress;
-            });
-        }, 400);
-
+        const fetchMemInfo = async () => {
+            if (window.electronAPI) {
+                const info = await window.electronAPI.getMemoryUsage();
+                setMemInfo(info);
+            }
+        };
+        fetchMemInfo();
+        const interval = setInterval(fetchMemInfo, 3000);
         return () => clearInterval(interval);
-    }, [ramFreed]);
+    }, []);
+
+    const toGB = (bytes:number) => (bytes / 1024**3).toFixed(2);
 
     return (
-        <div>
-            <p className="text-muted-foreground mb-4">{status}</p>
-            <Progress value={progress} className="w-full mb-4 h-3" />
-            <div className="text-center text-lg font-bold text-primary mb-6">
-                {ramFreed.toFixed(0)} MB Freed
-            </div>
-            <div className="text-right">
-                <Button onClick={onFinish} disabled={isOptimizing}>
-                    {isOptimizing ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <CheckCircle className="mr-2 h-4 w-4" />}
-                    {isOptimizing ? 'Optimizing...' : 'Finish'}
+        <div className="flex flex-col items-center justify-center gap-4 h-[250px]">
+            {memInfo ? (
+                <>
+                    <div className="text-center">
+                        <p className="text-5xl font-bold text-primary">
+                            {memInfo.usage.toFixed(1)}%
+                        </p>
+                        <p className="text-muted-foreground">RAM Usage</p>
+                    </div>
+                    <div className="flex gap-6 text-center">
+                        <div>
+                            <p className="font-bold">{toGB(memInfo.used)} GB</p>
+                            <p className="text-xs text-muted-foreground">Used</p>
+                        </div>
+                        <div>
+                            <p className="font-bold">{toGB(memInfo.total)} GB</p>
+                            <p className="text-xs text-muted-foreground">Total</p>
+                        </div>
+                    </div>
+                </>
+            ) : (
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            )}
+            <div className="text-right w-full absolute bottom-6 right-6">
+                <Button onClick={onFinish}>
+                    <CheckCircle className="mr-2 h-4 w-4" />
+                    Finish
                 </Button>
             </div>
         </div>
@@ -221,7 +257,8 @@ const StartupManager = () => {
     ]);
 
     const toggleItem = (index: number) => {
-        setStartupItems(items => items.map((item, i) => i === index ? {...item, enabled: !item.enabled} : item));
+        toast.info("This is a demo. Startup items cannot be changed.");
+        // setStartupItems(items => items.map((item, i) => i === index ? {...item, enabled: !item.enabled} : item));
     };
 
     return (
@@ -241,16 +278,20 @@ const StartupManager = () => {
 
 const CpuMonitor = () => {
     const [data, setData] = useState(() =>
-        Array.from({ length: 10 }, (_, i) => ({ name: `T-${10-i}`, usage: Math.random() * 20 + 5 }))
+        Array.from({ length: 10 }, () => ({ name: ``, usage: 0 }))
     );
 
     useEffect(() => {
-        const interval = setInterval(() => {
-            setData(prevData => {
-                const newData = [...prevData.slice(1), { name: `T-${0}`, usage: Math.random() * 40 + 10 }];
-                return newData.map((d, i) => ({...d, name: `T-${10-i}`}));
-            });
-        }, 1500);
+        const fetchUsage = async () => {
+             if (window.electronAPI) {
+                const usage = await window.electronAPI.getCpuUsage();
+                setData(prevData => {
+                    const newData = [...prevData.slice(1), { name: ``, usage: usage }];
+                    return newData;
+                });
+            }
+        };
+        const interval = setInterval(fetchUsage, 2000);
         return () => clearInterval(interval);
     }, []);
 
@@ -265,8 +306,8 @@ const CpuMonitor = () => {
                         </linearGradient>
                     </defs>
                     <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
-                    <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} unit="%" />
-                    <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }}/>
+                    <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} unit="%" domain={[0, 100]} />
+                    <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }} formatter={(value: number) => `${value.toFixed(1)}%`}/>
                     <Area type="monotone" dataKey="usage" stroke="hsl(var(--primary))" fill="url(#colorUsage)" />
                 </AreaChart>
             </ResponsiveContainer>
@@ -275,43 +316,28 @@ const CpuMonitor = () => {
 };
 
 const PerformanceBoost = ({ onFinish }: { onFinish: () => void }) => {
-    const [boosts, setBoosts] = useState([
+    const boosts = [
         { name: 'Defragmenting Memory', done: false },
         { name: 'Cleaning Temporary Files', done: false },
         { name: 'Optimizing Startup Apps', done: false },
         { name: 'Balancing Power Plan', done: false },
-    ]);
-    const [isBoosting, setIsBoosting] = useState(true);
-
-    useEffect(() => {
-        let index = 0;
-        const interval = setInterval(() => {
-            if (index < boosts.length) {
-                setBoosts(b => b.map((item, i) => i === index ? {...item, done: true} : item));
-                index++;
-            } else {
-                clearInterval(interval);
-                setIsBoosting(false);
-                toast.success("Performance Boosted!");
-            }
-        }, 700);
-        return () => clearInterval(interval);
-    }, []);
-
+    ];
+    
     return (
-        <div>
+         <div>
+            <p className="text-muted-foreground mb-4">This tool is a demonstration. For real optimization, use specific tools like Disk Cleaner and RAM Optimizer.</p>
             <ul className="space-y-3 mb-6">
                 {boosts.map((boost, index) => (
                     <li key={index} className="flex items-center gap-3">
-                        {boost.done ? <CheckCircle className="h-5 w-5 text-success" /> : <Loader2 className="h-5 w-5 animate-spin text-primary" />}
-                        <span className={cn(boost.done ? "text-muted-foreground line-through" : "text-foreground")}>{boost.name}</span>
+                        <CheckCircle className="h-5 w-5 text-success" />
+                        <span className="text-muted-foreground line-through">{boost.name}</span>
                     </li>
                 ))}
             </ul>
             <div className="text-right">
-                <Button onClick={onFinish} disabled={isBoosting}>
-                    {isBoosting ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <CheckCircle className="mr-2 h-4 w-4" />}
-                    {isBoosting ? 'Boosting...' : 'Finish'}
+                <Button onClick={onFinish}>
+                    <CheckCircle className="mr-2 h-4 w-4" />
+                    Finish
                 </Button>
             </div>
         </div>
@@ -319,27 +345,33 @@ const PerformanceBoost = ({ onFinish }: { onFinish: () => void }) => {
 };
 
 const ProcessManager = () => {
-    const [processes, setProcesses] = useState([
-        { name: 'chrome.exe', cpu: 12.5, ram: 256.3 },
-        { name: 'Code.exe', cpu: 8.2, ram: 512.1 },
-        { name: 'explorer.exe', cpu: 2.1, ram: 128.5 },
-        { name: 'svchost.exe', cpu: 0.5, ram: 64.2 },
-    ]);
+    const [processes, setProcesses] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const interval = setInterval(() => {
-            setProcesses(procs => procs.map(p => ({
-                ...p,
-                cpu: Math.max(0.1, p.cpu + (Math.random() - 0.5) * 2),
-                ram: Math.max(10, p.ram + (Math.random() - 0.5) * 10),
-            })));
-        }, 2000);
-        return () => clearInterval(interval);
+        const fetchProcesses = async () => {
+            if (window.electronAPI) {
+                try {
+                    const procs = await window.electronAPI.getRunningProcesses();
+                    setProcesses(procs);
+                } catch (e) {
+                    console.error(e);
+                    setProcesses([]);
+                } finally {
+                    setLoading(false);
+                }
+            }
+        };
+        fetchProcesses();
     }, []);
 
+    if(loading) {
+        return <div className="flex justify-center items-center h-[250px]"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
+    }
+
     return (
-        <div className="space-y-2">
-            <div className="flex justify-between text-xs font-bold text-muted-foreground px-3">
+        <div className="space-y-2 max-h-[300px] overflow-y-auto">
+            <div className="flex justify-between text-xs font-bold text-muted-foreground px-3 sticky top-0 bg-card/80 backdrop-blur-sm py-2">
                 <span>Process Name</span>
                 <div className="flex gap-8">
                     <span>CPU %</span>
@@ -347,11 +379,11 @@ const ProcessManager = () => {
                 </div>
             </div>
             {processes.map((proc) => (
-                <div key={proc.name} className="flex justify-between rounded-lg p-3 hover:bg-secondary">
-                    <span className="font-medium">{proc.name}</span>
-                    <div className="flex gap-8 font-mono">
+                <div key={proc.pid} className="flex justify-between rounded-lg p-3 hover:bg-secondary">
+                    <span className="font-medium truncate pr-4">{proc.name}</span>
+                    <div className="flex gap-8 font-mono text-sm min-w-[120px] justify-between">
                         <span>{proc.cpu.toFixed(1)}%</span>
-                        <span>{proc.ram.toFixed(1)}</span>
+                        <span>{(proc.mem / 1024).toFixed(1)}</span>
                     </div>
                 </div>
             ))}
@@ -417,8 +449,12 @@ const TemperatureMonitor = () => {
     const [temp, setTemp] = useState(45);
 
     useEffect(() => {
+        // This is a simulation as Node.js has no stable, cross-platform way to get CPU temp.
         const interval = setInterval(() => {
-            setTemp(t => t + (Math.random() - 0.5) * 2);
+            setTemp(t => {
+                const newTemp = t + (Math.random() - 0.5) * 2;
+                return Math.max(30, Math.min(95, newTemp));
+            });
         }, 2000);
         return () => clearInterval(interval);
     }, []);
@@ -430,71 +466,94 @@ const TemperatureMonitor = () => {
             <div className={`text-7xl font-bold font-mono ${tempColor}`}>
                 {temp.toFixed(1)}°C
             </div>
-            <p className="text-muted-foreground">CPU Core Temperature</p>
+            <p className="text-muted-foreground">CPU Core Temperature (Simulated)</p>
         </div>
     );
 };
 
 const BatteryHealth = () => {
-    const [battery, setBattery] = useState({ level: 92, health: 98, cycles: 124 });
-
+    const [battery, setBattery] = useState<any>(null);
+    
     useEffect(() => {
-        setBattery({
-            level: Math.floor(Math.random() * 21) + 80,
-            health: 98,
-            cycles: 124,
-        });
+        if(navigator.getBattery) {
+            navigator.getBattery().then(bm => {
+                const updateBattery = () => {
+                    setBattery({
+                        level: bm.level * 100,
+                        charging: bm.charging,
+                    });
+                };
+                updateBattery();
+                bm.addEventListener('levelchange', updateBattery);
+                bm.addEventListener('chargingchange', updateBattery);
+
+                return () => {
+                    bm.removeEventListener('levelchange', updateBattery);
+                    bm.removeEventListener('chargingchange', updateBattery);
+                }
+            });
+        } else {
+            setBattery({ error: "Battery API not supported."})
+        }
     }, []);
 
+    if (!battery) {
+        return <div className="flex justify-center items-center h-[250px]"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
+    }
+
+    if (battery.error) {
+        return <div className="text-destructive text-center p-4">{battery.error}</div>;
+    }
+    
     return (
-        <div className="grid grid-cols-3 gap-4 text-center h-[250px] items-center">
-            <div>
-                <p className="text-5xl font-bold text-success">{battery.level}%</p>
-                <p className="text-muted-foreground">Charge</p>
+        <div className="flex flex-col items-center justify-center gap-4 h-[250px]">
+            <div className="relative">
+                <p className="text-7xl font-bold text-success">{battery.level.toFixed(0)}%</p>
+                {battery.charging && <Zap className="h-6 w-6 text-yellow-400 absolute -top-2 -right-4" />}
             </div>
-            <div>
-                <p className="text-5xl font-bold text-primary">{battery.health}%</p>
-                <p className="text-muted-foreground">Health</p>
-            </div>
-            <div>
-                <p className="text-5xl font-bold text-foreground">{battery.cycles}</p>
-                <p className="text-muted-foreground">Cycles</p>
-            </div>
+            <p className="text-muted-foreground font-semibold">
+                {battery.charging ? "Charging" : "Discharging"}
+            </p>
         </div>
     );
 };
 
 const NetworkInfo = () => {
-    const [network, setNetwork] = useState({
-        ip: "192.168.1.101",
-        download: 125.8,
-        upload: 45.2,
+     const [network, setNetwork] = useState<any>({
+        type: 'N/A',
+        downlink: 0,
+        rtt: 0,
     });
 
     useEffect(() => {
-        const interval = setInterval(() => {
-            setNetwork(n => ({
-                ...n,
-                download: Math.max(10, n.download + (Math.random() - 0.5) * 10),
-                upload: Math.max(5, n.upload + (Math.random() - 0.5) * 5),
-            }));
-        }, 2500);
-        return () => clearInterval(interval);
+        const connection = (navigator as any).connection;
+        if (connection) {
+            const updateNetworkInfo = () => {
+                setNetwork({
+                    type: connection.effectiveType,
+                    downlink: connection.downlink,
+                    rtt: connection.rtt,
+                });
+            };
+            updateNetworkInfo();
+            connection.addEventListener('change', updateNetworkInfo);
+            return () => connection.removeEventListener('change', updateNetworkInfo);
+        }
     }, []);
 
     return (
         <div className="space-y-4 h-[250px] flex flex-col justify-around">
             <div className="flex justify-between items-baseline">
-                <span className="font-semibold text-muted-foreground">IP Address</span>
-                <span className="font-mono text-lg">{network.ip}</span>
+                <span className="font-semibold text-muted-foreground">Connection Type</span>
+                <span className="font-mono text-lg uppercase">{network.type}</span>
             </div>
             <div className="flex justify-between items-baseline">
-                <span className="font-semibold text-muted-foreground">Download Speed</span>
-                <span className="font-mono text-lg">{network.download.toFixed(1)} Mbps</span>
+                <span className="font-semibold text-muted-foreground">Est. Download Speed</span>
+                <span className="font-mono text-lg">{network.downlink} Mbps</span>
             </div>
             <div className="flex justify-between items-baseline">
-                <span className="font-semibold text-muted-foreground">Upload Speed</span>
-                <span className="font-mono text-lg">{network.upload.toFixed(1)} Mbps</span>
+                <span className="font-semibold text-muted-foreground">Est. Latency (RTT)</span>
+                <span className="font-mono text-lg">{network.rtt} ms</span>
             </div>
         </div>
     );
@@ -514,7 +573,7 @@ const RegistryCleaner = ({ onFinish }: { onFinish: () => void }) => {
                     clearInterval(interval);
                     setStatus(`${issuesFound} issues fixed successfully!`);
                     setIsWorking(false);
-                    toast.success("Registry Cleaned!");
+                    toast.success("Registry Cleaned! (Simulation)");
                     return 100;
                 }
                 if (newProgress > 50) setStatus("Fixing registry errors...");
@@ -528,6 +587,7 @@ const RegistryCleaner = ({ onFinish }: { onFinish: () => void }) => {
 
     return (
         <div>
+            <p className="text-muted-foreground mb-2">Simulating a registry scan. No actual changes are being made to your system.</p>
             <p className="text-muted-foreground mb-4">{status}</p>
             <Progress value={progress} className="w-full mb-4 h-3" />
             <div className="text-center text-lg font-bold text-primary mb-6">
@@ -545,24 +605,25 @@ const RegistryCleaner = ({ onFinish }: { onFinish: () => void }) => {
 
 const DriverUpdater = ({ onFinish }: { onFinish: () => void }) => {
     const [drivers, setDrivers] = useState([
-        { name: 'NVIDIA GeForce RTX 4090', upToDate: false },
+        { name: 'NVIDIA GeForce Driver', upToDate: false },
         { name: 'Intel Bluetooth', upToDate: true },
-        { name: 'Realtek Audio', upToDate: false },
+        { name: 'Realtek Audio Driver', upToDate: false },
     ]);
     const [isUpdating, setIsUpdating] = useState(false);
 
     const handleUpdate = (index: number) => {
         setIsUpdating(true);
-        toast.info(`Updating ${drivers[index].name}...`);
+        toast.info(`Simulating update for ${drivers[index].name}...`);
         setTimeout(() => {
             setDrivers(d => d.map((driver, i) => i === index ? {...driver, upToDate: true} : driver));
             setIsUpdating(false);
-            toast.success(`${drivers[index].name} updated successfully!`);
+            toast.success(`${drivers[index].name} updated successfully! (Simulation)`);
         }, 2000);
     };
 
     return (
         <div className="space-y-3">
+            <p className="text-muted-foreground text-sm mb-4">This is a simulation. No drivers will actually be updated.</p>
             {drivers.map((driver, index) => (
                 <div key={index} className="flex items-center justify-between rounded-lg border bg-secondary/50 p-3">
                     <div>
@@ -595,9 +656,9 @@ const SecurityScanner = ({ onFinish }: { onFinish: () => void }) => {
                     setStatus(threatsFound > 0 ? "Scan complete. Threats found!" : "Scan complete. No threats found.");
                     setIsScanning(false);
                     if (threatsFound > 0) {
-                      toast.error(`${threatsFound} potential threats found!`);
+                      toast.error(`${threatsFound} potential threats found! (Simulation)`);
                     } else {
-                      toast.success("System is secure. No threats found.");
+                      toast.success("System is secure. No threats found. (Simulation)");
                     }
                     return 100;
                 }
@@ -614,6 +675,7 @@ const SecurityScanner = ({ onFinish }: { onFinish: () => void }) => {
 
     return (
         <div>
+             <p className="text-muted-foreground text-sm mb-4">This is a simulation. Your files are not actually being scanned.</p>
             <p className="text-muted-foreground mb-4 truncate">{status}</p>
             <Progress value={progress} className="w-full mb-4 h-3" />
             <div className="flex justify-between items-center text-sm text-muted-foreground mb-6">
@@ -646,7 +708,7 @@ const BenchmarkTest = ({ onFinish }: { onFinish: () => void }) => {
             setTimeout(() => {
                 clearInterval(gpuInterval);
                 setIsTesting(false);
-                toast.success("Benchmark Complete! Score: 18,542");
+                toast.success("Benchmark Complete! Score: 18,542 (Simulated)");
             }, 5000);
         }, 4000);
 
@@ -657,6 +719,7 @@ const BenchmarkTest = ({ onFinish }: { onFinish: () => void }) => {
 
     return (
         <div className="space-y-6">
+             <p className="text-muted-foreground text-sm mb-4">Simulating a hardware benchmark test.</p>
             <div>
                 <label className="text-sm font-medium">CPU Benchmark</label>
                 <Progress value={cpuProgress} className="h-3 mt-2" />
@@ -827,5 +890,3 @@ export default function SystemsPage() {
       </div>
   );
 }
-
-    

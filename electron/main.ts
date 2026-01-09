@@ -3,6 +3,7 @@ import { app, BrowserWindow, ipcMain } from 'electron';
 import path from 'node:path';
 import os from 'node:os';
 import child_process from 'node:child_process';
+import fs from 'node:fs';
 
 // The built directory structure
 //
@@ -64,6 +65,113 @@ function createWindow() {
         hostname: os.hostname(),
         userInfo: os.userInfo(),
     };
+  });
+
+  ipcMain.handle('get-cpu-usage', () => {
+    return new Promise((resolve) => {
+        const start = os.cpus();
+        setTimeout(() => {
+            const end = os.cpus();
+            let totalIdle = 0;
+            let totalTick = 0;
+
+            for (let i = 0; i < start.length; i++) {
+                const startCpu = start[i];
+                const endCpu = end[i];
+                const cpuTimes = endCpu.times;
+                const startTimes = startCpu.times;
+
+                totalTick += (cpuTimes.user - startTimes.user) + (cpuTimes.nice - startTimes.nice) + (cpuTimes.sys - startTimes.sys) + (cpuTimes.idle - startTimes.idle) + (cpuTimes.irq - startTimes.irq);
+                totalIdle += cpuTimes.idle - startTimes.idle;
+            }
+            const usage = 100 - (totalIdle / totalTick) * 100;
+            resolve(usage);
+        }, 1000);
+    });
+  });
+
+  ipcMain.handle('get-memory-usage', () => {
+    const totalMem = os.totalmem();
+    const freeMem = os.freemem();
+    const usedMem = totalMem - freeMem;
+    return {
+        total: totalMem,
+        used: usedMem,
+        free: freeMem,
+        usage: (usedMem / totalMem) * 100,
+    };
+  });
+
+   ipcMain.handle('get-disk-info', async () => {
+    return new Promise((resolve, reject) => {
+      // This command works on macOS and Linux. For Windows, 'wmic logicaldisk' would be needed.
+      const command = os.platform() === 'win32' ? 'wmic logicaldisk get size,freespace' : 'df -k /';
+      child_process.exec(command, (err, stdout) => {
+        if (err) {
+          return reject(err);
+        }
+        
+        let total = 0;
+        let free = 0;
+        let used = 0;
+
+        try {
+          if (os.platform() === 'win32') {
+             const lines = stdout.trim().split('\n').slice(1);
+             lines.forEach(line => {
+                const parts = line.trim().split(/\s+/);
+                if(parts.length >= 2){
+                    free += parseInt(parts[0], 10);
+                    total += parseInt(parts[1], 10);
+                }
+             });
+             used = total - free;
+          } else {
+            const lines = stdout.trim().split('\n');
+            const data = lines[lines.length - 1].split(/\s+/);
+            total = parseInt(data[1], 10) * 1024;
+            used = parseInt(data[2], 10) * 1024;
+            free = parseInt(data[3], 10) * 1024;
+          }
+           resolve({ total, used, free, usage: (used / total) * 100 });
+        } catch(e) {
+            reject(e);
+        }
+      });
+    });
+  });
+
+  ipcMain.handle('get-running-processes', () => {
+      const command = os.platform() === 'win32' 
+          ? 'tasklist /fo csv /nh'
+          : 'ps -eo pid,ppid,pcpu,pmem,comm';
+
+      return new Promise((resolve, reject) => {
+          child_process.exec(command, (err, stdout) => {
+              if (err) return reject(err);
+
+              const processes = stdout.trim().split('\n').map(line => {
+                  if (os.platform() === 'win32') {
+                      const parts = line.replace(/"/g, '').split(',');
+                      return {
+                          pid: parseInt(parts[1], 10),
+                          name: parts[0],
+                          cpu: 0, // Tasklist doesn't provide easy CPU usage
+                          mem: parseFloat(parts[4].replace(/,/g, '')) * 1024 // in KB to Bytes
+                      };
+                  } else {
+                      const parts = line.trim().split(/\s+/);
+                      return {
+                          pid: parseInt(parts[0], 10),
+                          name: parts[4],
+                          cpu: parseFloat(parts[2]),
+                          mem: parseFloat(parts[3])
+                      };
+                  }
+              }).filter(p => p.pid && p.name);
+              resolve(processes.slice(0, 20)); // Limit for performance
+          });
+      });
   });
 
 

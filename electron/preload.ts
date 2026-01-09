@@ -9,4 +9,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // System Info
   getSystemInfo: () => ipcRenderer.invoke('get-system-info'),
+  getCpuUsage: () => ipcRenderer.invoke('get-cpu-usage'),
+  getMemoryUsage: () => ipcRenderer.invoke('get-memory-usage'),
+  getDiskInfo: () => ipcRenderer.invoke('get-disk-info'),
+  getRunningProcesses: () => ipcRenderer.invoke('get-running-processes'),
 });
