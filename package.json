@@ -5,7 +5,7 @@
   "type": "module",
   "main": "dist/electron/main.js",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "npm run build:frontend && npm run build:electron",
     "build:frontend": "next build",
     "build:electron": "tsc -p electron/tsconfig.json && vite build --config electron/vite.config.ts",
