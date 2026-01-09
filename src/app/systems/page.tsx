@@ -360,21 +360,53 @@ const ProcessManager = () => {
 };
 
 const SystemInfo = () => {
-    const info = {
-        'OS': 'Windows 11 Pro',
-        'Processor': '12th Gen Intel(R) Core(TM) i9-12900K',
-        'RAM': '64.0 GB',
-        'Graphics Card': 'NVIDIA GeForce RTX 4090',
-        'Mainboard': 'ASUS ROG STRIX Z690-E GAMING WIFI',
-        'Storage': '2TB NVMe SSD',
-    };
+    const [info, setInfo] = useState<any>({});
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchSystemInfo = async () => {
+            if (window.electronAPI) {
+                try {
+                    const systemInfo = await window.electronAPI.getSystemInfo();
+                    setInfo(systemInfo);
+                } catch (error) {
+                    console.error("Failed to fetch system info:", error);
+                    setInfo({ error: "Could not fetch system info." });
+                } finally {
+                    setLoading(false);
+                }
+            } else {
+                setInfo({ error: "System API not available in this environment." });
+                setLoading(false);
+            }
+        };
+
+        fetchSystemInfo();
+    }, []);
+
+    const infoList = [
+        { key: 'OS', value: info.os },
+        { key: 'Processor', value: info.cpu },
+        { key: 'Graphics Card', value: info.gpu },
+        { key: 'RAM', value: info.ram },
+        { key: 'Computer Name', value: info.hostname },
+        { key: 'User', value: info.userInfo?.username },
+    ];
+
+    if (loading) {
+        return <div className="flex justify-center items-center h-[250px]"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
+    }
+    
+    if (info.error) {
+        return <div className="text-destructive text-center p-4">{info.error}</div>;
+    }
 
     return (
         <ul className="space-y-3">
-            {Object.entries(info).map(([key, value]) => (
-                <li key={key} className="flex justify-between border-b pb-2">
+            {infoList.map(({key, value}) => (
+                <li key={key} className="flex justify-between border-b pb-2 text-sm">
                     <span className="font-semibold text-muted-foreground">{key}</span>
-                    <span className="font-medium text-foreground text-right">{value}</span>
+                    <span className="font-medium text-foreground text-right">{value || 'N/A'}</span>
                 </li>
             ))}
         </ul>
@@ -699,18 +731,9 @@ export default function SystemsPage() {
     return <ToolWrapper title={activeTool.name} icon={activeTool.icon} onBack={() => setActiveTool(null)}>{toolComponent}</ToolWrapper>;
   };
 
-  if (activeTool) {
-    return (
-        <div className="space-y-6 animate-fade-in">
-            {renderActiveTool()}
-        </div>
-    );
-  }
-
-
   return (
       <div className="space-y-6 animate-fade-in">
-        <div className="relative overflow-hidden gradient-dark p-8">
+        <div className="relative overflow-hidden p-8 gradient-dark">
           <div className="absolute -right-20 -top-20 h-60 w-60 rounded-full bg-primary/20 blur-3xl" />
           <div className="relative flex items-center gap-4">
             <div className="flex h-16 w-16 items-center justify-center rounded-2xl gradient-primary shadow-glow-intense animate-pulse-glow">
@@ -763,7 +786,7 @@ export default function SystemsPage() {
             </div>
             
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            {filteredTools.map((tool, index) => (
+            {activeTool ? renderActiveTool() : filteredTools.map((tool, index) => (
                 <button
                 key={tool.id}
                 onClick={() => handleToolClick(tool)}
@@ -791,7 +814,7 @@ export default function SystemsPage() {
             ))}
             </div>
 
-            {filteredTools.length === 0 && (
+            {!activeTool && filteredTools.length === 0 && (
             <div className="flex flex-col items-center justify-center py-12 text-center">
                 <Search className="h-12 w-12 text-muted-foreground" />
                 <h3 className="mt-4 text-lg font-bold text-foreground">No tools found</h3>

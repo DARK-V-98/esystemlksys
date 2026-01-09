@@ -3,10 +3,13 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
+  "main": "dist/electron/main.js",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
+    "dev": "vite",
+    "build": "npm run build:frontend && npm run build:electron",
+    "build:frontend": "next build",
+    "build:electron": "tsc -p electron/tsconfig.json && vite build --config electron/vite.config.ts",
+    "start": "electron .",
     "lint": "next lint"
   },
   "dependencies": {
@@ -46,7 +49,7 @@
     "firebase": "^10.12.3",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.462.0",
-    "next": "14.2.5",
+    "next": "14.2.35",
     "next-themes": "0.4.0",
     "react": "^18",
     "react-day-picker": "^8.10.1",
@@ -65,8 +68,13 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "electron": "^31.2.1",
+    "electron-builder": "^24.13.3",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vite": "^5.3.3",
+    "vite-plugin-electron": "^0.28.7",
+    "vite-plugin-electron-renderer": "^0.14.5"
   }
 }

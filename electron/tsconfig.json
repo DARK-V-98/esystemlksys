@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "target": "ESNext",
+    "sourceMap": false,
+    "skipLibCheck": true,
+    "strict": true,
+    "lib": ["ESNext"],
+    "types": ["node"],
+    "outDir": "../dist/electron"
+  },
+  "include": ["**/*.ts"]
+}

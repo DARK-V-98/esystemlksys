@@ -10,11 +10,16 @@ declare global {
       minimize: () => void;
       maximize: () => void;
       close: () => void;
+      getSystemInfo: () => Promise<any>;
     };
   }
 }
 
 export default function TitleBar() {
+  const handleMinimize = () => window.electronAPI?.minimize();
+  const handleMaximize = () => window.electronAPI?.maximize();
+  const handleClose = () => window.electronAPI?.close();
+
   return (
     <div 
       className="flex h-10 items-center justify-between px-4 gradient-dark text-primary-foreground" 
@@ -27,21 +32,21 @@ export default function TitleBar() {
 
       <div className="flex items-center" style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}>
         <button
-          onClick={() => window.electronAPI?.minimize()}
+          onClick={handleMinimize}
           className="p-2 text-muted-foreground transition-colors hover:bg-white/10 rounded-md"
           aria-label="Minimize"
         >
           <Minus className="h-4 w-4" />
         </button>
         <button
-          onClick={() => window.electronAPI?.maximize()}
+          onClick={handleMaximize}
           className="p-2 text-muted-foreground transition-colors hover:bg-white/10 rounded-md"
           aria-label="Maximize"
         >
           <Square className="h-4 w-4" />
         </button>
         <button
-          onClick={() => window.electronAPI?.close()}
+          onClick={handleClose}
           className="p-2 text-muted-foreground transition-colors hover:bg-destructive/80 rounded-md"
           aria-label="Close"
         >
