@@ -1,3 +1,60 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "lv1",
+      "url": "https://picsum.photos/seed/lv1/600/400",
+      "width": 600,
+      "height": 400,
+      "aiHint": "web development"
+    },
+    {
+      "id": "lv2",
+      "url": "https://picsum.photos/seed/lv2/600/400",
+      "width": 600,
+      "height": 400,
+      "aiHint": "css framework"
+    },
+    {
+      "id": "lv3",
+      "url": "https://picsum.photos/seed/lv3/600/400",
+      "width": 600,
+      "height": 400,
+      "aiHint": "design tool"
+    },
+    {
+      "id": "lv4",
+      "url": "https://picsum.photos/seed/lv4/600/400",
+      "width": 600,
+      "height": 400,
+      "aiHint": "productivity app"
+    },
+    {
+      "id": "lv5",
+      "url": "https://picsum.photos/seed/lv5/600/400",
+      "width": 600,
+      "height": 400,
+      "aiHint": "react framework"
+    },
+    {
+      "id": "lv6",
+      "url": "https://picsum.photos/seed/lv6/600/400",
+      "width": 600,
+      "height": 400,
+      "aiHint": "design inspiration"
+    },
+    {
+      "id": "lv7",
+      "url": "https://picsum.photos/seed/lv7/600/400",
+      "width": 600,
+      "height": 400,
+      "aiHint": "ai framework"
+    },
+    {
+      "id": "lv8",
+      "url": "https://picsum.photos/seed/lv8/600/400",
+      "width": 600,
+      "height": 400,
+      "aiHint": "web documentation"
+    }
+  ]
 }
