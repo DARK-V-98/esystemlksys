@@ -25,7 +25,7 @@ export default function VideoPlayerPage() {
   return (
     <div className="space-y-6 animate-fade-in">
        {/* Header */}
-      <div className="relative overflow-hidden rounded-2xl gradient-dark p-8">
+      <div className="relative overflow-hidden gradient-dark p-8">
         <div className="absolute -right-20 -top-20 h-60 w-60 rounded-full bg-primary/20 blur-3xl" />
         <div className="relative flex items-center gap-4">
           <div className="flex h-16 w-16 items-center justify-center rounded-2xl gradient-primary shadow-glow-intense animate-pulse-glow">
