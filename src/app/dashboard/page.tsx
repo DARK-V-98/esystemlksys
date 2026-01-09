@@ -12,7 +12,8 @@ import {
   Users,
   User,
   Shield,
-  LogOut
+  LogOut,
+  PlayCircle
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getAuth, onAuthStateChanged, User as FirebaseUser, signOut } from "firebase/auth";
@@ -36,38 +37,31 @@ const menuCards = [
   {
     icon: Wrench,
     title: "Tools",
-    description: "PDF tools, file converters, text utilities, image editors",
+    description: "File converters, text utilities, image editors",
     path: "/tools",
     count: "20+",
   },
   {
     icon: Monitor,
     title: "Systems",
-    description: "PC optimization, disk cleanup, RAM boost, system info",
+    description: "PC optimization, disk cleanup, RAM boost",
     path: "/systems",
     count: "18+",
   },
   {
+    icon: PlayCircle,
+    title: "Media Player",
+    description: "Play local audio and video files",
+    path: "/media",
+    count: "New",
+  },
+  {
     icon: Globe,
     title: "Websites",
-    description: "SEO tools, web scrapers, meta analyzers, site generators",
+    description: "SEO tools, web scrapers, meta analyzers",
     path: "/websites",
     count: "Coming",
   },
-  {
-    icon: Settings,
-    title: "Management",
-    description: "Account settings, preferences, usage stats, admin tools",
-    path: "/management",
-    count: "Coming",
-  },
-];
-
-const stats = [
-  { icon: Wrench, label: "Total Tools", value: "38+", color: "text-primary" },
-  { icon: Cpu, label: "Categories", value: "4" },
-  { icon: HardDrive, label: "File Formats", value: "50+" },
-  { icon: Users, label: "Active Users", value: "1" },
 ];
 
 export default function DashboardPage() {
@@ -187,21 +181,6 @@ export default function DashboardPage() {
                     </p>
                 </div>
               </Link>
-            ))}
-          </div>
-
-          {/* Stats */}
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-            {stats.map((stat, index) => (
-              <div
-                key={stat.label}
-                className="rounded-xl border-2 border-border bg-card p-5 text-center shadow-card transition-all duration-300 hover:border-primary hover:shadow-glow animate-slide-up"
-                style={{ animationDelay: `${(index + 4) * 100}ms` }}
-              >
-                <stat.icon className={`h-8 w-8 mx-auto mb-2 ${stat.color || 'text-muted-foreground'}`} />
-                <p className="text-2xl md:text-3xl font-black text-gradient">{stat.value}</p>
-                <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>
-              </div>
             ))}
           </div>
         </div>
