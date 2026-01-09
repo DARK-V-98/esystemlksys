@@ -2,10 +2,11 @@
 import { MainLayout } from "@/components/layout/MainLayout";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { getFirestore, doc, serverTimestamp, updateDoc } from "firebase/firestore";
+import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
+import { getFirestore, doc, serverTimestamp, updateDoc, getDoc } from "firebase/firestore";
 import { app } from "@/firebase/config";
 import { Cpu } from "lucide-react";
+import { toast } from 'sonner';
 
 export default function AppLayout({
     children,
@@ -21,13 +22,25 @@ export default function AppLayout({
         
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
             if (user) {
+                const userDocRef = doc(db, 'users', user.uid);
+                const userDoc = await getDoc(userDocRef);
+
+                if (userDoc.exists() && userDoc.data().isBanned) {
+                    toast.error("Account Suspended", {
+                        description: "Your account has been suspended. Please contact an administrator.",
+                    });
+                    await signOut(auth);
+                    localStorage.clear();
+                    router.push("/auth?error=banned");
+                    return;
+                }
+
                 // User is authenticated via Firebase
                 if (localStorage.getItem("isAuthenticated") !== "true") {
                     localStorage.setItem("isAuthenticated", "true");
                 }
                 
                 // Update last active timestamp
-                const userDocRef = doc(db, 'users', user.uid);
                 await updateDoc(userDocRef, { lastActive: serverTimestamp() });
 
                 setLoading(false);

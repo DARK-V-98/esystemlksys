@@ -1,13 +1,13 @@
 'use client';
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from 'next/link';
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Cpu, Eye, EyeOff, Mail, Lock, User, Zap, Shield, Layers, Signal, ServerCrash } from "lucide-react";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, onAuthStateChanged } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, onAuthStateChanged, signOut } from "firebase/auth";
 import { getFirestore, doc, setDoc, serverTimestamp, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
 import { app } from "@/firebase/config";
 import { ThemeSwitcher } from "@/components/ThemeSwitcher";
@@ -28,8 +28,15 @@ export default function Auth() {
   const [maintenanceLoading, setMaintenanceLoading] = useState(true);
 
   const router = useRouter();
+  const searchParams = useSearchParams();
   const auth = getAuth(app);
   const db = getFirestore(app);
+
+  useEffect(() => {
+    if (searchParams.get('error') === 'banned') {
+       setError("banned");
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     const maintenanceRef = doc(db, "app-status", "maintenance");
@@ -56,7 +63,7 @@ export default function Auth() {
           setUserRole(role);
           
           if (userData.isBanned) {
-            setError("Your account has been suspended. Please contact support.");
+            setError("banned");
             await auth.signOut();
             return;
           }
@@ -118,7 +125,7 @@ export default function Auth() {
 
           if(userData.isBanned) {
              await auth.signOut();
-             setError("Your account has been suspended. Please contact support.");
+             setError("banned");
              setLoading(false);
              return;
           }
@@ -178,6 +185,19 @@ export default function Auth() {
       setLoading(false);
     }
   };
+
+  const BannedUserMessage = () => (
+    <div className="rounded-lg bg-destructive/10 border border-destructive/30 p-4 space-y-2">
+      <h3 className="font-bold text-destructive">Account Suspended</h3>
+      <p className="text-sm text-destructive/90">
+        Your account access has been revoked. For more details or to appeal, please contact an administrator.
+      </p>
+      <div className="text-xs text-destructive/80">
+        <p>WhatsApp: +94765711396</p>
+        <p>Website: <a href="https://www.esystemlk.xyz" target="_blank" rel="noopener noreferrer" className="underline">www.esystemlk.xyz</a></p>
+      </div>
+    </div>
+  );
 
   return (
     <div className="flex h-full">
@@ -281,94 +301,73 @@ export default function Auth() {
             </p>
           </div>
 
-          {maintenanceMode && (
+          {maintenanceMode && !isLogin && (
               <div className="rounded-lg bg-destructive/10 border border-destructive/30 p-3 text-center">
-                <p className="text-sm text-destructive font-medium">The system is currently under maintenance. Only administrators can log in.</p>
+                <p className="text-sm text-destructive font-medium">The system is currently under maintenance and new account registrations are disabled.</p>
               </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {!isLogin && (
+          {maintenanceMode && isLogin && (
+              <div className="rounded-lg bg-orange-500/10 border border-orange-500/30 p-3 text-center">
+                <p className="text-sm text-orange-500 font-medium">The system is under maintenance. Only administrators can log in.</p>
+              </div>
+          )}
+
+          {error === 'banned' ? <BannedUserMessage /> : (
+            <form onSubmit={handleSubmit} className="space-y-5">
+              {!isLogin && (
+                <div className="space-y-2">
+                  <Label htmlFor="name" className="text-foreground font-semibold">Full Name</Label>
+                  <div className="relative">
+                    <User className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      id="name"
+                      type="text"
+                      placeholder="Enter your name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="pl-12 h-12"
+                      disabled={loading || maintenanceMode}
+                    />
+                  </div>
+                </div>
+              )}
+
               <div className="space-y-2">
-                <Label htmlFor="name" className="text-foreground font-semibold">Full Name</Label>
+                <Label htmlFor="email" className="text-foreground font-semibold">Email Address</Label>
                 <div className="relative">
-                  <User className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+                  <Mail className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
                   <Input
-                    id="name"
-                    type="text"
-                    placeholder="Enter your name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    id="email"
+                    type="email"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     className="pl-12 h-12"
-                    disabled={loading || (maintenanceMode && !['admin', 'developer'].includes(userRole))}
+                    disabled={loading}
                   />
                 </div>
               </div>
-            )}
 
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-foreground font-semibold">Email Address</Label>
-              <div className="relative">
-                <Mail className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="pl-12 h-12"
-                  disabled={loading}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="password" className="text-foreground font-semibold">Password</Label>
-              <div className="relative">
-                <Lock className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="pl-12 pr-12 h-12"
-                  disabled={loading}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5" />
-                  ) : (
-                    <Eye className="h-5 w-5" />
-                  )}
-                </button>
-              </div>
-            </div>
-
-             {!isLogin && (
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="text-foreground font-semibold">Confirm Password</Label>
+                <Label htmlFor="password" className="text-foreground font-semibold">Password</Label>
                 <div className="relative">
                   <Lock className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
                   <Input
-                    id="confirmPassword"
-                    type={showConfirmPassword ? "text" : "password"}
-                    placeholder="Confirm your password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     className="pl-12 pr-12 h-12"
                     disabled={loading}
                   />
                   <button
                     type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                   >
-                    {showConfirmPassword ? (
+                    {showPassword ? (
                       <EyeOff className="h-5 w-5" />
                     ) : (
                       <Eye className="h-5 w-5" />
@@ -376,33 +375,62 @@ export default function Auth() {
                   </button>
                 </div>
               </div>
-            )}
-            
-            {isLogin && (
-              <div className="text-right">
-                <Link href="/forgot-password" passHref>
-                  <span className="text-sm font-medium text-primary hover:underline cursor-pointer">
-                    Forgot Password?
-                  </span>
-                </Link>
-              </div>
-            )}
 
-            {error && (
-              <div className="rounded-lg bg-destructive/10 border border-destructive/30 p-3">
-                <p className="text-sm text-destructive font-medium">{error}</p>
-              </div>
-            )}
+              {!isLogin && (
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword" className="text-foreground font-semibold">Confirm Password</Label>
+                  <div className="relative">
+                    <Lock className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      id="confirmPassword"
+                      type={showConfirmPassword ? "text" : "password"}
+                      placeholder="Confirm your password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      className="pl-12 pr-12 h-12"
+                      disabled={loading || maintenanceMode}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOff className="h-5 w-5" />
+                      ) : (
+                        <Eye className="h-5 w-5" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+              )}
+              
+              {isLogin && (
+                <div className="text-right">
+                  <Link href="/forgot-password" passHref>
+                    <span className="text-sm font-medium text-primary hover:underline cursor-pointer">
+                      Forgot Password?
+                    </span>
+                  </Link>
+                </div>
+              )}
 
-            <div>
-                <Button type="submit" variant="gradient" size="xl" className="w-full font-bold" disabled={loading || (maintenanceMode && !isLogin) }>
-                {loading ? (
-                    <Cpu className="h-6 w-6 animate-spin" />
-                ) : (isLogin ? "Sign In" : "Create Account")
-                }
-                </Button>
-            </div>
-          </form>
+              {error && error !== 'banned' && (
+                <div className="rounded-lg bg-destructive/10 border border-destructive/30 p-3">
+                  <p className="text-sm text-destructive font-medium">{error}</p>
+                </div>
+              )}
+
+              <div>
+                  <Button type="submit" variant="gradient" size="xl" className="w-full font-bold" disabled={loading || (maintenanceMode && !isLogin) }>
+                  {loading ? (
+                      <Cpu className="h-6 w-6 animate-spin" />
+                  ) : (isLogin ? "Sign In" : "Create Account")
+                  }
+                  </Button>
+              </div>
+            </form>
+          )}
 
           <div className="text-center">
             <p className="text-muted-foreground">
@@ -413,6 +441,7 @@ export default function Auth() {
                   setError("");
                 }}
                 className="ml-2 font-bold text-primary hover:underline"
+                disabled={error === 'banned'}
               >
                 {isLogin ? "Sign Up" : "Sign In"}
               </button>
