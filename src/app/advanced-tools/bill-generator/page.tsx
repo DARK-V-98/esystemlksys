@@ -4,7 +4,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft, Receipt, Trash2, Plus, Download, Palette, Upload, RefreshCcw, Save } from 'lucide-react';
+import { ArrowLeft, Receipt, Trash2, Plus, Download, Palette, Upload, RefreshCcw, Save, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -12,13 +12,12 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from 'sonner';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
 import { getAuth, onAuthStateChanged, User as FirebaseUser } from "firebase/auth";
 import { getFirestore, doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { app } from "@/firebase/config";
+import { BillPreviewDialog } from '@/components/bill-preview-dialog';
 
-interface BillItem {
+export interface BillItem {
   id: number;
   description: string;
   quantity: number;
@@ -53,8 +52,8 @@ export default function BillGeneratorPage() {
 
   const [user, setUser] = useState<FirebaseUser | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
-  const billPreviewRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -152,35 +151,6 @@ export default function BillGeneratorPage() {
     }
   };
 
-  const downloadPDF = async () => {
-    const billElement = billPreviewRef.current;
-    if (!billElement) return;
-
-    toast.info('Generating PDF...');
-
-    try {
-        const canvas = await html2canvas(billElement, {
-            scale: 2,
-            useCORS: true,
-            backgroundColor: null,
-        });
-        
-        const imgData = canvas.toDataURL('image/png');
-        const pdf = new jsPDF({
-            orientation: 'p',
-            unit: 'px',
-            format: [canvas.width, canvas.height]
-        });
-
-        pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
-        pdf.save(`invoice-${invoiceNumber}.pdf`);
-        toast.success('PDF downloaded successfully!');
-    } catch (error) {
-        console.error("Error generating PDF:", error);
-        toast.error('Failed to generate PDF. See console for details.');
-    }
-  };
-
   const resetFields = () => {
       setYourCompany(initialYourCompany);
       setYourAddress(initialYourAddress);
@@ -238,7 +208,23 @@ export default function BillGeneratorPage() {
         setIsSaving(false);
     }
   };
-
+  
+  const billData = {
+    logo,
+    yourCompany,
+    yourAddress,
+    clientCompany,
+    clientAddress,
+    invoiceNumber,
+    invoiceDate,
+    dueDate,
+    items,
+    tax,
+    accentColor,
+    subtotal,
+    taxAmount,
+    total,
+  };
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -270,9 +256,9 @@ export default function BillGeneratorPage() {
                     <Save className="mr-2 h-5 w-5"/>
                     {isSaving ? 'Saving...' : 'Save Bill'}
                 </Button>
-                <Button onClick={downloadPDF} variant="gradient">
-                    <Download className="mr-2 h-5 w-5"/>
-                    Download PDF
+                <Button onClick={() => setIsPreviewOpen(true)} variant="gradient">
+                    <Eye className="mr-2 h-5 w-5"/>
+                    Preview & Download
                 </Button>
             </div>
         </div>
@@ -330,7 +316,7 @@ export default function BillGeneratorPage() {
             </ScrollArea>
             {/* Preview Panel */}
             <div className="lg:col-span-2 rounded-lg p-8 bg-white text-black shadow-elevated">
-              <div ref={billPreviewRef} className="p-4 bg-white">
+              <div className="p-4 bg-white">
                 <div className="flex justify-between items-start mb-8">
                     <div className="flex items-center gap-4">
                         {logo && <Image src={logo} alt="company logo" width={80} height={80} className="object-contain" />}
@@ -410,6 +396,13 @@ export default function BillGeneratorPage() {
             </div>
         </div>
       </div>
+      <BillPreviewDialog 
+        isOpen={isPreviewOpen}
+        setIsOpen={setIsPreviewOpen}
+        billData={billData}
+      />
     </div>
   );
 }
+
+    
