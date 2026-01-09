@@ -62,6 +62,13 @@ const menuCards = [
     path: "/websites",
     count: "Coming",
   },
+  {
+    icon: Settings,
+    title: "Management",
+    description: "Account settings, preferences, usage stats",
+    path: "/management",
+    count: "Coming",
+  },
 ];
 
 export default function DashboardPage() {
@@ -161,7 +168,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Menu Grid */}
-          <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
+          <div className="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-5">
             {menuCards.map((card, index) => (
               <Link
                 key={card.path}
@@ -170,10 +177,10 @@ export default function DashboardPage() {
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 <div className="system-card rounded-2xl p-6 shadow-card h-full flex flex-col items-center justify-center text-center aspect-square">
-                    <div className="flex h-20 w-20 items-center justify-center rounded-3xl gradient-primary shadow-glow transition-all duration-300 group-hover:shadow-glow-intense group-hover:scale-110">
-                        <card.icon className="h-10 w-10 text-primary-foreground" />
+                    <div className="flex h-16 w-16 items-center justify-center rounded-2xl gradient-primary shadow-glow transition-all duration-300 group-hover:shadow-glow-intense group-hover:scale-110">
+                        <card.icon className="h-8 w-8 text-primary-foreground" />
                     </div>
-                    <h3 className="mt-4 text-xl font-bold text-foreground group-hover:text-primary transition-colors">
+                    <h3 className="mt-4 text-lg font-bold text-foreground group-hover:text-primary transition-colors">
                         {card.title}
                     </h3>
                     <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
