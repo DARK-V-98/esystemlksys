@@ -1,11 +1,29 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    
+    function isPrivileged() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'developer'];
+    }
+
     // Users can create their own profile, but cannot be impersonated.
     // They can only read and update their own profile.
     match /users/{userId} {
       allow read, update: if request.auth.uid == userId;
       allow create: if request.auth.uid == userId && request.resource.data.uid == userId;
+    }
+
+    // Maintenance status can be read by anyone, but only modified by privileged users.
+    match /app-status/maintenance {
+      allow read: if true;
+      allow write: if isPrivileged();
+    }
+
+    // Notifications can be read by any authenticated user, but only created by privileged users.
+    match /notifications/{notificationId} {
+      allow read: if request.auth != null;
+      allow create: if isPrivileged();
+      allow update, delete: if false; // Notifications are immutable
     }
   }
 }

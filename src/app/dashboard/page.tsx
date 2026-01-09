@@ -14,7 +14,8 @@ import {
   Shield,
   LogOut,
   PlayCircle,
-  Menu
+  Menu,
+  UserCog
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getAuth, onAuthStateChanged, User as FirebaseUser, signOut } from "firebase/auth";
@@ -73,6 +74,7 @@ export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<FirebaseUser | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
+  const isPrivileged = userRole === 'admin' || userRole === 'developer';
 
   useEffect(() => {
     const auth = getAuth(app);
@@ -89,6 +91,7 @@ export default function DashboardPage() {
         }
     } else {
         setUserRole(null);
+        router.push('/auth');
     }
     });
 
@@ -96,7 +99,7 @@ export default function DashboardPage() {
     setUserRole(localStorage.getItem('userRole'));
     
     return () => unsubscribe();
-  }, []);
+  }, [router]);
 
   const handleLogout = async () => {
     const auth = getAuth(app);
@@ -153,6 +156,12 @@ export default function DashboardPage() {
                           </div>
                       </DropdownMenuLabel>
                       <DropdownMenuSeparator />
+                      {isPrivileged && (
+                        <DropdownMenuItem onClick={() => router.push('/admin/dashboard')} className="cursor-pointer">
+                            <UserCog className="mr-2 h-4 w-4" />
+                            Switch to Admin
+                        </DropdownMenuItem>
+                      )}
                       <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer">
                           <LogOut className="mr-2 h-4 w-4" />
                           Sign Out

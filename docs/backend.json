@@ -20,7 +20,7 @@
         },
         "role": {
           "type": "string",
-          "enum": ["user", "admin"],
+          "enum": ["user", "admin", "developer"],
           "description": "The user's role."
         },
         "createdAt": {
@@ -30,6 +30,35 @@
         }
       },
       "required": ["uid", "name", "email", "role", "createdAt"]
+    },
+    "AppStatus": {
+      "title": "App Status",
+      "description": "Represents the global status of the application.",
+      "type": "object",
+      "properties": {
+        "isUnderMaintenance": {
+          "type": "boolean",
+          "description": "Whether the application is currently under maintenance."
+        }
+      },
+      "required": ["isUnderMaintenance"]
+    },
+    "AdminNotification": {
+      "title": "Admin Notification",
+      "description": "A system-wide notification sent by an admin.",
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string",
+          "description": "The content of the notification."
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the notification was sent."
+        }
+      },
+      "required": ["message", "timestamp"]
     }
   },
   "auth": {
@@ -41,6 +70,18 @@
         "$ref": "#/entities/UserProfile"
       },
       "description": "User profile documents, keyed by user ID."
+    },
+    "/app-status/maintenance": {
+        "schema": {
+            "$ref": "#/entities/AppStatus"
+        },
+        "description": "A single document to control the application's maintenance status."
+    },
+    "/notifications/{notificationId}": {
+        "schema": {
+            "$ref": "#/entities/AdminNotification"
+        },
+        "description": "A collection of system-wide notifications."
     }
   }
 }

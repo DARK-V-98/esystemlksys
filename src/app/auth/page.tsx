@@ -6,11 +6,12 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Cpu, Eye, EyeOff, Mail, Lock, User, Zap, Shield, Layers } from "lucide-react";
+import { Cpu, Eye, EyeOff, Mail, Lock, User, Zap, Shield, Layers, Signal, ServerCrash } from "lucide-react";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, onAuthStateChanged } from "firebase/auth";
-import { getFirestore, doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { getFirestore, doc, setDoc, serverTimestamp, getDoc, onSnapshot } from "firebase/firestore";
 import { app } from "@/firebase/config";
 import { ThemeSwitcher } from "@/components/ThemeSwitcher";
+import { cn } from "@/lib/utils";
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -22,25 +23,59 @@ export default function Auth() {
   const [name, setName] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [userRole, setUserRole] = useState("user");
+  const [maintenanceMode, setMaintenanceMode] = useState(true); // Default to true until status is fetched
+  const [maintenanceLoading, setMaintenanceLoading] = useState(true);
+
   const router = useRouter();
   const auth = getAuth(app);
   const db = getFirestore(app);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        // If user is already logged in, redirect to dashboard
-        router.push('/dashboard');
+    const maintenanceRef = doc(db, "app-status", "maintenance");
+    const unsubscribe = onSnapshot(maintenanceRef, (doc) => {
+      if (doc.exists()) {
+        setMaintenanceMode(doc.data().isUnderMaintenance);
+      } else {
+        setMaintenanceMode(false); // If doc doesn't exist, assume not in maintenance
       }
+      setMaintenanceLoading(false);
     });
     return () => unsubscribe();
-  }, [router, auth]);
+  }, [db]);
+  
+  useEffect(() => {
+    const unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        // If user is already logged in, get their role
+        const userDocRef = doc(db, "users", user.uid);
+        const userDoc = await getDoc(userDocRef);
+        if (userDoc.exists()) {
+          const role = userDoc.data().role;
+          setUserRole(role);
+          if (maintenanceMode && !['admin', 'developer'].includes(role)) {
+            // If in maintenance and user is not privileged, keep them here with an error
+            setError("The system is under maintenance. Please try again later.");
+          } else {
+            router.push('/dashboard');
+          }
+        }
+      }
+    });
+    return () => unsubscribeAuth();
+  }, [router, auth, db, maintenanceMode]);
 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
+
+    if (maintenanceMode && !['admin', 'developer'].includes(userRole)) {
+      setError("The system is currently under maintenance. Please try again later.");
+      setLoading(false);
+      return;
+    }
 
     if (!email || !password) {
       setError("Please fill in all required fields");
@@ -64,10 +99,25 @@ export default function Auth() {
     try {
       if (isLogin) {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        localStorage.setItem("isAuthenticated", "true");
         const user = userCredential.user;
+        const userDocRef = doc(db, "users", user.uid);
+        const userDoc = await getDoc(userDocRef);
+        
+        if (userDoc.exists()) {
+          const role = userDoc.data().role;
+          if (maintenanceMode && !['admin', 'developer'].includes(role)) {
+              await auth.signOut();
+              setError("The system is under maintenance. Only administrators can log in at this time.");
+              setLoading(false);
+              return;
+          }
+          localStorage.setItem("userRole", role);
+        }
+
+        localStorage.setItem("isAuthenticated", "true");
         localStorage.setItem("userName", user?.displayName || user?.email?.split("@")[0] || "User");
         router.push("/dashboard");
+
       } else {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
@@ -78,12 +128,13 @@ export default function Auth() {
           uid: user.uid,
           name: name,
           email: user.email,
-          role: "user",
+          role: "user", // New users are always 'user' role
           createdAt: serverTimestamp(),
         });
 
         localStorage.setItem("isAuthenticated", "true");
         localStorage.setItem("userName", name);
+        localStorage.setItem("userRole", "user");
         router.push("/dashboard");
       }
     } catch (err: any) {
@@ -141,9 +192,30 @@ export default function Auth() {
           </div>
         </div>
 
-        <p className="text-sm text-primary-foreground/50">
-          © 2024 ESYSTEMLK. All rights reserved.
-        </p>
+        <div className="flex justify-between items-center">
+            <p className="text-sm text-primary-foreground/50">
+                © 2024 ESYSTEMLK. All rights reserved.
+            </p>
+            <div className="flex items-center gap-2 rounded-full border border-border bg-secondary/20 px-3 py-1.5 text-sm font-semibold">
+                {maintenanceLoading ? (
+                    <>
+                        <Cpu className="h-4 w-4 animate-spin"/>
+                        <span>Checking...</span>
+                    </>
+                ) : maintenanceMode ? (
+                    <>
+                        <ServerCrash className="h-4 w-4 text-destructive"/>
+                        <span className="text-destructive">Maintenance</span>
+                    </>
+                ) : (
+                    <>
+                        <Signal className="h-4 w-4 text-success"/>
+                        <span className="text-success">Online</span>
+                    </>
+                )}
+            </div>
+        </div>
+
       </div>
 
       {/* Right Panel - Auth Form */}
@@ -171,7 +243,13 @@ export default function Auth() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          {maintenanceMode && (
+              <div className="rounded-lg bg-destructive/10 border border-destructive/30 p-3 text-center">
+                <p className="text-sm text-destructive font-medium">The system is currently under maintenance. Only administrators can log in.</p>
+              </div>
+          )}
+
+          <form onSubmit={handleSubmit} className={cn("space-y-5", maintenanceMode && "opacity-80 pointer-events-none")}>
             {!isLogin && (
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-foreground font-semibold">Full Name</Label>
@@ -279,7 +357,7 @@ export default function Auth() {
             )}
 
             <div>
-                <Button type="submit" variant="gradient" size="xl" className="w-full font-bold" disabled={loading}>
+                <Button type="submit" variant="gradient" size="xl" className="w-full font-bold" disabled={loading || maintenanceMode}>
                 {loading ? (
                     <Cpu className="h-6 w-6 animate-spin" />
                 ) : (isLogin ? "Sign In" : "Create Account")

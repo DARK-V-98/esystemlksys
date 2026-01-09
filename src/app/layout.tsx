@@ -7,6 +7,7 @@ import { useEffect } from 'react';
 import TitleBar from '@/components/TitleBar';
 import { ThemeProvider } from '@/components/theme-provider';
 import Script from 'next/script';
+import AdminNotificationListener from '@/components/AdminNotificationListener';
 
 export default function RootLayout({
   children,
@@ -39,6 +40,7 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <TitleBar />
+            <AdminNotificationListener />
             <TooltipProvider>
               <div className="flex-grow overflow-y-auto">
                 <Toaster />
