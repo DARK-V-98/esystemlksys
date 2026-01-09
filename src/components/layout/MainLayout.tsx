@@ -1,7 +1,6 @@
 'use client';
 import { ReactNode } from "react";
 import { Sidebar } from "./Sidebar";
-import { Header } from "./Header";
 import { useRouter } from "next/navigation";
 import { getAuth, signOut } from "firebase/auth";
 import { app } from "@/firebase/config";
@@ -31,7 +30,6 @@ export function MainLayout({ children }: MainLayoutProps) {
     <div className="min-h-screen bg-background">
       <Sidebar />
       <div className="flex flex-col md:pl-64">
-        <Header onLogout={handleLogout} />
         <main className="flex-grow p-6">
             {children}
         </main>
