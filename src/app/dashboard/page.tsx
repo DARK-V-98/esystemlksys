@@ -165,7 +165,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Menu Grid */}
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
             {menuCards.map((card, index) => (
               <Link
                 key={card.path}
@@ -173,30 +173,16 @@ export default function DashboardPage() {
                 className="group animate-slide-up"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
-                <div className="system-card rounded-2xl p-6 shadow-card h-full">
-                  <div className="flex flex-col sm:flex-row items-start justify-between h-full">
-                    <div className="flex items-center gap-4">
-                      <div className="flex h-16 w-16 items-center justify-center rounded-2xl gradient-primary shadow-glow transition-all duration-300 group-hover:shadow-glow-intense group-hover:scale-110">
-                        <card.icon className="h-8 w-8 text-primary-foreground" />
-                      </div>
-                      <div className="pr-4">
-                        <h3 className="text-2xl font-bold text-foreground group-hover:text-primary transition-colors">
-                          {card.title}
-                        </h3>
-                        <p className="mt-1 text-muted-foreground">
-                          {card.description}
-                        </p>
-                      </div>
+                <div className="system-card rounded-2xl p-6 shadow-card h-full flex flex-col items-center justify-center text-center aspect-square">
+                    <div className="flex h-20 w-20 items-center justify-center rounded-3xl gradient-primary shadow-glow transition-all duration-300 group-hover:shadow-glow-intense group-hover:scale-110">
+                        <card.icon className="h-10 w-10 text-primary-foreground" />
                     </div>
-                    <span className="mt-4 sm:mt-0 self-start sm:self-center shrink-0 rounded-full gradient-primary px-4 py-1.5 text-sm font-bold text-primary-foreground shadow-glow">
-                      {card.count}
-                    </span>
-                  </div>
-
-                  <div className="mt-6 flex items-center text-sm font-bold text-primary">
-                    <span>Explore {card.title}</span>
-                    <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-200 group-hover:translate-x-2" />
-                  </div>
+                    <h3 className="mt-4 text-xl font-bold text-foreground group-hover:text-primary transition-colors">
+                        {card.title}
+                    </h3>
+                    <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
+                        {card.description}
+                    </p>
                 </div>
               </Link>
             ))}
