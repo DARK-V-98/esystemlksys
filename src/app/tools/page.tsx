@@ -26,6 +26,15 @@ import {
   ArrowLeft
 } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+  PaginationEllipsis,
+} from "@/components/ui/pagination";
 
 
 const tools = [
@@ -63,6 +72,8 @@ const categories = ["All", "PDF", "Converter", "Image", "Text"];
 export default function ToolsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
+  const [currentPage, setCurrentPage] = useState(1);
+  const toolsPerPage = 8;
 
   const filteredTools = tools.filter((tool) => {
     const matchesSearch = tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -70,6 +81,81 @@ export default function ToolsPage() {
     const matchesCategory = activeCategory === "All" || tool.category === activeCategory;
     return matchesSearch && matchesCategory;
   });
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredTools.length / toolsPerPage);
+  const indexOfLastTool = currentPage * toolsPerPage;
+  const indexOfFirstTool = indexOfLastTool - toolsPerPage;
+  const currentTools = filteredTools.slice(indexOfFirstTool, indexOfLastTool);
+
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
+  const getPaginationItems = () => {
+    const items = [];
+    if (totalPages <= 5) {
+      for (let i = 1; i <= totalPages; i++) {
+        items.push(
+          <PaginationItem key={i}>
+            <PaginationLink href="#" isActive={i === currentPage} onClick={() => handlePageChange(i)}>
+              {i}
+            </PaginationLink>
+          </PaginationItem>
+        );
+      }
+    } else {
+        items.push(
+            <PaginationItem key={1}>
+              <PaginationLink href="#" isActive={1 === currentPage} onClick={() => handlePageChange(1)}>
+                1
+              </PaginationLink>
+            </PaginationItem>
+        );
+
+        if (currentPage > 3) {
+            items.push(<PaginationEllipsis key="start-ellipsis" />);
+        }
+
+        let startPage = Math.max(2, currentPage - 1);
+        let endPage = Math.min(totalPages - 1, currentPage + 1);
+
+        if (currentPage <= 2) {
+            startPage = 2;
+            endPage = 4;
+        }
+
+        if (currentPage >= totalPages - 1) {
+            startPage = totalPages - 3;
+            endPage = totalPages - 1;
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            items.push(
+              <PaginationItem key={i}>
+                <PaginationLink href="#" isActive={i === currentPage} onClick={() => handlePageChange(i)}>
+                  {i}
+                </PaginationLink>
+              </PaginationItem>
+            );
+        }
+
+        if (currentPage < totalPages - 2) {
+            items.push(<PaginationEllipsis key="end-ellipsis" />);
+        }
+
+        items.push(
+            <PaginationItem key={totalPages}>
+              <PaginationLink href="#" isActive={totalPages === currentPage} onClick={() => handlePageChange(totalPages)}>
+                {totalPages}
+              </PaginationLink>
+            </PaginationItem>
+        );
+    }
+    return items;
+  }
 
   return (
       <div className="space-y-6 animate-fade-in">
@@ -104,7 +190,10 @@ export default function ToolsPage() {
                     type="text"
                     placeholder="Search tools..."
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      setCurrentPage(1); // Reset to first page on search
+                    }}
                     className="pl-12 h-12"
                     />
                 </div>
@@ -113,7 +202,10 @@ export default function ToolsPage() {
                 {categories.map((category) => (
                 <button
                     key={category}
-                    onClick={() => setActiveCategory(category)}
+                    onClick={() => {
+                      setActiveCategory(category);
+                      setCurrentPage(1); // Reset to first page on filter change
+                    }}
                     className={`rounded-xl px-5 py-2.5 text-sm font-bold transition-all duration-200 ${
                     activeCategory === category
                         ? "gradient-primary text-primary-foreground shadow-glow"
@@ -127,8 +219,8 @@ export default function ToolsPage() {
         </div>
 
         {/* Tools Grid */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {filteredTools.map((tool, index) => (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 min-h-[460px]">
+          {currentTools.map((tool, index) => (
             <button
               key={tool.id}
               className="system-card group rounded-xl p-5 text-center shadow-card animate-slide-up h-full flex flex-col items-center justify-center"
@@ -150,13 +242,28 @@ export default function ToolsPage() {
 
         {/* Empty State */}
         {filteredTools.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-12 text-center">
+          <div className="flex flex-col items-center justify-center py-12 text-center min-h-[460px]">
             <Search className="h-12 w-12 text-muted-foreground" />
             <h3 className="mt-4 text-lg font-bold text-foreground">No tools found</h3>
             <p className="mt-1 text-muted-foreground">
               Try adjusting your search or filter criteria
             </p>
           </div>
+        )}
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+            <Pagination>
+            <PaginationContent>
+                <PaginationItem>
+                <PaginationPrevious href="#" onClick={() => handlePageChange(currentPage - 1)} />
+                </PaginationItem>
+                {getPaginationItems()}
+                <PaginationItem>
+                <PaginationNext href="#" onClick={() => handlePageChange(currentPage + 1)} />
+                </PaginationItem>
+            </PaginationContent>
+            </Pagination>
         )}
       </div>
   );
