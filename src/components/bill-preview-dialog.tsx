@@ -1,7 +1,7 @@
 
 
 'use client';
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import Image from 'next/image';
 import {
   Dialog,
@@ -16,31 +16,44 @@ import { toast } from 'sonner';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import type { BillItem } from '@/app/advanced-tools/invoice-generator/page';
-import { Download } from 'lucide-react';
+import { Download, Save, Cpu } from 'lucide-react';
+
+interface BillData {
+    logo: string | null;
+    yourCompany: string;
+    yourAddress: string;
+    clientCompany: string;
+    clientAddress: string;
+    invoiceNumber: string;
+    invoiceDate: string;
+    dueDate: string;
+    items: BillItem[];
+    tax: number;
+    accentColor: string;
+    subtotal: number;
+    taxAmount: number;
+    total: number;
+}
 
 interface BillPreviewDialogProps {
     isOpen: boolean;
     setIsOpen: (isOpen: boolean) => void;
-    billData: {
-        logo: string | null;
-        yourCompany: string;
-        yourAddress: string;
-        clientCompany: string;
-        clientAddress: string;
-        invoiceNumber: string;
-        invoiceDate: string;
-        dueDate: string;
-        items: BillItem[];
-        tax: number;
-        accentColor: string;
-        subtotal: number;
-        taxAmount: number;
-        total: number;
-    }
+    billData: BillData;
+    onFinalizeAndSave: () => Promise<BillData | null>;
+    isUserLoggedIn: boolean;
 }
 
-export function BillPreviewDialog({ isOpen, setIsOpen, billData }: BillPreviewDialogProps) {
+export function BillPreviewDialog({ isOpen, setIsOpen, billData, onFinalizeAndSave, isUserLoggedIn }: BillPreviewDialogProps) {
     const billPreviewRef = useRef<HTMLDivElement>(null);
+    const [isSaving, setIsSaving] = useState(false);
+    const [currentBillData, setCurrentBillData] = useState(billData);
+
+    React.useEffect(() => {
+        if(isOpen) {
+            setCurrentBillData(billData);
+        }
+    }, [isOpen, billData]);
+
     const {
         logo,
         yourCompany,
@@ -56,9 +69,9 @@ export function BillPreviewDialog({ isOpen, setIsOpen, billData }: BillPreviewDi
         subtotal,
         taxAmount,
         total,
-    } = billData;
+    } = currentBillData;
     
-    const downloadPDF = async () => {
+    const downloadPDF = async (dataForPdf: BillData) => {
         const billElement = billPreviewRef.current;
         if (!billElement) return;
 
@@ -79,13 +92,29 @@ export function BillPreviewDialog({ isOpen, setIsOpen, billData }: BillPreviewDi
             });
 
             pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
-            pdf.save(`invoice-${invoiceNumber}.pdf`);
+            pdf.save(`invoice-${dataForPdf.invoiceNumber}.pdf`);
             toast.success('PDF downloaded successfully!');
         } catch (error) {
             console.error("Error generating PDF:", error);
             toast.error('Failed to generate PDF. See console for details.');
         }
     };
+
+    const handleSaveAndDownload = async () => {
+        setIsSaving(true);
+        const finalData = await onFinalizeAndSave();
+        if (finalData) {
+            setCurrentBillData(finalData); // Update preview with final data
+            // Allow state to update and re-render before downloading
+            setTimeout(async () => {
+                await downloadPDF(finalData);
+                setIsSaving(false);
+                setIsOpen(false);
+            }, 100);
+        } else {
+            setIsSaving(false);
+        }
+    }
 
 
     return (
@@ -94,7 +123,7 @@ export function BillPreviewDialog({ isOpen, setIsOpen, billData }: BillPreviewDi
                 <DialogHeader>
                     <DialogTitle>Invoice Preview</DialogTitle>
                     <DialogDescription>
-                        Review your invoice before downloading.
+                        Review your invoice before saving and downloading.
                     </DialogDescription>
                 </DialogHeader>
                 <div className="flex-grow overflow-auto p-2 bg-muted/50 rounded-lg">
@@ -171,11 +200,12 @@ export function BillPreviewDialog({ isOpen, setIsOpen, billData }: BillPreviewDi
                     </div>
                 </div>
                 <DialogFooter>
-                    <Button type="button" variant="secondary" onClick={() => setIsOpen(false)}>Close</Button>
-                    <Button onClick={downloadPDF} variant="gradient">
-                        <Download className="mr-2 h-4 w-4"/>
-                        Download PDF
+                    <Button type="button" variant="secondary" onClick={() => setIsOpen(false)}>Cancel</Button>
+                    <Button onClick={handleSaveAndDownload} variant="gradient" disabled={!isUserLoggedIn || isSaving}>
+                        {isSaving ? <Cpu className="mr-2 h-4 w-4 animate-spin"/> : <Save className="mr-2 h-4 w-4"/>}
+                        {isSaving ? 'Saving...' : 'Save & Download PDF'}
                     </Button>
+                    {!isUserLoggedIn && <p className="text-xs text-destructive text-right">You must be logged in to save.</p>}
                 </DialogFooter>
             </DialogContent>
         </Dialog>

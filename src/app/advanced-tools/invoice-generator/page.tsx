@@ -5,7 +5,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft, Receipt, Trash2, Plus, Download, Palette, Upload, RefreshCcw, Save, Eye } from 'lucide-react';
+import { ArrowLeft, Receipt, Trash2, Plus, Eye, RefreshCcw, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -14,9 +14,9 @@ import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from 'sonner';
 import { getAuth, onAuthStateChanged, User as FirebaseUser } from "firebase/auth";
-import { getFirestore, doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { app } from "@/firebase/config";
 import { BillPreviewDialog } from '@/components/bill-preview-dialog';
+import { getFirestore, doc, setDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 
 export interface BillItem {
   id: number;
@@ -33,7 +33,7 @@ const initialClientAddress = '456 Avenue, Town, Country';
 const initialTax = 10;
 const initialAccentColor = '#E60023';
 
-const getInitialInvoiceNumber = () => `INV-${Date.now().toString().slice(-6)}`;
+const getInitialInvoiceNumber = () => `DRAFT-${Date.now().toString()}`;
 const getInitialInvoiceDate = () => new Date().toISOString().slice(0, 10);
 const getInitialDueDate = () => new Date(new Date().setDate(new Date().getDate() + 30)).toISOString().slice(0, 10);
 
@@ -52,7 +52,6 @@ export default function InvoiceGeneratorPage() {
   const [accentColor, setAccentColor] = useState(initialAccentColor);
 
   const [user, setUser] = useState<FirebaseUser | null>(null);
-  const [isSaving, setIsSaving] = useState(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -99,6 +98,9 @@ export default function InvoiceGeneratorPage() {
 
   // Save data to localStorage whenever it changes
   useEffect(() => {
+    // Don't run this on the initial server render
+    if (!invoiceNumber) return;
+
     const dataToSave = {
         yourCompany,
         yourAddress,
@@ -167,46 +169,51 @@ export default function InvoiceGeneratorPage() {
       localStorage.removeItem('billGeneratorData');
       toast.success("Form fields have been reset.");
   }
-  
-  const saveBillToFirestore = async () => {
+
+  const handleFinalizeAndSave = async () => {
     if (!user) {
         toast.error("You must be logged in to save an invoice.");
-        return;
+        return null;
     }
-    setIsSaving(true);
-    toast.info("Saving invoice to your account...");
 
-    const billData = {
-        yourCompany,
-        yourAddress,
-        clientCompany,
-        clientAddress,
-        invoiceNumber,
-        invoiceDate,
-        dueDate,
-        items,
-        tax,
-        accentColor,
-        subtotal,
-        taxAmount,
-        total,
+    // 1. Generate new permanent invoice number
+    const permanentInvoiceNumber = `INV-${Date.now().toString().slice(-6)}`;
+
+    // 2. Prepare data with new number
+    const finalBillData = {
+        ...billData,
+        invoiceNumber: permanentInvoiceNumber,
     };
-    
+
+    const billRecord = {
+        id: permanentInvoiceNumber,
+        userId: user.uid,
+        data: JSON.stringify(finalBillData),
+        createdAt: serverTimestamp(),
+    };
+
     try {
         const db = getFirestore(app);
-        const billRef = doc(db, 'users', user.uid, 'bills', invoiceNumber);
-        await setDoc(billRef, {
-            id: invoiceNumber,
-            userId: user.uid,
-            data: JSON.stringify(billData),
-            createdAt: serverTimestamp(),
-        });
-        toast.success("Invoice saved successfully!");
+
+        // Delete the old draft record if it exists
+        if (invoiceNumber.startsWith('DRAFT-')) {
+            const oldBillRef = doc(db, 'users', user.uid, 'bills', invoiceNumber);
+            await deleteDoc(oldBillRef).catch(e => console.warn("Old draft not found, proceeding.", e));
+        }
+
+        // Save the new final record
+        const newBillRef = doc(db, 'users', user.uid, 'bills', permanentInvoiceNumber);
+        await setDoc(newBillRef, billRecord);
+        
+        // Update client-side state with the new permanent number
+        setInvoiceNumber(permanentInvoiceNumber);
+        
+        toast.success(`Invoice ${permanentInvoiceNumber} saved successfully!`);
+        return finalBillData;
     } catch(error) {
         console.error("Error saving invoice:", error);
         toast.error("Failed to save invoice. See console for details.");
-    } finally {
-        setIsSaving(false);
+        return null;
     }
   };
   
@@ -228,7 +235,7 @@ export default function InvoiceGeneratorPage() {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6 animate-fade-in p-8">
       <div className="relative overflow-hidden gradient-dark p-8">
         <div className="absolute -right-20 -top-20 h-60 w-60 rounded-full bg-primary/20 blur-3xl" />
         <div className="relative flex items-center gap-4">
@@ -253,11 +260,7 @@ export default function InvoiceGeneratorPage() {
                 <span>Back to Advanced Tools</span>
             </Link>
             <div className="flex gap-2">
-                <Button onClick={saveBillToFirestore} disabled={!user || isSaving}>
-                    <Save className="mr-2 h-5 w-5"/>
-                    {isSaving ? 'Saving...' : 'Save Invoice'}
-                </Button>
-                <Button onClick={() => setIsPreviewOpen(true)} variant="gradient">
+                <Button onClick={() => setIsPreviewOpen(true)} variant="gradient" className="h-12">
                     <Eye className="mr-2 h-5 w-5"/>
                     Preview & Download
                 </Button>
@@ -308,9 +311,18 @@ export default function InvoiceGeneratorPage() {
                      <div>
                         <h3 className="font-bold text-lg mb-2">Invoice Info</h3>
                         <div className="grid grid-cols-2 gap-4">
-                            <Input placeholder="Invoice #" value={invoiceNumber} onChange={(e) => setInvoiceNumber(e.target.value)} />
-                            <Input type="date" value={invoiceDate} onChange={(e) => setInvoiceDate(e.target.value)} />
-                            <Input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
+                            <div>
+                                <Label className="text-xs text-muted-foreground">Invoice #</Label>
+                                <Input value={invoiceNumber} readOnly className="font-mono bg-muted"/>
+                            </div>
+                             <div>
+                                <Label className="text-xs text-muted-foreground">Invoice Date</Label>
+                                <Input type="date" value={invoiceDate} onChange={(e) => setInvoiceDate(e.target.value)} />
+                            </div>
+                             <div>
+                                <Label className="text-xs text-muted-foreground">Due Date</Label>
+                                <Input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -401,6 +413,8 @@ export default function InvoiceGeneratorPage() {
         isOpen={isPreviewOpen}
         setIsOpen={setIsPreviewOpen}
         billData={billData}
+        onFinalizeAndSave={handleFinalizeAndSave}
+        isUserLoggedIn={!!user}
       />
     </div>
   );
