@@ -44,7 +44,7 @@ const menuCards = [
   {
     icon: Monitor,
     title: "Systems",
-    description: "PC optimization, disk cleanup, RAM boost",
+    description: "Access POS, Inventory, and other business systems",
     path: "/systems",
   },
   {
