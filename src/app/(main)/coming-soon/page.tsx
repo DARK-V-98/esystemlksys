@@ -1,8 +1,9 @@
 'use client'
 import { useSearchParams } from 'next/navigation';
 import { Construction, Rocket } from "lucide-react";
+import { Suspense } from 'react';
 
-export default function ComingSoon() {
+function ComingSoonContent() {
   const searchParams = useSearchParams()
   const title = searchParams.get('title') || 'Page';
 
@@ -35,5 +36,14 @@ export default function ComingSoon() {
           </p>
         </div>
       </div>
+  );
+}
+
+
+export default function ComingSoon() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ComingSoonContent />
+    </Suspense>
   );
 }
