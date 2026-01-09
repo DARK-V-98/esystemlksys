@@ -25,7 +25,7 @@ export default function RootLayout({
       <head>
         <link rel="manifest" href="/manifest.json" />
       </head>
-      <body className="flex flex-col h-screen">
+      <body className="flex flex-col h-screen overflow-hidden">
           <TitleBar />
           <TooltipProvider>
             <div className="flex-grow overflow-y-auto">
