@@ -112,7 +112,7 @@ export default function DashboardPage() {
       <div className="flex flex-col">
         <div className="flex-grow space-y-8 animate-fade-in">
           {/* Header */}
-          <div className="relative overflow-hidden rounded-2xl gradient-dark p-6 md:p-8">
+          <div className="relative overflow-hidden gradient-dark p-6 md:p-8">
             <div className="absolute -right-20 -top-20 h-60 w-60 rounded-full bg-primary/20 blur-3xl" />
             <div className="absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-primary/10 blur-2xl" />
             <div className="relative flex justify-between items-start">
