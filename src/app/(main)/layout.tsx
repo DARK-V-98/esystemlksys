@@ -16,20 +16,32 @@ export default function AppLayout({
 
     useEffect(() => {
         const auth = getAuth(app);
+        
         const unsubscribe = onAuthStateChanged(auth, (user) => {
-            if (!user) {
-                router.push("/auth");
-            } else {
-                localStorage.setItem("isAuthenticated", "true");
+            if (user) {
+                // User is authenticated via Firebase
+                if (localStorage.getItem("isAuthenticated") !== "true") {
+                    localStorage.setItem("isAuthenticated", "true");
+                }
                 setLoading(false);
+            } else {
+                // User is not authenticated via Firebase, check local storage as a fallback
+                if (localStorage.getItem("isAuthenticated") === "true") {
+                    // This state is inconsistent, let's log out properly
+                    localStorage.removeItem("isAuthenticated");
+                }
+                router.push("/auth");
             }
         });
 
+        // This handles the case where the page reloads and Firebase auth state is not yet determined.
         const isAuthenticated = localStorage.getItem("isAuthenticated");
         if (!isAuthenticated) {
-            router.push("/auth");
+            // If no local flag, we wait for Firebase to tell us, or redirect if it determines no user.
+            // If Firebase is fast, it will set loading to false. If not, the onAuthStateChanged will handle it.
         } else {
-            setLoading(false);
+            // If there's a local flag, we can probably show the UI, but still let Firebase be the source of truth.
+            setLoading(false); 
         }
 
         // Disable right-click context menu
