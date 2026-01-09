@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Cpu, Eye, EyeOff, Mail, Lock, User, Zap, Shield, Layers } from "lucide-react";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { app } from "@/firebase/config"; // Import the Firebase app instance
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -14,8 +16,9 @@ export default function Auth() {
   const [name, setName] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
+  const auth = getAuth(app);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
@@ -29,9 +32,22 @@ export default function Auth() {
       return;
     }
 
-    localStorage.setItem("isAuthenticated", "true");
-    localStorage.setItem("userName", name || email.split("@")[0]);
-    router.push("/dashboard");
+    try {
+      if (isLogin) {
+        await signInWithEmailAndPassword(auth, email, password);
+        localStorage.setItem("isAuthenticated", "true");
+        const user = auth.currentUser;
+        localStorage.setItem("userName", user?.displayName || user?.email?.split("@")[0] || "User");
+      } else {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        await updateProfile(userCredential.user, { displayName: name });
+        localStorage.setItem("isAuthenticated", "true");
+        localStorage.setItem("userName", name);
+      }
+      router.push("/dashboard");
+    } catch (err: any) {
+      setError(err.message);
+    }
   };
 
   return (
