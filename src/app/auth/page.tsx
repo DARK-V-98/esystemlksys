@@ -99,7 +99,7 @@ export default function Auth() {
         <div className="absolute top-8 right-8">
             <ThemeSwitcher />
         </div>
-        <div className="animate-slide-up" style={{animationDelay: '100ms'}}>
+        <div>
             <div className="flex items-center gap-3">
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl gradient-primary shadow-glow-intense animate-pulse-glow">
                 <Cpu className="h-8 w-8 text-primary-foreground" />
@@ -112,12 +112,12 @@ export default function Auth() {
         </div>
 
         <div className="space-y-8">
-          <h2 className="text-5xl font-black leading-tight text-primary-foreground animate-slide-up" style={{animationDelay: '200ms'}}>
+          <h2 className="text-5xl font-black leading-tight text-primary-foreground">
             Your Ultimate
             <br />
             <span className="text-primary neon-text">PC Powerhouse</span>
           </h2>
-          <p className="text-lg text-primary-foreground/80 animate-slide-up" style={{animationDelay: '300ms'}}>
+          <p className="text-lg text-primary-foreground/80">
             100+ powerful tools for file management, system optimization,
             web utilities, and complete PC control. All in one platform.
           </p>
@@ -130,8 +130,7 @@ export default function Auth() {
             ].map((feature, index) => (
               <div
                 key={feature.label}
-                className="rounded-xl border border-primary/30 bg-primary/10 p-4 backdrop-blur animate-slide-up"
-                style={{animationDelay: `${400 + index * 100}ms`}}
+                className="rounded-xl border border-primary/30 bg-primary/10 p-4 backdrop-blur"
               >
                 <feature.icon className="h-8 w-8 text-primary mb-2" />
                 <p className="font-bold text-primary-foreground">{feature.label}</p>
@@ -141,7 +140,7 @@ export default function Auth() {
           </div>
         </div>
 
-        <p className="text-sm text-primary-foreground/50 animate-slide-up" style={{animationDelay: '700ms'}}>
+        <p className="text-sm text-primary-foreground/50">
           © 2024 ESYSTEMLK. All rights reserved.
         </p>
       </div>
@@ -153,14 +152,14 @@ export default function Auth() {
         </div>
         <div className="w-full max-w-md space-y-8">
           {/* Mobile Logo */}
-          <div className="flex items-center justify-center gap-3 lg:hidden animate-fade-in">
+          <div className="flex items-center justify-center gap-3 lg:hidden">
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl gradient-primary shadow-glow">
               <Cpu className="h-8 w-8 text-primary-foreground" />
             </div>
             <h1 className="text-2xl font-black text-gradient">ESYSTEMLK</h1>
           </div>
 
-          <div className="text-center animate-slide-up">
+          <div className="text-center">
             <h2 className="text-4xl font-black text-foreground">
               {isLogin ? "Welcome Back" : "Create Account"}
             </h2>
@@ -173,7 +172,7 @@ export default function Auth() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             {!isLogin && (
-              <div className="space-y-2 animate-fade-in" style={{animationDelay: '100ms'}}>
+              <div className="space-y-2">
                 <Label htmlFor="name" className="text-foreground font-semibold">Full Name</Label>
                 <div className="relative">
                   <User className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
@@ -190,7 +189,7 @@ export default function Auth() {
               </div>
             )}
 
-            <div className="space-y-2 animate-fade-in" style={{animationDelay: '200ms'}}>
+            <div className="space-y-2">
               <Label htmlFor="email" className="text-foreground font-semibold">Email Address</Label>
               <div className="relative">
                 <Mail className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
@@ -206,7 +205,7 @@ export default function Auth() {
               </div>
             </div>
 
-            <div className="space-y-2 animate-fade-in" style={{animationDelay: '300ms'}}>
+            <div className="space-y-2">
               <Label htmlFor="password" className="text-foreground font-semibold">Password</Label>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
@@ -234,7 +233,7 @@ export default function Auth() {
             </div>
 
              {!isLogin && (
-              <div className="space-y-2 animate-fade-in" style={{animationDelay: '400ms'}}>
+              <div className="space-y-2">
                 <Label htmlFor="confirmPassword" className="text-foreground font-semibold">Confirm Password</Label>
                 <div className="relative">
                   <Lock className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
@@ -263,7 +262,7 @@ export default function Auth() {
             )}
             
             {isLogin && (
-              <div className="text-right animate-fade-in" style={{animationDelay: '400ms'}}>
+              <div className="text-right">
                 <Link href="/forgot-password" passHref>
                   <span className="text-sm font-medium text-primary hover:underline cursor-pointer">
                     Forgot Password?
@@ -273,12 +272,12 @@ export default function Auth() {
             )}
 
             {error && (
-              <div className="rounded-lg bg-destructive/10 border border-destructive/30 p-3 animate-fade-in">
+              <div className="rounded-lg bg-destructive/10 border border-destructive/30 p-3">
                 <p className="text-sm text-destructive font-medium">{error}</p>
               </div>
             )}
 
-            <div className="animate-slide-up" style={{animationDelay: '500ms'}}>
+            <div>
                 <Button type="submit" variant="gradient" size="xl" className="w-full font-bold" disabled={loading}>
                 {loading ? (
                     <Cpu className="h-6 w-6 animate-spin" />
@@ -288,7 +287,7 @@ export default function Auth() {
             </div>
           </form>
 
-          <div className="text-center animate-fade-in" style={{animationDelay: '600ms'}}>
+          <div className="text-center">
             <p className="text-muted-foreground">
               {isLogin ? "Don't have an account?" : "Already have an account?"}
               <button
