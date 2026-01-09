@@ -7,7 +7,7 @@ import { Music, ArrowLeft, Upload, ListMusic, Play, Pause, SkipForward, SkipBack
 import { cn } from '@/lib/utils';
 import { toast } from '@/components/ui/sonner';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import jsmediatags from 'jsmediatags';
+import type { jsmediatags as JsMediaTags } from 'jsmediatags/types';
 
 interface PlaylistItem {
   name: string;
@@ -23,6 +23,12 @@ export default function AudioPlayerPage() {
   
   const audioRef = useRef<HTMLAudioElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [jsmediatags, setJsmediatags] = useState<JsMediaTags | null>(null);
+
+  useEffect(() => {
+    // Correctly import the browser version of jsmediatags
+    import('jsmediatags/dist/jsmediatags.min.js').then(mod => setJsmediatags(mod.default));
+  }, []);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -37,7 +43,7 @@ export default function AudioPlayerPage() {
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
-    if (files) {
+    if (files && jsmediatags) {
       const newItems: PlaylistItem[] = Array.from(files).map(file => ({
         name: file.name,
         src: URL.createObjectURL(file),
