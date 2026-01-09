@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
@@ -22,7 +23,7 @@ import { cn } from '@/lib/utils';
 
 const initialYourCompany = 'Your Company Name';
 const initialYourAddress = '123 Street, City, Country\nPhone: (123) 456-7890\nEmail: contact@yourcompany.com';
-const initialLetterContent = `Date: ${new Date().toLocaleDateString()}
+const getInitialLetterContent = () => `Date: ${new Date().toLocaleDateString()}
 
 Subject: Regarding...
 
@@ -38,7 +39,7 @@ export default function LetterheadGeneratorPage() {
   const [logo, setLogo] = useState<string | null>(null);
   const [yourCompany, setYourCompany] = useState(initialYourCompany);
   const [yourAddress, setYourAddress] = useState(initialYourAddress);
-  const [letterContent, setLetterContent] = useState(initialLetterContent);
+  const [letterContent, setLetterContent] = useState('');
   const [accentColor, setAccentColor] = useState('#333333');
   const [selectedDesign, setSelectedDesign] = useState(0);
 
@@ -63,16 +64,20 @@ export default function LetterheadGeneratorPage() {
         setLogo(data.logo || null);
         setYourCompany(data.yourCompany || initialYourCompany);
         setYourAddress(data.yourAddress || initialYourAddress);
-        setLetterContent(data.letterContent || initialLetterContent);
+        setLetterContent(data.letterContent || getInitialLetterContent());
         setAccentColor(data.accentColor || '#333333');
         setSelectedDesign(data.selectedDesign || 0);
+      } else {
+        setLetterContent(getInitialLetterContent());
       }
     } catch (error) {
       console.error("Failed to load from local storage", error);
+      setLetterContent(getInitialLetterContent());
     }
   }, []);
 
   useEffect(() => {
+    if (!letterContent) return; // Don't save initial empty state
     const dataToSave = { logo, yourCompany, yourAddress, letterContent, accentColor, selectedDesign };
     localStorage.setItem('letterheadGeneratorData', JSON.stringify(dataToSave));
   }, [logo, yourCompany, yourAddress, letterContent, accentColor, selectedDesign]);
@@ -90,7 +95,7 @@ export default function LetterheadGeneratorPage() {
     setLogo(null);
     setYourCompany(initialYourCompany);
     setYourAddress(initialYourAddress);
-    setLetterContent(initialLetterContent);
+    setLetterContent(getInitialLetterContent());
     setAccentColor('#333333');
     setSelectedDesign(0);
     localStorage.removeItem('letterheadGeneratorData');
