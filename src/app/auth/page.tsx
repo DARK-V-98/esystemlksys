@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Cpu, Eye, EyeOff, Mail, Lock, User, Zap, Shield, Layers, Signal, ServerCrash } from "lucide-react";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, onAuthStateChanged } from "firebase/auth";
-import { getFirestore, doc, setDoc, serverTimestamp, getDoc, onSnapshot } from "firebase/firestore";
+import { getFirestore, doc, setDoc, serverTimestamp, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
 import { app } from "@/firebase/config";
 import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 import { cn } from "@/lib/utils";
@@ -51,8 +51,16 @@ export default function Auth() {
         const userDocRef = doc(db, "users", user.uid);
         const userDoc = await getDoc(userDocRef);
         if (userDoc.exists()) {
-          const role = userDoc.data().role;
+          const userData = userDoc.data();
+          const role = userData.role;
           setUserRole(role);
+          
+          if (userData.isBanned) {
+            setError("Your account has been suspended. Please contact support.");
+            await auth.signOut();
+            return;
+          }
+
           if (maintenanceMode && !['admin', 'developer'].includes(role)) {
             // If in maintenance and user is not privileged, keep them here with an error
             setError("The system is under maintenance. Please try again later.");
@@ -105,13 +113,24 @@ export default function Auth() {
         
         let role = "user";
         if (userDoc.exists()) {
-          role = userDoc.data().role;
+          const userData = userDoc.data();
+          role = userData.role;
+
+          if(userData.isBanned) {
+             await auth.signOut();
+             setError("Your account has been suspended. Please contact support.");
+             setLoading(false);
+             return;
+          }
+
           if (maintenanceMode && !['admin', 'developer'].includes(role)) {
               await auth.signOut();
               setError("The system is under maintenance. Only administrators can log in at this time.");
               setLoading(false);
               return;
           }
+          // Update last active time on login
+          await updateDoc(userDocRef, { lastActive: serverTimestamp() });
         } else {
           // If user doc doesn't exist, create it
           await setDoc(userDocRef, {
@@ -120,6 +139,9 @@ export default function Auth() {
             email: user.email,
             role: "user", // Default role
             createdAt: serverTimestamp(),
+            lastActive: serverTimestamp(),
+            isBanned: false,
+            ipAddress: 'N/A',
           });
         }
         localStorage.setItem("userRole", role);
@@ -140,6 +162,9 @@ export default function Auth() {
           email: user.email,
           role: "user", // New users are always 'user' role
           createdAt: serverTimestamp(),
+          lastActive: serverTimestamp(),
+          isBanned: false,
+          ipAddress: 'N/A', // IP address is not available on client-side
         });
 
         localStorage.setItem("isAuthenticated", "true");
@@ -259,7 +284,7 @@ export default function Auth() {
               </div>
           )}
 
-          <form onSubmit={handleSubmit} className={cn("space-y-5", maintenanceMode && "opacity-80 pointer-events-none")}>
+          <form onSubmit={handleSubmit} className="space-y-5">
             {!isLogin && (
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-foreground font-semibold">Full Name</Label>
@@ -272,7 +297,7 @@ export default function Auth() {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className="pl-12 h-12"
-                    disabled={loading}
+                    disabled={loading || (maintenanceMode && !['admin', 'developer'].includes(userRole))}
                   />
                 </div>
               </div>
@@ -367,7 +392,7 @@ export default function Auth() {
             )}
 
             <div>
-                <Button type="submit" variant="gradient" size="xl" className="w-full font-bold" disabled={loading || maintenanceMode}>
+                <Button type="submit" variant="gradient" size="xl" className="w-full font-bold" disabled={loading || (maintenanceMode && !isLogin) }>
                 {loading ? (
                     <Cpu className="h-6 w-6 animate-spin" />
                 ) : (isLogin ? "Sign In" : "Create Account")

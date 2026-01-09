@@ -8,7 +8,8 @@ import {
   User,
   SlidersHorizontal,
   Bell,
-  UserCog
+  UserCog,
+  Users
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { getAuth, onAuthStateChanged, User as FirebaseUser, signOut } from 'firebase/auth';
@@ -37,6 +38,12 @@ const adminMenuCards = [
     title: "Notifications",
     description: "Send system-wide notifications",
     path: "/admin/notifications",
+  },
+  {
+    icon: Users,
+    title: "User Management",
+    description: "Manage user roles and access",
+    path: "/admin/user-management",
   },
 ];
 

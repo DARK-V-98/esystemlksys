@@ -27,6 +27,19 @@
           "type": "string",
           "format": "date-time",
           "description": "The timestamp when the user profile was created."
+        },
+        "lastActive": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The timestamp of the user's last activity."
+        },
+        "isBanned": {
+            "type": "boolean",
+            "description": "Whether the user is banned from accessing the system."
+        },
+        "ipAddress": {
+            "type": "string",
+            "description": "The last known IP address of the user (for informational purposes)."
         }
       },
       "required": ["uid", "name", "email", "role", "createdAt"]

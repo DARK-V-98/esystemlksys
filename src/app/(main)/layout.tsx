@@ -3,6 +3,7 @@ import { MainLayout } from "@/components/layout/MainLayout";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getFirestore, doc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { app } from "@/firebase/config";
 import { Cpu } from "lucide-react";
 
@@ -16,13 +17,19 @@ export default function AppLayout({
 
     useEffect(() => {
         const auth = getAuth(app);
+        const db = getFirestore(app);
         
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
             if (user) {
                 // User is authenticated via Firebase
                 if (localStorage.getItem("isAuthenticated") !== "true") {
                     localStorage.setItem("isAuthenticated", "true");
                 }
+                
+                // Update last active timestamp
+                const userDocRef = doc(db, 'users', user.uid);
+                await updateDoc(userDocRef, { lastActive: serverTimestamp() });
+
                 setLoading(false);
             } else {
                 // User is not authenticated via Firebase, check local storage as a fallback
