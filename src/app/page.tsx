@@ -214,17 +214,12 @@ export default function SplashScreen() {
        {/* Enter Button */}
         {showEnterButton && (
             <div className="absolute z-20 flex flex-col items-center animate-fade-in" style={{animationDuration: '1s'}}>
-                 <h2 className="text-4xl font-black text-white neon-text mb-6">Press Enter to Start</h2>
-                <Button 
-                    variant="gradient" 
-                    size="xl" 
+                <button
                     onClick={handleNavigation}
-                    className="w-64 font-bold text-lg animate-pulse-glow"
+                    className="w-80 h-20 text-3xl font-black text-white rounded-2xl border-2 border-primary bg-primary/20 shadow-glow-intense animate-pulse-glow neon-border transition-all duration-300 hover:bg-primary/30 hover:shadow-red-500/80"
                 >
-                    <CornerDownLeft className="mr-3 h-6 w-6"/>
-                    Enter System
-                </Button>
-                <p className="text-muted-foreground mt-4 text-sm">Or press Spacebar</p>
+                    Enter
+                </button>
             </div>
         )}
 
@@ -252,7 +247,15 @@ export default function SplashScreen() {
             from { opacity: 0; }
             to { opacity: 1; }
         }
+        .neon-border {
+            box-shadow: 0 0 5px hsl(var(--primary)),
+                        0 0 10px hsl(var(--primary)),
+                        0 0 20px hsl(var(--primary)),
+                        inset 0 0 5px hsl(var(--primary));
+        }
       `}</style>
     </div>
   );
 }
+
+    
