@@ -15,7 +15,7 @@ export default function RootLayout({
 
   useEffect(() => {
     if ('serviceWorker' in navigator) {
-      navigator.service-worker
+      navigator.serviceWorker
         .register('/sw.js')
         .then((registration) => console.log('scope is: ', registration.scope));
     }
@@ -35,7 +35,7 @@ export default function RootLayout({
           >
             <TitleBar />
             <TooltipProvider>
-              <div className="flex-grow">
+              <div className="flex-grow overflow-y-auto">
                 <Toaster />
                 <Sonner />
                 {children}
