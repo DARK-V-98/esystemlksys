@@ -7,9 +7,9 @@ import {
   Monitor, 
   Globe, 
   Settings, 
-  Cpu,
   Menu,
-  PlayCircle
+  PlayCircle,
+  Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
@@ -18,6 +18,7 @@ const menuItems = [
   { icon: Wrench, label: "Tools", path: "/tools" },
   { icon: Monitor, label: "Systems", path: "/systems" },
   { icon: PlayCircle, label: "Media", path: "/media" },
+  { icon: Sparkles, label: "Advanced Tools", path: "/advanced-tools" },
   { icon: Globe, label: "Websites", path: "/websites", count: "Coming" },
   { icon: Settings, label: "Management", path: "/management", count: "Coming" },
 ];

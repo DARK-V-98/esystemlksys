@@ -2,6 +2,10 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
     function isPrivileged() {
       return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'developer'];
     }
@@ -10,10 +14,15 @@ service cloud.firestore {
     // Users can create their own profile, but cannot be impersonated.
     // They can only read and update their own profile.
     match /users/{userId} {
-      allow read: if request.auth.uid == userId || isPrivileged();
-      allow update: if request.auth.uid == userId;
-      allow create: if request.auth.uid == userId && request.resource.data.uid == userId;
-      allow list: if isPrivileged(); // Allow admins to list all users
+      allow read: if isOwner(userId) || isPrivileged();
+      allow update: if isOwner(userId);
+      allow create: if isOwner(userId) && request.resource.data.uid == userId;
+      allow list: if isPrivileged();
+    }
+
+    // Users can manage their own bills.
+    match /users/{userId}/bills/{billId} {
+        allow read, write, delete: if isOwner(userId);
     }
 
     // Maintenance status can be read by anyone, but only modified by privileged users.

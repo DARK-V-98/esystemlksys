@@ -72,6 +72,18 @@
         }
       },
       "required": ["message", "timestamp"]
+    },
+    "Bill": {
+      "title": "Bill / Receipt",
+      "description": "Represents a user-generated bill or receipt.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier for the bill." },
+        "userId": { "type": "string", "description": "The ID of the user who created the bill." },
+        "data": { "type": "string", "description": "A JSON string containing all the bill details." },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "data", "createdAt"]
     }
   },
   "auth": {
@@ -83,6 +95,12 @@
         "$ref": "#/entities/UserProfile"
       },
       "description": "User profile documents, keyed by user ID."
+    },
+    "/users/{userId}/bills/{billId}": {
+      "schema": {
+        "$ref": "#/entities/Bill"
+      },
+      "description": "Bills created by a specific user."
     },
     "/app-status/maintenance": {
         "schema": {
