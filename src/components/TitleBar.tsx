@@ -1,4 +1,7 @@
 'use client';
+import { Minus, Square, X } from 'lucide-react';
+import { Cpu } from "lucide-react";
+
 
 // This is a type declaration to inform TypeScript about the custom `electronAPI`
 // that will be injected into the `window` object by your Electron preload script.
@@ -14,30 +17,36 @@ declare global {
 
 export default function TitleBar() {
   return (
-    <div className="flex h-8 items-center justify-between bg-slate-900 px-2.5 text-white" style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}>
-      <span className="text-sm font-semibold">ESystemLK</span>
+    <div 
+      className="flex h-10 items-center justify-between px-4 gradient-dark text-primary-foreground" 
+      style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}
+    >
+      <div className="flex items-center gap-2">
+        <Cpu className="h-5 w-5 text-primary" />
+        <span className="text-sm font-bold text-gradient">ESYSTEMLK</span>
+      </div>
 
       <div className="flex items-center" style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}>
         <button
           onClick={() => window.electronAPI?.minimize()}
-          className="px-3 py-1 text-sm hover:bg-slate-700 rounded-sm"
+          className="p-2 text-muted-foreground transition-colors hover:bg-white/10 rounded-md"
           aria-label="Minimize"
         >
-          —
+          <Minus className="h-4 w-4" />
         </button>
         <button
           onClick={() => window.electronAPI?.maximize()}
-          className="px-3 py-1 text-sm hover:bg-slate-700 rounded-sm"
+          className="p-2 text-muted-foreground transition-colors hover:bg-white/10 rounded-md"
           aria-label="Maximize"
         >
-          ▢
+          <Square className="h-4 w-4" />
         </button>
         <button
           onClick={() => window.electronAPI?.close()}
-          className="px-3 py-1 text-sm hover:bg-destructive rounded-sm"
+          className="p-2 text-muted-foreground transition-colors hover:bg-destructive/80 rounded-md"
           aria-label="Close"
         >
-          ✕
+          <X className="h-4 w-4" />
         </button>
       </div>
     </div>
