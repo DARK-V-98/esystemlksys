@@ -15,7 +15,8 @@ import {
   LogOut,
   PlayCircle,
   Menu,
-  UserCog
+  UserCog,
+  Sparkles
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getAuth, onAuthStateChanged, User as FirebaseUser, signOut } from "firebase/auth";
@@ -53,6 +54,12 @@ const menuCards = [
     title: "Media Player",
     description: "Play local audio and video files",
     path: "/media",
+  },
+  {
+    icon: Sparkles,
+    title: "Advanced Tools",
+    description: "Specialized utilities like the Bill Generator",
+    path: "/advanced-tools",
   },
   {
     icon: Globe,
@@ -172,7 +179,7 @@ export default function DashboardPage() {
             </div>
         </div>
         <div className="bg-card rounded-lg border shadow-sm p-6">
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
                 {menuCards.map((card, index) => (
                 <Link
                     key={card.path}
