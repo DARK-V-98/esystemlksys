@@ -228,9 +228,12 @@ export default function Auth() {
         </div>
 
         <div className="flex justify-between items-center">
-            <p className="text-sm text-primary-foreground/50">
-                © 2024 ESYSTEMLK. All rights reserved.
-            </p>
+            <div className="text-sm text-primary-foreground/50">
+              <p>© 2024 ESYSTEMLK. All rights reserved.</p>
+              <a href="https://www.esystemlk.xyz" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
+                www.esystemlk.xyz
+              </a>
+            </div>
             <div className="flex items-center gap-2 rounded-full border border-border bg-secondary/20 px-3 py-1.5 text-sm font-semibold">
                 {maintenanceLoading ? (
                     <>

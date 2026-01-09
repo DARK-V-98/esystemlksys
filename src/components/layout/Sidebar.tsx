@@ -96,6 +96,9 @@ export function Sidebar() {
               Powered by
             </p>
             <p className="text-sm font-black text-gradient">ESYSTEMLK</p>
+            <a href="https://www.esystemlk.xyz" target="_blank" rel="noopener noreferrer" className="text-xs text-muted-foreground hover:text-primary transition-colors">
+                www.esystemlk.xyz
+            </a>
           </div>
         </div>
     </div>
