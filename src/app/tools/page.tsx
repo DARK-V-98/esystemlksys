@@ -23,6 +23,8 @@ import {
   Palette,
   Wrench
 } from "lucide-react";
+import { toast } from "@/components/ui/sonner";
+
 
 const tools = [
   // PDF Tools
@@ -123,6 +125,7 @@ export default function ToolsPage() {
               key={tool.id}
               className="system-card group rounded-xl p-5 text-left shadow-card animate-slide-up"
               style={{ animationDelay: `${index * 50}ms` }}
+              onClick={() => toast.info("Coming soon!", { description: `The '${tool.name}' tool is under development.`})}
             >
               <div className="flex items-start gap-4">
                 <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary transition-all duration-300 group-hover:gradient-primary group-hover:text-primary-foreground group-hover:shadow-glow group-hover:scale-110">
@@ -154,13 +157,6 @@ export default function ToolsPage() {
             </p>
           </div>
         )}
-
-        {/* Footer */}
-        <div className="rounded-xl bg-secondary p-4 text-center">
-          <p className="text-sm text-muted-foreground">
-            Powered by <span className="font-black text-gradient">ESYSTEMLK</span> • File Tools
-          </p>
-        </div>
       </div>
   );
 }

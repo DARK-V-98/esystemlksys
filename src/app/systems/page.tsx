@@ -20,42 +20,122 @@ import {
   Search,
   FolderOpen,
   Database,
-  Activity
+  Activity,
+  CheckCircle,
+  XCircle,
+  Loader2
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { Card, CardContent } from "@/components/ui/card";
+import { toast } from "@/components/ui/sonner";
 
 const systemTools = [
   // Disk & Storage
   { id: 1, name: "Disk Cleaner", description: "Remove junk files and free up disk space", icon: Trash2, category: "Storage", status: "active" },
-  { id: 2, name: "Disk Analyzer", description: "Visualize disk usage and find large files", icon: HardDrive, category: "Storage", status: "active" },
-  { id: 3, name: "Duplicate Finder", description: "Find and remove duplicate files", icon: FolderOpen, category: "Storage", status: "active" },
-  { id: 4, name: "Disk Defragmenter", description: "Optimize disk performance", icon: Database, category: "Storage", status: "active" },
+  { id: 2, name: "Disk Analyzer", description: "Visualize disk usage and find large files", icon: HardDrive, category: "Storage", status: "inactive" },
+  { id: 3, name: "Duplicate Finder", description: "Find and remove duplicate files", icon: FolderOpen, category: "Storage", status: "inactive" },
+  { id: 4, name: "Disk Defragmenter", description: "Optimize disk performance", icon: Database, category: "Storage", status: "inactive" },
   
   // Performance
-  { id: 5, name: "RAM Optimizer", description: "Free up memory and boost performance", icon: MemoryStick, category: "Performance", status: "active" },
-  { id: 6, name: "Startup Manager", description: "Control programs that run at startup", icon: Rocket, category: "Performance", status: "active" },
-  { id: 7, name: "Process Manager", description: "Monitor and manage running processes", icon: Activity, category: "Performance", status: "active" },
-  { id: 8, name: "CPU Monitor", description: "Real-time CPU usage monitoring", icon: Cpu, category: "Performance", status: "active" },
-  { id: 9, name: "Performance Boost", description: "One-click system optimization", icon: Zap, category: "Performance", status: "active" },
+  { id: 5, name: "RAM Optimizer", description: "Free up memory and boost performance", icon: MemoryStick, category: "Performance", status: "inactive" },
+  { id: 6, name: "Startup Manager", description: "Control programs that run at startup", icon: Rocket, category: "Performance", status: "inactive" },
+  { id: 7, name: "Process Manager", description: "Monitor and manage running processes", icon: Activity, category: "Performance", status: "inactive" },
+  { id: 8, name: "CPU Monitor", description: "Real-time CPU usage monitoring", icon: Cpu, category: "Performance", status: "inactive" },
+  { id: 9, name: "Performance Boost", description: "One-click system optimization", icon: Zap, category: "Performance", status: "inactive" },
   
   // System Info
-  { id: 10, name: "System Info", description: "View detailed system specifications", icon: Monitor, category: "Info", status: "active" },
-  { id: 11, name: "Temperature Monitor", description: "Track CPU and GPU temperatures", icon: Thermometer, category: "Info", status: "active" },
-  { id: 12, name: "Battery Health", description: "Check battery status and health", icon: Battery, category: "Info", status: "active" },
-  { id: 13, name: "Network Info", description: "View network configuration and status", icon: Wifi, category: "Info", status: "active" },
+  { id: 10, name: "System Info", description: "View detailed system specifications", icon: Monitor, category: "Info", status: "inactive" },
+  { id: 11, name: "Temperature Monitor", description: "Track CPU and GPU temperatures", icon: Thermometer, category: "Info", status: "inactive" },
+  { id: 12, name: "Battery Health", description: "Check battery status and health", icon: Battery, category: "Info", status: "inactive" },
+  { id: 13, name: "Network Info", description: "View network configuration and status", icon: Wifi, category: "Info", status: "inactive" },
   
   // Maintenance
-  { id: 14, name: "Registry Cleaner", description: "Clean and repair Windows registry", icon: Server, category: "Maintenance", status: "active" },
-  { id: 15, name: "Driver Updater", description: "Check and update system drivers", icon: RefreshCw, category: "Maintenance", status: "active" },
-  { id: 16, name: "Security Scanner", description: "Scan for security vulnerabilities", icon: Shield, category: "Maintenance", status: "active" },
-  { id: 17, name: "Scheduled Tasks", description: "Manage Windows scheduled tasks", icon: Clock, category: "Maintenance", status: "active" },
-  { id: 18, name: "Benchmark Test", description: "Test your system performance", icon: Gauge, category: "Maintenance", status: "active" },
+  { id: 14, name: "Registry Cleaner", description: "Clean and repair Windows registry", icon: Server, category: "Maintenance", status: "inactive" },
+  { id: 15, name: "Driver Updater", description: "Check and update system drivers", icon: RefreshCw, category: "Maintenance", status: "inactive" },
+  { id: 16, name: "Security Scanner", description: "Scan for security vulnerabilities", icon: Shield, category: "Maintenance", status: "inactive" },
+  { id: 17, name: "Scheduled Tasks", description: "Manage Windows scheduled tasks", icon: Clock, category: "Maintenance", status: "inactive" },
+  { id: 18, name: "Benchmark Test", description: "Test your system performance", icon: Gauge, category: "Maintenance", status: "inactive" },
 ];
 
 const categories = ["All", "Storage", "Performance", "Info", "Maintenance"];
 
+type Tool = typeof systemTools[0];
+
+const DiskCleaner = ({ onFinish }: { onFinish: () => void }) => {
+    const [progress, setProgress] = useState(0);
+    const [status, setStatus] = useState("Scanning for junk files...");
+    const [filesCleaned, setFilesCleaned] = useState(0);
+    const [spaceFreed, setSpaceFreed] = useState(0);
+    const [isCleaning, setIsCleaning] = useState(true);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setProgress(prev => {
+                if (prev >= 100) {
+                    clearInterval(interval);
+                    setStatus("Cleaning complete!");
+                    setIsCleaning(false);
+                    toast.success(`Disk Cleaned! Freed ${(Math.random() * 2 + 1).toFixed(2)} GB of space.`);
+                    return 100;
+                }
+                const newProgress = prev + Math.random() * 10;
+                if (newProgress > 20 && newProgress < 80) {
+                    setStatus("Removing temporary files...");
+                    setFilesCleaned(f => f + Math.floor(Math.random() * 50));
+                    setSpaceFreed(s => s + Math.random() * 100);
+                } else if (newProgress >= 80) {
+                    setStatus("Clearing system cache...");
+                }
+                return Math.min(newProgress, 100);
+            });
+        }, 300);
+
+        return () => clearInterval(interval);
+    }, []);
+
+    return (
+        <Card className="col-span-1 sm:col-span-2 lg:col-span-3 border-primary/50 shadow-glow">
+            <CardContent className="p-6">
+                <div className="flex items-center gap-4 mb-4">
+                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl gradient-primary text-primary-foreground">
+                        <Trash2 className="h-7 w-7" />
+                    </div>
+                    <div>
+                        <h3 className="text-xl font-bold text-foreground">Disk Cleaner</h3>
+                        <p className="text-muted-foreground">{status}</p>
+                    </div>
+                </div>
+                <Progress value={progress} className="w-full mb-4 h-3" />
+                <div className="flex justify-between items-center text-sm text-muted-foreground mb-6">
+                    <span>{filesCleaned} files cleaned</span>
+                    <span>{(spaceFreed / 1024).toFixed(2)} GB freed</span>
+                </div>
+                <div className="text-right">
+                    <Button onClick={onFinish} disabled={isCleaning}>
+                        {isCleaning ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <CheckCircle className="mr-2 h-4 w-4" />}
+                        {isCleaning ? 'Cleaning in Progress...' : 'Finish'}
+                    </Button>
+                </div>
+            </CardContent>
+        </Card>
+    );
+}
+
 export default function SystemsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
+  const [activeTool, setActiveTool] = useState<Tool | null>(null);
+
+  const handleToolClick = (tool: Tool) => {
+    if (tool.status === 'active') {
+        setActiveTool(tool);
+    } else {
+        toast.warning("Coming Soon!", {
+            description: `The '${tool.name}' tool is under development.`,
+        });
+    }
+  };
 
   const filteredTools = systemTools.filter((tool) => {
     const matchesSearch = tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -63,6 +143,14 @@ export default function SystemsPage() {
     const matchesCategory = activeCategory === "All" || tool.category === activeCategory;
     return matchesSearch && matchesCategory;
   });
+
+  if (activeTool) {
+    if (activeTool.id === 1) {
+        return <DiskCleaner onFinish={() => setActiveTool(null)} />;
+    }
+    // Future tools can be handled here with else-if
+  }
+
 
   return (
       <div className="space-y-6 animate-fade-in">
@@ -87,13 +175,14 @@ export default function SystemsPage() {
         {/* Quick Actions */}
         <div className="grid gap-4 md:grid-cols-4">
           {[
-            { icon: Trash2, label: "Quick Clean", desc: "Free up space", action: "clean" },
-            { icon: Zap, label: "Boost PC", desc: "Optimize now", action: "boost" },
-            { icon: Shield, label: "Security Scan", desc: "Check threats", action: "scan" },
-            { icon: RefreshCw, label: "Update All", desc: "Check updates", action: "update" },
+            { icon: Trash2, label: "Quick Clean", desc: "Free up space", action: () => handleToolClick(systemTools.find(t => t.id === 1)!) },
+            { icon: Zap, label: "Boost PC", desc: "Optimize now", action: () => toast.info("Coming soon!") },
+            { icon: Shield, label: "Security Scan", desc: "Check threats", action: () => toast.info("Coming soon!") },
+            { icon: RefreshCw, label: "Update All", desc: "Check updates", action: () => toast.info("Coming soon!") },
           ].map((action) => (
             <button
-              key={action.action}
+              key={action.label}
+              onClick={action.action}
               className="group flex items-center gap-4 rounded-xl border-2 border-border bg-card p-4 shadow-card transition-all duration-300 hover:border-primary hover:shadow-glow"
             >
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary transition-all duration-300 group-hover:gradient-primary group-hover:text-primary-foreground group-hover:shadow-glow">
@@ -141,19 +230,21 @@ export default function SystemsPage() {
           {filteredTools.map((tool, index) => (
             <button
               key={tool.id}
-              className="system-card group rounded-xl p-5 text-left shadow-card animate-slide-up"
+              onClick={() => handleToolClick(tool)}
+              className="system-card group rounded-xl p-5 text-left shadow-card animate-slide-up disabled:opacity-50 disabled:cursor-not-allowed"
               style={{ animationDelay: `${index * 50}ms` }}
+              disabled={tool.status === 'inactive'}
             >
               <div className="flex items-start gap-4">
                 <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary transition-all duration-300 group-hover:gradient-primary group-hover:text-primary-foreground group-hover:shadow-glow group-hover:scale-110">
                   <tool.icon className="h-7 w-7" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-bold text-foreground group-hover:text-primary transition-colors">
+                  <div className="flex items-center justify-between">
+                     <h3 className="font-bold text-foreground group-hover:text-primary transition-colors">
                       {tool.name}
                     </h3>
-                    <span className="h-2 w-2 rounded-full bg-success animate-pulse" />
+                    <span className={`h-2.5 w-2.5 rounded-full ${tool.status === 'active' ? 'bg-success' : 'bg-amber-500'}`} />
                   </div>
                   <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
                     {tool.description}
@@ -177,13 +268,6 @@ export default function SystemsPage() {
             </p>
           </div>
         )}
-
-        {/* Footer */}
-        <div className="rounded-xl bg-secondary p-4 text-center">
-          <p className="text-sm text-muted-foreground">
-            Powered by <span className="font-black text-gradient">ESYSTEMLK</span> • System Utilities
-          </p>
-        </div>
       </div>
   );
 }

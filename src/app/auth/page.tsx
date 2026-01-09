@@ -1,12 +1,12 @@
 'use client';
-import { useState } from "react";
-import { useRouter, notFound } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Cpu, Eye, EyeOff, Mail, Lock, User, Zap, Shield, Layers } from "lucide-react";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, onAuthStateChanged } from "firebase/auth";
 import { getFirestore, doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { app } from "@/firebase/config";
 
@@ -23,6 +23,17 @@ export default function Auth() {
   const router = useRouter();
   const auth = getAuth(app);
   const db = getFirestore(app);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // If user is already logged in, redirect to dashboard
+        router.push('/dashboard');
+      }
+    });
+    return () => unsubscribe();
+  }, [router, auth]);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -278,13 +289,6 @@ export default function Auth() {
                 {isLogin ? "Sign Up" : "Sign In"}
               </button>
             </p>
-          </div>
-
-          <div className="rounded-xl bg-secondary p-4 text-center">
-            <p className="text-xs text-muted-foreground">
-              Powered by
-            </p>
-            <p className="text-lg font-black text-gradient">ESYSTEMLK</p>
           </div>
         </div>
       </div>

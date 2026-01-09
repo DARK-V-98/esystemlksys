@@ -12,6 +12,8 @@ import {
   Users
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { getAuth } from "firebase/auth";
+import { app } from "@/firebase/config";
 
 const menuCards = [
   {
@@ -26,7 +28,7 @@ const menuCards = [
     title: "Systems",
     description: "PC optimization, disk cleanup, RAM boost, system info",
     path: "/systems",
-    count: "15+",
+    count: "18+",
   },
   {
     icon: Globe,
@@ -45,21 +47,27 @@ const menuCards = [
 ];
 
 const stats = [
-  { icon: Wrench, label: "Total Tools", value: "100+", color: "text-primary" },
+  { icon: Wrench, label: "Total Tools", value: "38+", color: "text-primary" },
   { icon: Cpu, label: "Categories", value: "4" },
   { icon: HardDrive, label: "File Formats", value: "50+" },
-  { icon: Users, label: "Active Users", value: "10K+" },
+  { icon: Users, label: "Active Users", value: "1" },
 ];
 
 export default function DashboardPage() {
   const [userName, setUserName] = useState("User");
 
   useEffect(() => {
-    setUserName(localStorage.getItem("userName") || "User");
+    const auth = getAuth(app);
+    const user = auth.currentUser;
+    if (user) {
+        setUserName(user.displayName || user.email?.split('@')[0] || "User");
+    } else {
+        setUserName(localStorage.getItem("userName") || "User");
+    }
   }, []);
 
   return (
-      <div className="flex flex-col min-h-[calc(100vh-3rem)]">
+      <div className="flex flex-col">
         <div className="flex-grow space-y-8 animate-fade-in">
           {/* Header */}
           <div className="relative overflow-hidden rounded-2xl gradient-dark p-8">
@@ -84,7 +92,7 @@ export default function DashboardPage() {
             {menuCards.map((card, index) => (
               <Link
                 key={card.path}
-                href={card.count === 'Coming' ? `/coming-soon?title=${card.title}` : card.path}
+                href={card.count === 'Coming' ? `/coming-soon?title=${card.label}` : card.path}
                 className="group animate-slide-up"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
@@ -131,12 +139,6 @@ export default function DashboardPage() {
               </div>
             ))}
           </div>
-        </div>
-        {/* Footer */}
-        <div className="mt-8 rounded-xl bg-secondary p-4 text-center">
-            <p className="text-sm text-muted-foreground">
-                Powered by <span className="font-black text-gradient">ESYSTEMLK</span> • Multipurpose System
-            </p>
         </div>
       </div>
   );
