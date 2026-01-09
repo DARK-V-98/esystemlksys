@@ -34,27 +34,19 @@ export default function AppLayout({
             }
         });
 
-        // This handles the case where the page reloads and Firebase auth state is not yet determined.
-        const isAuthenticated = localStorage.getItem("isAuthenticated");
-        if (!isAuthenticated) {
-            // If no local flag, we wait for Firebase to tell us, or redirect if it determines no user.
-            // If Firebase is fast, it will set loading to false. If not, the onAuthStateChanged will handle it.
-        } else {
-            // If there's a local flag, we can probably show the UI, but still let Firebase be the source of truth.
-            setLoading(false); 
-        }
-
-        // Disable right-click context menu
-        const handleContextMenu = (e: MouseEvent) => {
-            e.preventDefault();
-        };
-        document.addEventListener('contextmenu', handleContextMenu);
-
         return () => {
             unsubscribe();
-            document.removeEventListener('contextmenu', handleContextMenu);
         };
     }, [router]);
+
+    useEffect(() => {
+        // This effect runs only on the client
+        const isAuthenticated = localStorage.getItem("isAuthenticated");
+        if (isAuthenticated) {
+            setLoading(false);
+        }
+        // The onAuthStateChanged listener will handle redirection if not authenticated
+    }, []);
 
     if (loading) {
         return (
@@ -64,5 +56,11 @@ export default function AppLayout({
         );
     }
 
-    return <MainLayout>{children}</MainLayout>;
+    return (
+        <MainLayout>
+            <div className="p-4 sm:p-6 md:p-8">
+                {children}
+            </div>
+        </MainLayout>
+    );
 }

@@ -372,31 +372,7 @@ export default function SystemsPage() {
             </div>
           </div>
         </div>
-
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {[
-            { icon: Trash2, label: "Quick Clean", desc: "Free up space", action: () => handleToolClick(systemTools.find(t => t.id === 1)!) },
-            { icon: Zap, label: "Boost PC", desc: "Optimize now", action: () => handleToolClick(systemTools.find(t => t.id === 5)!) },
-            { icon: Shield, label: "Security Scan", desc: "Check threats", action: () => handleToolClick(systemTools.find(t => t.id === 16)!) },
-            { icon: RefreshCw, label: "Update All", desc: "Check updates", action: () => toast.info("Coming soon!") },
-          ].map((action) => (
-            <button
-              key={action.label}
-              onClick={action.action}
-              className="group flex items-center gap-4 rounded-xl border-2 border-border bg-card p-4 shadow-card transition-all duration-300 hover:border-primary hover:shadow-glow"
-            >
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary transition-all duration-300 group-hover:gradient-primary group-hover:text-primary-foreground group-hover:shadow-glow">
-                <action.icon className="h-6 w-6" />
-              </div>
-              <div className="text-left">
-                <p className="font-bold text-foreground">{action.label}</p>
-                <p className="text-sm text-muted-foreground">{action.desc}</p>
-              </div>
-            </button>
-          ))}
-        </div>
-
+        
         {/* Search & Filter */}
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div className="flex flex-col sm:flex-row sm:items-center gap-4">
@@ -433,7 +409,7 @@ export default function SystemsPage() {
         </div>
 
         {/* Tools Grid */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {filteredTools.map((tool, index) => (
             <button
               key={tool.id}
@@ -442,23 +418,20 @@ export default function SystemsPage() {
               style={{ animationDelay: `${index * 50}ms` }}
               disabled={tool.status === 'inactive'}
             >
-              <div className="flex items-start gap-4">
-                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary transition-all duration-300 group-hover:gradient-primary group-hover:text-primary-foreground group-hover:shadow-glow group-hover:scale-110">
-                  <tool.icon className="h-7 w-7" />
+              <div className="flex items-center gap-4">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-all duration-300 group-hover:gradient-primary group-hover:text-primary-foreground group-hover:shadow-glow group-hover:scale-110">
+                  <tool.icon className="h-6 w-6" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between">
-                     <h3 className="font-bold text-foreground group-hover:text-primary transition-colors">
+                     <h3 className="font-bold text-foreground group-hover:text-primary transition-colors truncate">
                       {tool.name}
                     </h3>
                     <span className={`h-2.5 w-2.5 rounded-full ${tool.status === 'active' ? 'bg-success' : 'bg-amber-500'} group-disabled:bg-muted-foreground`} />
                   </div>
-                  <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
+                  <p className="mt-1 text-xs text-muted-foreground line-clamp-1">
                     {tool.description}
                   </p>
-                  <span className="mt-2 inline-block rounded-lg bg-secondary px-3 py-1 text-xs font-semibold text-muted-foreground">
-                    {tool.category}
-                  </span>
                 </div>
               </div>
             </button>
