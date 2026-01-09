@@ -9,7 +9,9 @@
     "strict": true,
     "lib": ["ESNext"],
     "types": ["node"],
-    "outDir": "../dist/electron"
+    "outDir": "../dist/electron",
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true
   },
   "include": ["**/*.ts"]
 }

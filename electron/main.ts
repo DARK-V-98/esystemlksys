@@ -1,9 +1,9 @@
 // electron/main.ts
 import { app, BrowserWindow, ipcMain } from 'electron';
-import path from 'node:path';
-import os from 'node:os';
-import child_process from 'node:child_process';
-import fs from 'node:fs';
+import * as path from 'node:path';
+import * as os from 'node:os';
+import * as child_process from 'node:child_process';
+import * as fs from 'node:fs';
 
 // The built directory structure
 //
@@ -106,7 +106,7 @@ function createWindow() {
     return new Promise((resolve, reject) => {
       // This command works on macOS and Linux. For Windows, 'wmic logicaldisk' would be needed.
       const command = os.platform() === 'win32' ? 'wmic logicaldisk get size,freespace' : 'df -k /';
-      child_process.exec(command, (err, stdout) => {
+      child_process.exec(command, (err: child_process.ExecException | null, stdout: string) => {
         if (err) {
           return reject(err);
         }
@@ -118,7 +118,7 @@ function createWindow() {
         try {
           if (os.platform() === 'win32') {
              const lines = stdout.trim().split('\n').slice(1);
-             lines.forEach(line => {
+             lines.forEach((line: string) => {
                 const parts = line.trim().split(/\s+/);
                 if(parts.length >= 2){
                     free += parseInt(parts[0], 10);
@@ -147,10 +147,10 @@ function createWindow() {
           : 'ps -eo pid,ppid,pcpu,pmem,comm';
 
       return new Promise((resolve, reject) => {
-          child_process.exec(command, (err, stdout) => {
+          child_process.exec(command, (err: child_process.ExecException | null, stdout: string) => {
               if (err) return reject(err);
 
-              const processes = stdout.trim().split('\n').map(line => {
+              const processes = stdout.trim().split('\n').map((line: string) => {
                   if (os.platform() === 'win32') {
                       const parts = line.replace(/"/g, '').split(',');
                       return {
@@ -168,7 +168,7 @@ function createWindow() {
                           mem: parseFloat(parts[3])
                       };
                   }
-              }).filter(p => p.pid && p.name);
+              }).filter((p: any) => p.pid && p.name);
               resolve(processes.slice(0, 20)); // Limit for performance
           });
       });
