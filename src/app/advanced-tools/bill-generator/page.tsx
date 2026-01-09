@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
@@ -29,11 +30,12 @@ const initialYourCompany = 'Your Company';
 const initialYourAddress = '123 Street, City, Country';
 const initialClientCompany = 'Client Company';
 const initialClientAddress = '456 Avenue, Town, Country';
-const initialInvoiceNumber = `INV-${Date.now().toString().slice(-6)}`;
-const initialInvoiceDate = new Date().toISOString().slice(0, 10);
-const initialDueDate = new Date(new Date().setDate(new Date().getDate() + 30)).toISOString().slice(0, 10);
 const initialTax = 10;
 const initialAccentColor = '#E60023';
+
+const getInitialInvoiceNumber = () => `INV-${Date.now().toString().slice(-6)}`;
+const getInitialInvoiceDate = () => new Date().toISOString().slice(0, 10);
+const getInitialDueDate = () => new Date(new Date().setDate(new Date().getDate() + 30)).toISOString().slice(0, 10);
 
 
 export default function BillGeneratorPage() {
@@ -42,9 +44,9 @@ export default function BillGeneratorPage() {
   const [yourAddress, setYourAddress] = useState(initialYourAddress);
   const [clientCompany, setClientCompany] = useState(initialClientCompany);
   const [clientAddress, setClientAddress] = useState(initialClientAddress);
-  const [invoiceNumber, setInvoiceNumber] = useState(initialInvoiceNumber);
-  const [invoiceDate, setInvoiceDate] = useState(initialInvoiceDate);
-  const [dueDate, setDueDate] = useState(initialDueDate);
+  const [invoiceNumber, setInvoiceNumber] = useState('');
+  const [invoiceDate, setInvoiceDate] = useState('');
+  const [dueDate, setDueDate] = useState('');
   const [items, setItems] = useState<BillItem[]>(initialItems);
   const [tax, setTax] = useState(initialTax);
   const [accentColor, setAccentColor] = useState(initialAccentColor);
@@ -73,16 +75,25 @@ export default function BillGeneratorPage() {
             setYourAddress(parsedData.yourAddress || initialYourAddress);
             setClientCompany(parsedData.clientCompany || initialClientCompany);
             setClientAddress(parsedData.clientAddress || initialClientAddress);
-            setInvoiceNumber(parsedData.invoiceNumber || initialInvoiceNumber);
-            setInvoiceDate(parsedData.invoiceDate || initialInvoiceDate);
-            setDueDate(parsedData.dueDate || initialDueDate);
+            setInvoiceNumber(parsedData.invoiceNumber || getInitialInvoiceNumber());
+            setInvoiceDate(parsedData.invoiceDate || getInitialInvoiceDate());
+            setDueDate(parsedData.dueDate || getInitialDueDate());
             setItems(parsedData.items && parsedData.items.length > 0 ? parsedData.items : initialItems);
             setTax(parsedData.tax || initialTax);
             setAccentColor(parsedData.accentColor || initialAccentColor);
+        } else {
+            // Set initial date-dependent values only on the client
+            setInvoiceNumber(getInitialInvoiceNumber());
+            setInvoiceDate(getInitialInvoiceDate());
+            setDueDate(getInitialDueDate());
         }
     } catch (error) {
         console.error("Failed to load data from local storage", error);
         toast.error("Could not load your saved data.");
+        // Fallback to client-side generation
+        setInvoiceNumber(getInitialInvoiceNumber());
+        setInvoiceDate(getInitialInvoiceDate());
+        setDueDate(getInitialDueDate());
     }
   }, []);
 
@@ -175,9 +186,9 @@ export default function BillGeneratorPage() {
       setYourAddress(initialYourAddress);
       setClientCompany(initialClientCompany);
       setClientAddress(initialClientAddress);
-      setInvoiceNumber(initialInvoiceNumber);
-      setInvoiceDate(initialInvoiceDate);
-      setDueDate(initialDueDate);
+      setInvoiceNumber(getInitialInvoiceNumber());
+      setInvoiceDate(getInitialInvoiceDate());
+      setDueDate(getInitialDueDate());
       setItems(initialItems);
       setTax(initialTax);
       setAccentColor(initialAccentColor);
