@@ -1,7 +1,8 @@
 'use client';
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Cpu, Zap, Shield, Wrench, HardDrive, MemoryStick } from "lucide-react";
+import Image from "next/image";
+import { Zap, Shield, Wrench, HardDrive, MemoryStick } from "lucide-react";
 
 const loadingSteps = [
   "Initializing core modules...",
@@ -125,8 +126,8 @@ export default function SplashScreen() {
           <div className="absolute -inset-4 rounded-3xl bg-primary/30 blur-2xl animate-pulse" />
           
           {/* Logo */}
-          <div className="relative flex h-32 w-32 items-center justify-center rounded-3xl gradient-primary shadow-glow-intense">
-            <Cpu className="h-16 w-16 text-white" />
+          <div className="relative flex h-32 w-32 items-center justify-center rounded-3xl gradient-primary shadow-glow-intense p-4">
+            <Image src="/logo.png" alt="ESYSTEMLK Logo" width={96} height={96} />
             
             {/* Corner accents */}
             <div className="absolute -right-2 -top-2 h-4 w-4 rounded-full bg-primary shadow-glow animate-ping" />

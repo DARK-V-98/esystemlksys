@@ -1,6 +1,7 @@
 'use client';
 import { useState } from "react";
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -42,8 +43,8 @@ export default function ForgotPasswordPage() {
       {/* Left Panel - Branding */}
       <div className="hidden w-1/2 flex-col justify-between gradient-dark p-12 lg:flex">
          <div className="flex items-center gap-3">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl gradient-primary shadow-glow-intense animate-pulse-glow">
-            <Cpu className="h-8 w-8 text-primary-foreground" />
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl gradient-primary shadow-glow-intense animate-pulse-glow p-2">
+             <Image src="/logo.png" alt="ESYSTEMLK Logo" width={48} height={48} />
           </div>
           <div>
             <h1 className="text-3xl font-black text-primary-foreground">ESYSTEMLK</h1>

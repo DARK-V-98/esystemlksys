@@ -1,7 +1,6 @@
 'use client';
+import Image from 'next/image';
 import { Minus, Square, X } from 'lucide-react';
-import { Cpu } from "lucide-react";
-
 
 // This is a type declaration to inform TypeScript about the custom `electronAPI`
 // that will be injected into the `window` object by your Electron preload script.
@@ -22,7 +21,7 @@ export default function TitleBar() {
       style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}
     >
       <div className="flex items-center gap-2">
-        <Cpu className="h-5 w-5 text-primary" />
+        <Image src="/logo.png" alt="ESYSTEMLK Logo" width={20} height={20} />
         <span className="text-sm font-bold text-gradient">ESYSTEMLK</span>
       </div>
 

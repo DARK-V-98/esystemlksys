@@ -1,5 +1,6 @@
 'use client';
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { 
   Wrench, 
@@ -38,8 +39,8 @@ export function Sidebar() {
       {/* Logo */}
       <div className="flex h-20 items-center border-b border-sidebar-border px-6">
         <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl gradient-primary shadow-glow animate-pulse-glow">
-            <Cpu className="h-6 w-6 text-primary-foreground" />
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl gradient-primary shadow-glow animate-pulse-glow p-1">
+            <Image src="/logo.png" alt="ESYSTEMLK Logo" width={36} height={36} />
           </div>
           <div>
             <h1 className="text-xl font-black text-gradient">ESYSTEMLK</h1>

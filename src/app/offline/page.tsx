@@ -1,4 +1,5 @@
-import { WifiOff, Cpu } from "lucide-react";
+import { WifiOff } from "lucide-react";
+import Image from "next/image";
 
 export default function OfflinePage() {
   return (
@@ -31,8 +32,8 @@ export default function OfflinePage() {
         </p>
         
         <div className="mt-12 flex items-center justify-center gap-4 rounded-xl border border-white/20 bg-white/5 p-4 backdrop-blur-sm">
-           <div className="flex h-12 w-12 items-center justify-center rounded-lg gradient-primary shadow-glow">
-              <Cpu className="h-7 w-7 text-primary-foreground" />
+           <div className="flex h-12 w-12 items-center justify-center rounded-lg gradient-primary shadow-glow p-2">
+              <Image src="/logo.png" alt="ESYSTEMLK Logo" width={40} height={40} />
             </div>
             <div>
               <h2 className="text-lg font-bold text-gradient">ESYSTEMLK</h2>
