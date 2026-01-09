@@ -5,7 +5,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft, Receipt, Trash2, Plus, Eye, RefreshCcw, Upload } from 'lucide-react';
+import { ArrowLeft, Receipt, Trash2, Plus, Eye, RefreshCcw, Upload, Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -419,3 +419,5 @@ export default function InvoiceGeneratorPage() {
     </div>
   );
 }
+
+    
