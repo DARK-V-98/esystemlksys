@@ -18,9 +18,9 @@ interface UserProfile {
   email: string;
   role: 'user' | 'admin' | 'developer';
   createdAt: Timestamp;
-  lastActive: Timestamp;
+  lastActive?: Timestamp;
   isBanned: boolean;
-  ipAddress: string;
+  ipAddress?: string;
 }
 
 export default function UserManagementPage() {
