@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
@@ -37,7 +38,7 @@ const getInitialInvoiceDate = () => new Date().toISOString().slice(0, 10);
 const getInitialDueDate = () => new Date(new Date().setDate(new Date().getDate() + 30)).toISOString().slice(0, 10);
 
 
-export default function BillGeneratorPage() {
+export default function InvoiceGeneratorPage() {
   const [logo, setLogo] = useState<string | null>(null);
   const [yourCompany, setYourCompany] = useState(initialYourCompany);
   const [yourAddress, setYourAddress] = useState(initialYourAddress);
@@ -169,11 +170,11 @@ export default function BillGeneratorPage() {
   
   const saveBillToFirestore = async () => {
     if (!user) {
-        toast.error("You must be logged in to save a bill.");
+        toast.error("You must be logged in to save an invoice.");
         return;
     }
     setIsSaving(true);
-    toast.info("Saving bill to your account...");
+    toast.info("Saving invoice to your account...");
 
     const billData = {
         yourCompany,
@@ -200,10 +201,10 @@ export default function BillGeneratorPage() {
             data: JSON.stringify(billData),
             createdAt: serverTimestamp(),
         });
-        toast.success("Bill saved successfully!");
+        toast.success("Invoice saved successfully!");
     } catch(error) {
-        console.error("Error saving bill:", error);
-        toast.error("Failed to save bill. See console for details.");
+        console.error("Error saving invoice:", error);
+        toast.error("Failed to save invoice. See console for details.");
     } finally {
         setIsSaving(false);
     }
@@ -236,10 +237,10 @@ export default function BillGeneratorPage() {
           </div>
           <div>
             <h1 className="text-3xl font-black text-primary-foreground">
-              Bill <span className="text-primary neon-text">Generator</span>
+              Invoice <span className="text-primary neon-text">Generator</span>
             </h1>
             <p className="mt-1 text-primary-foreground/70">
-              Create and customize professional bills and receipts.
+              Create and customize professional invoices and receipts.
             </p>
           </div>
         </div>
@@ -254,7 +255,7 @@ export default function BillGeneratorPage() {
             <div className="flex gap-2">
                 <Button onClick={saveBillToFirestore} disabled={!user || isSaving}>
                     <Save className="mr-2 h-5 w-5"/>
-                    {isSaving ? 'Saving...' : 'Save Bill'}
+                    {isSaving ? 'Saving...' : 'Save Invoice'}
                 </Button>
                 <Button onClick={() => setIsPreviewOpen(true)} variant="gradient">
                     <Eye className="mr-2 h-5 w-5"/>
@@ -404,5 +405,3 @@ export default function BillGeneratorPage() {
     </div>
   );
 }
-
-    

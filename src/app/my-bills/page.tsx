@@ -37,7 +37,7 @@ interface BillData {
   total: number;
 }
 
-export default function MyBillsPage() {
+export default function MyInvoicesPage() {
   const [user, setUser] = useState<FirebaseUser | null>(null);
   const [bills, setBills] = useState<BillRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -71,7 +71,7 @@ export default function MyBillsPage() {
       setLoading(false);
     }, (error) => {
       console.error("Error fetching bills:", error);
-      toast.error("Failed to load your bills.");
+      toast.error("Failed to load your invoices.");
       setLoading(false);
     });
 
@@ -80,15 +80,15 @@ export default function MyBillsPage() {
 
   const handleDeleteBill = async (billId: string) => {
     if(!user) return;
-    toast.info("Deleting bill...");
+    toast.info("Deleting invoice...");
     try {
         const db = getFirestore(app);
         const billRef = doc(db, 'users', user.uid, 'bills', billId);
         await deleteDoc(billRef);
-        toast.success("Bill deleted successfully.");
+        toast.success("Invoice deleted successfully.");
     } catch (error) {
-        console.error("Error deleting bill:", error);
-        toast.error("Failed to delete bill.");
+        console.error("Error deleting invoice:", error);
+        toast.error("Failed to delete invoice.");
     }
   }
 
@@ -118,10 +118,10 @@ export default function MyBillsPage() {
           </div>
           <div>
             <h1 className="text-3xl font-black text-primary-foreground">
-              My <span className="text-primary neon-text">Bills</span>
+              My <span className="text-primary neon-text">Invoices</span>
             </h1>
             <p className="mt-1 text-primary-foreground/70">
-              Manage and view all your saved bills and receipts.
+              Manage and view all your saved invoices and receipts.
             </p>
           </div>
         </div>
@@ -143,10 +143,10 @@ export default function MyBillsPage() {
                     className="pl-10 h-12"
                   />
                 </div>
-                <Link href="/advanced-tools/bill-generator">
+                <Link href="/advanced-tools/invoice-generator">
                     <Button variant="gradient" className="h-12">
                         <Plus className="mr-2 h-5 w-5"/>
-                        Create New Bill
+                        Create New Invoice
                     </Button>
                 </Link>
             </div>
@@ -166,7 +166,7 @@ export default function MyBillsPage() {
                 <TableBody>
                     {loading ? (
                         <TableRow>
-                            <TableCell colSpan={5} className="text-center h-24">Loading your bills...</TableCell>
+                            <TableCell colSpan={5} className="text-center h-24">Loading your invoices...</TableCell>
                         </TableRow>
                     ) : filteredBills.length > 0 ? (
                       filteredBills.map((bill) => {
@@ -198,7 +198,7 @@ export default function MyBillsPage() {
                                         <AlertDialogHeader>
                                           <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                                           <AlertDialogDescription>
-                                            This action cannot be undone. This will permanently delete the bill with invoice number
+                                            This action cannot be undone. This will permanently delete the invoice with number
                                             <span className="font-bold text-primary"> {billData.invoiceNumber}</span>.
                                           </AlertDialogDescription>
                                         </AlertDialogHeader>
@@ -217,12 +217,12 @@ export default function MyBillsPage() {
                         <TableCell colSpan={5} className="text-center h-48">
                             <div className="flex flex-col items-center gap-2 text-muted-foreground">
                                 <Receipt className="h-10 w-10"/>
-                                <h3 className="font-semibold text-lg">No Bills Found</h3>
+                                <h3 className="font-semibold text-lg">No Invoices Found</h3>
                                 <p className="text-sm">
-                                    {searchQuery ? "No bills match your search." : "You haven't created any bills yet."}
+                                    {searchQuery ? "No invoices match your search." : "You haven't created any invoices yet."}
                                 </p>
-                                <Link href="/advanced-tools/bill-generator" className="mt-4">
-                                     <Button variant="secondary">Create Your First Bill</Button>
+                                <Link href="/advanced-tools/invoice-generator" className="mt-4">
+                                     <Button variant="secondary">Create Your First Invoice</Button>
                                 </Link>
                             </div>
                         </TableCell>

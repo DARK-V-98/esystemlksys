@@ -4,10 +4,10 @@ import { Sparkles, ArrowLeft, Receipt } from 'lucide-react';
 
 const advancedToolsOptions = [
   {
-    name: 'Bill Generator',
-    description: 'Create and customize professional bills or receipts.',
+    name: 'Invoice Generator',
+    description: 'Create and customize professional invoices or receipts.',
     icon: Receipt,
-    path: '/advanced-tools/bill-generator',
+    path: '/advanced-tools/invoice-generator',
   },
 ];
 

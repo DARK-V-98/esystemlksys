@@ -1,4 +1,5 @@
 
+
 'use client';
 import React, { useRef } from 'react';
 import Image from 'next/image';
@@ -14,7 +15,7 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
-import type { BillItem } from '@/app/advanced-tools/bill-generator/page';
+import type { BillItem } from '@/app/advanced-tools/invoice-generator/page';
 import { Download } from 'lucide-react';
 
 interface BillPreviewDialogProps {
