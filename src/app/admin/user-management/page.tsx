@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { getFirestore, collection, getDocs, doc, updateDoc, onSnapshot, Timestamp } from 'firebase/firestore';
 import { app } from '@/firebase/config';
 import { toast } from 'sonner';
-import { ArrowLeft, Users, Shield, VenetianMask } from 'lucide-react';
+import { ArrowLeft, Users, Shield, VenetianMask, Search } from 'lucide-react';
 import Link from 'next/link';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { formatDistanceToNow } from 'date-fns';
+import { Input } from '@/components/ui/input';
 
 interface UserProfile {
   uid: string;
@@ -26,6 +27,7 @@ interface UserProfile {
 export default function UserManagementPage() {
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
   const db = getFirestore(app);
 
   useEffect(() => {
@@ -61,6 +63,10 @@ export default function UserManagementPage() {
     }
   };
 
+  const filteredUsers = users.filter(user =>
+    user.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div className="space-y-6 p-8 animate-fade-in">
       <div className="relative overflow-hidden gradient-dark p-8">
@@ -81,10 +87,21 @@ export default function UserManagementPage() {
       </div>
 
       <div className="bg-card rounded-lg border shadow-sm p-6 space-y-6">
-        <Link href="/admin/dashboard" className="inline-flex items-center justify-center gap-2 rounded-xl h-12 px-5 text-sm font-bold transition-all duration-200 bg-secondary text-secondary-foreground hover:bg-secondary/80 hover:text-primary">
-            <ArrowLeft className="h-5 w-5" />
-            <span>Back to Admin Dashboard</span>
-        </Link>
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+            <Link href="/admin/dashboard" className="inline-flex items-center justify-center gap-2 rounded-xl h-12 px-5 text-sm font-bold transition-all duration-200 bg-secondary text-secondary-foreground hover:bg-secondary/80 hover:text-primary">
+                <ArrowLeft className="h-5 w-5" />
+                <span>Back to Admin Dashboard</span>
+            </Link>
+            <div className="relative w-full sm:max-w-xs">
+              <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Search by name..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 h-12"
+              />
+            </div>
+        </div>
         
         <div className="overflow-x-auto">
             <Table>
@@ -102,7 +119,8 @@ export default function UserManagementPage() {
                         <TableRow>
                             <TableCell colSpan={5} className="text-center h-24">Loading users...</TableCell>
                         </TableRow>
-                    ) : users.map((user) => (
+                    ) : filteredUsers.length > 0 ? (
+                      filteredUsers.map((user) => (
                         <TableRow key={user.uid}>
                             <TableCell>
                                 <div className="font-medium">{user.name}</div>
@@ -139,7 +157,12 @@ export default function UserManagementPage() {
                                 </div>
                             </TableCell>
                         </TableRow>
-                    ))}
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={5} className="text-center h-24">No users found matching your search.</TableCell>
+                      </TableRow>
+                    )}
                 </TableBody>
             </Table>
         </div>
