@@ -1,3 +1,4 @@
+
 # LinkVault
 
 A sleek desktop productivity application for managing web resources, allowing users to save links, tag and categorize them, add notes, and perform quick searches.
