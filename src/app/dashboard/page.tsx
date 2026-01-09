@@ -70,7 +70,7 @@ export default function DashboardPage() {
       <div className="flex flex-col">
         <div className="flex-grow space-y-8 animate-fade-in">
           {/* Header */}
-          <div className="relative overflow-hidden rounded-2xl gradient-dark p-8">
+          <div className="relative overflow-hidden rounded-2xl gradient-dark p-6 md:p-8">
             <div className="absolute -right-20 -top-20 h-60 w-60 rounded-full bg-primary/20 blur-3xl" />
             <div className="absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-primary/10 blur-2xl" />
             <div className="relative">
@@ -78,31 +78,31 @@ export default function DashboardPage() {
                 <Zap className="h-5 w-5 text-primary" />
                 <span className="text-sm font-semibold text-primary">MULTIPURPOSE SYSTEM</span>
               </div>
-              <h1 className="text-4xl font-black text-primary-foreground">
+              <h1 className="text-3xl md:text-4xl font-black text-primary-foreground">
                 Welcome back, <span className="text-primary neon-text">{userName}</span>
               </h1>
-              <p className="mt-2 text-primary-foreground/70 text-lg">
+              <p className="mt-2 text-primary-foreground/70 text-base md:text-lg">
                 Your complete PC toolkit is ready. Select a category to get started.
               </p>
             </div>
           </div>
 
           {/* Menu Grid */}
-          <div className="grid gap-6 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             {menuCards.map((card, index) => (
               <Link
                 key={card.path}
-                href={card.count === 'Coming' ? `/coming-soon?title=${card.label}` : card.path}
+                href={card.count === 'Coming' ? `/coming-soon?title=${card.title}` : card.path}
                 className="group animate-slide-up"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
-                <div className="system-card rounded-2xl p-6 shadow-card">
-                  <div className="flex items-start justify-between">
+                <div className="system-card rounded-2xl p-6 shadow-card h-full">
+                  <div className="flex flex-col sm:flex-row items-start justify-between h-full">
                     <div className="flex items-center gap-4">
                       <div className="flex h-16 w-16 items-center justify-center rounded-2xl gradient-primary shadow-glow transition-all duration-300 group-hover:shadow-glow-intense group-hover:scale-110">
                         <card.icon className="h-8 w-8 text-primary-foreground" />
                       </div>
-                      <div>
+                      <div className="pr-4">
                         <h3 className="text-2xl font-bold text-foreground group-hover:text-primary transition-colors">
                           {card.title}
                         </h3>
@@ -111,7 +111,7 @@ export default function DashboardPage() {
                         </p>
                       </div>
                     </div>
-                    <span className="rounded-full gradient-primary px-4 py-1.5 text-sm font-bold text-primary-foreground shadow-glow">
+                    <span className="mt-4 sm:mt-0 self-start sm:self-center shrink-0 rounded-full gradient-primary px-4 py-1.5 text-sm font-bold text-primary-foreground shadow-glow">
                       {card.count}
                     </span>
                   </div>
@@ -126,7 +126,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Stats */}
-          <div className="grid gap-4 md:grid-cols-4">
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
             {stats.map((stat, index) => (
               <div
                 key={stat.label}
@@ -134,7 +134,7 @@ export default function DashboardPage() {
                 style={{ animationDelay: `${(index + 4) * 100}ms` }}
               >
                 <stat.icon className={`h-8 w-8 mx-auto mb-2 ${stat.color || 'text-muted-foreground'}`} />
-                <p className="text-3xl font-black text-gradient">{stat.value}</p>
+                <p className="text-2xl md:text-3xl font-black text-gradient">{stat.value}</p>
                 <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>
               </div>
             ))}
