@@ -30,10 +30,10 @@ export function MainLayout({ children }: MainLayoutProps) {
     <div className="min-h-screen bg-background">
       <Sidebar />
       <div className="flex flex-col md:pl-64">
-        <main className="flex-grow p-6">
+        <main className="flex-grow p-4 sm:p-6 md:p-8">
             {children}
         </main>
-        <footer className="p-4 text-center">
+        <footer className="px-4 sm:px-6 md:px-8 pb-4 sm:pb-6 md:pb-8">
             <div className="rounded-xl bg-secondary p-4 text-center">
                 <p className="text-sm text-muted-foreground">
                     Powered by <span className="font-black text-gradient">ESYSTEMLK</span> • Multipurpose System
