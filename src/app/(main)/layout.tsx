@@ -39,15 +39,6 @@ export default function AppLayout({
         };
     }, [router]);
 
-    useEffect(() => {
-        // This effect runs only on the client
-        const isAuthenticated = localStorage.getItem("isAuthenticated");
-        if (isAuthenticated) {
-            setLoading(false);
-        }
-        // The onAuthStateChanged listener will handle redirection if not authenticated
-    }, []);
-
     if (loading) {
         return (
             <div className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-black">
@@ -58,9 +49,7 @@ export default function AppLayout({
 
     return (
         <MainLayout>
-            <div className="p-4 sm:p-6 md:p-8">
-                {children}
-            </div>
+            {children}
         </MainLayout>
     );
 }
