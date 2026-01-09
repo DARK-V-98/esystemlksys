@@ -35,7 +35,7 @@ export default function RootLayout({
           >
             <TitleBar />
             <TooltipProvider>
-              <div className="flex-grow overflow-y-auto">
+              <div className="flex-grow">
                 <Toaster />
                 <Sonner />
                 {children}
