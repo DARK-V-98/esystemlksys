@@ -103,16 +103,26 @@ export default function Auth() {
         const userDocRef = doc(db, "users", user.uid);
         const userDoc = await getDoc(userDocRef);
         
+        let role = "user";
         if (userDoc.exists()) {
-          const role = userDoc.data().role;
+          role = userDoc.data().role;
           if (maintenanceMode && !['admin', 'developer'].includes(role)) {
               await auth.signOut();
               setError("The system is under maintenance. Only administrators can log in at this time.");
               setLoading(false);
               return;
           }
-          localStorage.setItem("userRole", role);
+        } else {
+          // If user doc doesn't exist, create it
+          await setDoc(userDocRef, {
+            uid: user.uid,
+            name: user.displayName || user.email?.split("@")[0] || 'New User',
+            email: user.email,
+            role: "user", // Default role
+            createdAt: serverTimestamp(),
+          });
         }
+        localStorage.setItem("userRole", role);
 
         localStorage.setItem("isAuthenticated", "true");
         localStorage.setItem("userName", user?.displayName || user?.email?.split("@")[0] || "User");
