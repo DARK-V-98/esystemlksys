@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { Sparkles, ArrowLeft, Receipt } from 'lucide-react';
+import { Sparkles, ArrowLeft, Receipt, FileText, FileSignature } from 'lucide-react';
 
 const advancedToolsOptions = [
   {
@@ -9,11 +9,23 @@ const advancedToolsOptions = [
     icon: Receipt,
     path: '/advanced-tools/invoice-generator',
   },
+  {
+    name: 'Quotation Generator',
+    description: 'Design and send detailed quotations to clients.',
+    icon: FileText,
+    path: '/advanced-tools/quotation-generator',
+  },
+  {
+    name: 'Letterhead Generator',
+    description: 'Create official documents with custom designs.',
+    icon: FileSignature,
+    path: '/advanced-tools/letterhead-generator',
+  },
 ];
 
 export default function AdvancedToolsPage() {
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6 animate-fade-in p-8">
       <div className="relative overflow-hidden gradient-dark p-8">
         <div className="absolute -right-20 -top-20 h-60 w-60 rounded-full bg-primary/20 blur-3xl" />
         <div className="relative flex items-center gap-4">
@@ -37,7 +49,7 @@ export default function AdvancedToolsPage() {
             <span>Main Menu</span>
         </Link>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
             {advancedToolsOptions.map((option) => (
             <Link key={option.path} href={option.path}>
                 <div className="system-card group rounded-2xl p-8 text-center shadow-card h-full flex flex-col items-center justify-center aspect-video">

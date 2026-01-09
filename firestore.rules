@@ -20,8 +20,18 @@ service cloud.firestore {
       allow list: if isPrivileged();
     }
 
-    // Users can manage their own bills.
+    // Users can manage their own invoices.
     match /users/{userId}/bills/{billId} {
+        allow read, write, delete: if isOwner(userId);
+    }
+
+    // Users can manage their own quotations.
+    match /users/{userId}/quotations/{quotationId} {
+        allow read, write, delete: if isOwner(userId);
+    }
+
+    // Users can manage their own letterheads.
+    match /users/{userId}/letterheads/{letterheadId} {
         allow read, write, delete: if isOwner(userId);
     }
 

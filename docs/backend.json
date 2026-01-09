@@ -84,6 +84,30 @@
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["id", "userId", "data", "createdAt"]
+    },
+    "Quotation": {
+      "title": "Quotation",
+      "description": "Represents a user-generated quotation.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier for the quotation." },
+        "userId": { "type": "string", "description": "The ID of the user who created it." },
+        "data": { "type": "string", "description": "A JSON string containing all the quotation details." },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "data", "createdAt"]
+    },
+    "Letterhead": {
+      "title": "Letterhead",
+      "description": "Represents a user-generated letterhead document.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier for the letter." },
+        "userId": { "type": "string", "description": "The ID of the user who created it." },
+        "data": { "type": "string", "description": "A JSON string containing all the letter details." },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "data", "createdAt"]
     }
   },
   "auth": {
@@ -100,7 +124,19 @@
       "schema": {
         "$ref": "#/entities/Bill"
       },
-      "description": "Bills created by a specific user."
+      "description": "Invoices created by a specific user."
+    },
+    "/users/{userId}/quotations/{quotationId}": {
+      "schema": {
+        "$ref": "#/entities/Quotation"
+      },
+      "description": "Quotations created by a specific user."
+    },
+    "/users/{userId}/letterheads/{letterheadId}": {
+      "schema": {
+        "$ref": "#/entities/Letterhead"
+      },
+      "description": "Letterhead documents created by a specific user."
     },
     "/app-status/maintenance": {
         "schema": {
