@@ -93,7 +93,7 @@ export default function Auth() {
   };
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex h-full">
       {/* Left Panel - Branding */}
       <div className="hidden w-1/2 flex-col justify-between gradient-dark p-12 lg:flex overflow-hidden relative">
         <div className="absolute top-8 right-8">
