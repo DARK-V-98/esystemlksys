@@ -46,7 +46,7 @@ const PingMonitor = () => {
         color: 'text-muted-foreground',
         Icon: Signal,
         label: 'Unknown',
-        tooltip: 'Network latency cannot be determined.'
+        tooltip: 'Estimated Network RTT cannot be determined.'
       };
     }
     if (latency < 150) {
