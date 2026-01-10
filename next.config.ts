@@ -34,7 +34,6 @@ const nextConfig: NextConfig = {
     // This is required for Electron to work with Next.js
     outputFileTracing: false,
   },
-  output: 'export',
   webpack: (config, { isServer }) => {
     // In order to get pdf.js to work, we need to copy the worker file to the static assets folder.
     if (!isServer) {
