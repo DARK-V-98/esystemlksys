@@ -282,25 +282,25 @@ export default function ToolsPage() {
   );
 
   return (
-      <div className="space-y-6 animate-fade-in p-8">
-        <div className="relative overflow-hidden gradient-dark p-8">
+      <div className="space-y-6 animate-fade-in p-4 md:p-8">
+        <div className="relative overflow-hidden gradient-dark p-6 md:p-8">
           <div className="absolute -right-20 -top-20 h-60 w-60 rounded-full bg-primary/20 blur-3xl" />
           <div className="relative flex items-center gap-4">
             <div className="flex h-16 w-16 items-center justify-center rounded-2xl gradient-primary shadow-glow-intense animate-pulse-glow">
               <Wrench className="h-8 w-8 text-primary-foreground" />
             </div>
             <div>
-              <h1 className="text-3xl font-black text-primary-foreground">
-                File <span className="text-primary neon-text">Tools</span>
+              <h1 className="text-2xl md:text-3xl font-black text-primary-foreground">
+                All <span className="text-primary neon-text">Tools</span>
               </h1>
-              <p className="mt-1 text-primary-foreground/70">
+              <p className="mt-1 text-primary-foreground/70 text-sm md:text-base">
                 A collection of powerful utilities for daily tasks.
               </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-card rounded-lg border shadow-sm p-6 space-y-6">
+        <div className="bg-card rounded-lg border shadow-sm p-4 md:p-6 space-y-6">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                   <Link href="/dashboard" className="flex items-center justify-center gap-2 rounded-xl h-12 px-5 text-sm font-bold transition-all duration-200 bg-secondary text-secondary-foreground hover:bg-secondary/80 hover:text-primary">
@@ -321,7 +321,7 @@ export default function ToolsPage() {
                       />
                   </div>
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1 md:gap-2">
                   {categories.map((category) => (
                   <button
                       key={category}
@@ -329,7 +329,7 @@ export default function ToolsPage() {
                         setActiveCategory(category);
                         setCurrentPage(1);
                       }}
-                      className={`rounded-xl px-4 py-2 text-sm font-bold transition-all duration-200 ${
+                      className={`rounded-md md:rounded-xl px-3 py-1.5 md:px-4 md:py-2 text-xs md:text-sm font-bold transition-all duration-200 ${
                       activeCategory === category
                           ? "gradient-primary text-primary-foreground shadow-glow"
                           : "bg-secondary text-secondary-foreground hover:bg-secondary/80 hover:text-primary"

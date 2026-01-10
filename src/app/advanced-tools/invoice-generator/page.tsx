@@ -1,5 +1,3 @@
-
-
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
@@ -235,25 +233,25 @@ export default function InvoiceGeneratorPage() {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in p-8">
-      <div className="relative overflow-hidden gradient-dark p-8">
+    <div className="space-y-6 animate-fade-in p-4 md:p-8">
+      <div className="relative overflow-hidden gradient-dark p-6 md:p-8">
         <div className="absolute -right-20 -top-20 h-60 w-60 rounded-full bg-primary/20 blur-3xl" />
         <div className="relative flex items-center gap-4">
           <div className="flex h-16 w-16 items-center justify-center rounded-2xl gradient-primary shadow-glow-intense">
             <Receipt className="h-8 w-8 text-primary-foreground" />
           </div>
           <div>
-            <h1 className="text-3xl font-black text-primary-foreground">
+            <h1 className="text-2xl md:text-3xl font-black text-primary-foreground">
               Invoice <span className="text-primary neon-text">Generator</span>
             </h1>
-            <p className="mt-1 text-primary-foreground/70">
+            <p className="mt-1 text-primary-foreground/70 text-sm md:text-base">
               Create and customize professional invoices and receipts.
             </p>
           </div>
         </div>
       </div>
       
-      <div className="bg-card rounded-lg border shadow-sm p-6 space-y-6">
+      <div className="bg-card rounded-lg border shadow-sm p-4 md:p-6 space-y-6">
         <div className="flex flex-wrap gap-2 justify-between items-center">
             <Link href="/advanced-tools" className="inline-flex items-center justify-center gap-2 rounded-xl h-12 px-5 text-sm font-bold transition-all duration-200 bg-secondary text-secondary-foreground hover:bg-secondary/80 hover:text-primary">
                 <ArrowLeft className="h-5 w-5" />
@@ -328,18 +326,18 @@ export default function InvoiceGeneratorPage() {
                 </div>
             </ScrollArea>
             {/* Preview Panel */}
-            <div className="lg:col-span-2 rounded-lg p-8 bg-white text-black shadow-elevated">
+            <div className="lg:col-span-2 rounded-lg p-4 md:p-8 bg-white text-black shadow-elevated">
               <div className="p-4 bg-white">
                 <div className="flex justify-between items-start mb-8">
                     <div className="flex items-center gap-4">
                         {logo && <Image src={logo} alt="company logo" width={80} height={80} className="object-contain" />}
                         <div>
-                            <h1 className="text-2xl font-bold" style={{ color: accentColor }}>{yourCompany}</h1>
+                            <h1 className="text-xl md:text-2xl font-bold" style={{ color: accentColor }}>{yourCompany}</h1>
                             <p className="text-xs whitespace-pre-line">{yourAddress}</p>
                         </div>
                     </div>
                     <div className="text-right">
-                        <h2 className="text-3xl font-bold uppercase">Invoice</h2>
+                        <h2 className="text-2xl md:text-3xl font-bold uppercase">Invoice</h2>
                         <p className="text-sm"># {invoiceNumber}</p>
                     </div>
                 </div>
@@ -358,22 +356,22 @@ export default function InvoiceGeneratorPage() {
 
                 {/* Items Table */}
                 <div className="space-y-2 mb-8">
-                    <div className="grid grid-cols-12 gap-4 font-bold p-2 rounded-t-lg" style={{backgroundColor: accentColor, color: 'white'}}>
+                    <div className="grid grid-cols-12 gap-2 md:gap-4 font-bold p-2 rounded-t-lg text-xs md:text-sm" style={{backgroundColor: accentColor, color: 'white'}}>
                         <div className="col-span-7">Description</div>
                         <div className="col-span-2 text-right">Quantity</div>
                         <div className="col-span-2 text-right">Price</div>
                         <div className="col-span-1 text-right"></div>
                     </div>
                      {items.map((item, index) => (
-                        <div key={item.id} className="grid grid-cols-12 gap-4 items-center">
+                        <div key={item.id} className="grid grid-cols-12 gap-2 md:gap-4 items-center">
                             <div className="col-span-7">
-                                <Textarea value={item.description} onChange={(e) => handleItemChange(item.id, 'description', e.target.value)} rows={1} className="w-full text-sm"/>
+                                <Textarea value={item.description} onChange={(e) => handleItemChange(item.id, 'description', e.target.value)} rows={1} className="w-full text-xs md:text-sm"/>
                             </div>
                             <div className="col-span-2">
-                                <Input type="number" value={item.quantity} onChange={(e) => handleItemChange(item.id, 'quantity', Number(e.target.value))} className="w-full text-right"/>
+                                <Input type="number" value={item.quantity} onChange={(e) => handleItemChange(item.id, 'quantity', Number(e.target.value))} className="w-full text-right text-xs md:text-sm"/>
                             </div>
                              <div className="col-span-2">
-                                <Input type="number" value={item.price} onChange={(e) => handleItemChange(item.id, 'price', Number(e.target.value))} className="w-full text-right"/>
+                                <Input type="number" value={item.price} onChange={(e) => handleItemChange(item.id, 'price', Number(e.target.value))} className="w-full text-right text-xs md:text-sm"/>
                             </div>
                             <div className="col-span-1 text-right">
                                 <Button size="icon" variant="ghost" onClick={() => removeItem(item.id)} className="h-8 w-8 text-destructive"><Trash2 className="h-4 w-4"/></Button>
@@ -385,7 +383,7 @@ export default function InvoiceGeneratorPage() {
                 
                 {/* Totals */}
                 <div className="flex justify-end">
-                    <div className="w-64 space-y-2 text-sm">
+                    <div className="w-full max-w-[250px] space-y-2 text-sm">
                         <div className="flex justify-between">
                             <span className="text-gray-600">Subtotal</span>
                             <span className="font-medium">${subtotal.toFixed(2)}</span>
@@ -419,5 +417,3 @@ export default function InvoiceGeneratorPage() {
     </div>
   );
 }
-
-    

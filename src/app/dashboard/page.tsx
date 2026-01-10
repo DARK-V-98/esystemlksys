@@ -132,7 +132,7 @@ export default function DashboardPage() {
         <div className="relative overflow-hidden gradient-dark p-6 md:p-8 rounded-lg">
             <div className="absolute -right-20 -top-20 h-60 w-60 rounded-full bg-primary/20 blur-3xl" />
             <div className="absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-primary/10 blur-2xl" />
-            <div className="relative flex justify-between items-start">
+            <div className="relative flex flex-col md:flex-row justify-between items-start gap-4">
                 <div>
                     <div className="flex items-center gap-2 mb-2">
                         <Zap className="h-5 w-5 text-primary" />
@@ -145,7 +145,7 @@ export default function DashboardPage() {
                         Your complete PC toolkit is ready. Select a category to get started.
                     </p>
                 </div>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2 md:gap-4 self-end md:self-start">
                   <PingMonitor />
                   <ThemeSwitcher />
                   <DropdownMenu>
@@ -153,9 +153,9 @@ export default function DashboardPage() {
                       <Button
                           variant="outline"
                           size="icon"
-                          className="overflow-hidden rounded-full h-12 w-12 gradient-primary text-primary-foreground shadow-glow"
+                          className="overflow-hidden rounded-full h-10 w-10 md:h-12 md:w-12 gradient-primary text-primary-foreground shadow-glow"
                       >
-                          <User className="h-6 w-6" />
+                          <User className="h-5 w-5 md:h-6 md:w-6" />
                       </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-64">

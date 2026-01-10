@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 
 const menuItems = [
+  { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
   { icon: Wrench, label: "Tools", path: "/tools" },
   { icon: Monitor, label: "Systems", path: "/systems" },
   { icon: PlayCircle, label: "Media", path: "/media" },
@@ -58,20 +59,8 @@ export function Sidebar() {
         <p className="mb-3 px-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           Main Menu
         </p>
-        <Link
-              href="/dashboard"
-              className={cn(
-                "flex items-center gap-3 rounded-xl px-4 py-3.5 text-sm font-semibold transition-all duration-200",
-                pathname === "/dashboard"
-                  ? "gradient-primary text-primary-foreground shadow-glow"
-                  : "text-foreground hover:bg-secondary hover:text-primary"
-              )}
-            >
-              <LayoutDashboard className="h-5 w-5" />
-              Dashboard
-            </Link>
         {menuItems.map((item) => {
-          const isActive = pathname.startsWith(item.path);
+          const isActive = (item.path === '/dashboard' && pathname === item.path) || (item.path !== '/dashboard' && pathname.startsWith(item.path));
           const linkPath = item.count === 'Coming' 
             ? `/coming-soon?title=${item.label}`
             : item.path;
@@ -79,6 +68,7 @@ export function Sidebar() {
             <Link
               key={item.path}
               href={linkPath}
+              onClick={() => isMobile && setSidebarOpen(false)}
               className={cn(
                 "flex items-center gap-3 rounded-xl px-4 py-3.5 text-sm font-semibold transition-all duration-200",
                 isActive
