@@ -9,6 +9,10 @@ service cloud.firestore {
     function isPrivileged() {
       return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'developer'];
     }
+    
+    function isDeveloper() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'developer';
+    }
 
     // Admins/Developers can read all user profiles.
     // Users can create their own profile, but cannot be impersonated.
@@ -35,9 +39,9 @@ service cloud.firestore {
         allow read, write, delete: if isOwner(userId);
     }
     
-    // Developers can manage their own todos.
-    match /users/{userId}/todos/{todoId} {
-        allow read, write, delete: if isOwner(userId);
+    // Any developer can read, write, and delete from the shared todo list.
+    match /developer-todos/{todoId} {
+        allow read, write, delete: if isDeveloper();
     }
 
     // Maintenance status can be read by anyone, but only modified by privileged users.

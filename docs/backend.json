@@ -122,17 +122,31 @@
           "type": "string",
           "description": "The content of the todo item."
         },
-        "completed": {
-          "type": "boolean",
-          "description": "Whether the todo item is completed."
+        "status": {
+          "type": "string",
+          "enum": ["Pending", "Completed"],
+          "description": "The current status of the todo item."
         },
         "createdAt": {
           "type": "string",
           "format": "date-time",
           "description": "The timestamp when the todo was created."
+        },
+        "addedBy": {
+          "type": "string",
+          "description": "Name of the user who added the task."
+        },
+        "completedBy": {
+          "type": "string",
+          "description": "Name of the user who completed the task."
+        },
+        "completedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The timestamp when the todo was completed."
         }
       },
-      "required": ["id", "text", "completed", "createdAt"]
+      "required": ["id", "text", "status", "createdAt", "addedBy"]
     }
   },
   "auth": {
@@ -163,11 +177,11 @@
       },
       "description": "Letterhead documents created by a specific user."
     },
-    "/users/{userId}/todos/{todoId}": {
+    "/developer-todos/{todoId}": {
       "schema": {
         "$ref": "#/entities/Todo"
       },
-      "description": "Todo items for a specific developer."
+      "description": "A shared list of todo items for all developers."
     },
     "/app-status/maintenance": {
         "schema": {

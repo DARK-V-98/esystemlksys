@@ -12,22 +12,29 @@ import {
     doc,
     serverTimestamp,
     query,
-    orderBy
+    orderBy,
+    getDoc,
+    Timestamp
 } from 'firebase/firestore';
 import { app } from '@/firebase/config';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
-import { ArrowLeft, ListTodo, Plus, Trash2, Github } from 'lucide-react';
+import { ArrowLeft, ListTodo, Plus, Trash2, CheckCircle, Circle, User } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
+import { Badge } from '@/components/ui/badge';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { formatDistanceToNow } from 'date-fns';
 
 interface Todo {
     id: string;
     text: string;
-    completed: boolean;
-    createdAt: any;
+    status: 'Pending' | 'Completed';
+    createdAt: Timestamp;
+    addedBy: string;
+    completedBy?: string;
+    completedAt?: Timestamp;
 }
 
 export default function TodoPage() {
@@ -57,7 +64,7 @@ export default function TodoPage() {
           return;
       }
 
-      const todosRef = collection(db, 'users', currentUser.uid, 'todos');
+      const todosRef = collection(db, 'developer-todos');
       const q = query(todosRef, orderBy('createdAt', 'desc'));
       
       const unsubscribeTodos = onSnapshot(q, (snapshot) => {
@@ -78,15 +85,16 @@ export default function TodoPage() {
 
   const handleAddTodo = async (e: React.FormEvent) => {
       e.preventDefault();
-      if (!newTodo.trim() || !user) return;
+      if (!newTodo.trim() || !user || !user.displayName) return;
 
       try {
           const db = getFirestore(app);
-          const todosRef = collection(db, 'users', user.uid, 'todos');
+          const todosRef = collection(db, 'developer-todos');
           await addDoc(todosRef, {
               text: newTodo,
-              completed: false,
-              createdAt: serverTimestamp()
+              status: 'Pending',
+              createdAt: serverTimestamp(),
+              addedBy: user.displayName,
           });
           setNewTodo('');
           toast.success("Task added successfully!");
@@ -96,12 +104,26 @@ export default function TodoPage() {
       }
   }
   
-  const handleToggleTodo = async (id: string, completed: boolean) => {
-      if (!user) return;
+  const handleToggleStatus = async (id: string, currentStatus: 'Pending' | 'Completed') => {
+      if (!user || !user.displayName) return;
       const db = getFirestore(app);
-      const todoRef = doc(db, 'users', user.uid, 'todos', id);
+      const todoRef = doc(db, 'developer-todos', id);
       try {
-        await updateDoc(todoRef, { completed: !completed });
+        if (currentStatus === 'Pending') {
+            await updateDoc(todoRef, { 
+                status: 'Completed',
+                completedBy: user.displayName,
+                completedAt: serverTimestamp(),
+            });
+            toast.success("Task marked as completed.");
+        } else {
+            await updateDoc(todoRef, {
+                status: 'Pending',
+                completedBy: null,
+                completedAt: null,
+            });
+            toast.info("Task marked as pending.");
+        }
       } catch (error) {
         console.error("Error updating todo:", error);
         toast.error("Failed to update task status.");
@@ -111,7 +133,7 @@ export default function TodoPage() {
   const handleDeleteTodo = async (id: string) => {
     if (!user) return;
     const db = getFirestore(app);
-    const todoRef = doc(db, 'users', user.uid, 'todos', id);
+    const todoRef = doc(db, 'developer-todos', id);
     try {
         await deleteDoc(todoRef);
         toast.info("Task removed.");
@@ -121,7 +143,7 @@ export default function TodoPage() {
     }
   }
 
-  const completedCount = todos.filter(t => t.completed).length;
+  const completedCount = todos.filter(t => t.status === 'Completed').length;
   const pendingCount = todos.length - completedCount;
 
   return (
@@ -137,7 +159,7 @@ export default function TodoPage() {
                 Developer <span className="text-primary neon-text">Todo List</span>
                 </h1>
                 <p className="mt-1 text-primary-foreground/70">
-                A private task manager for developer-specific goals.
+                A shared task manager for all developers.
                 </p>
             </div>
             </div>
@@ -153,7 +175,7 @@ export default function TodoPage() {
                     <Input 
                         value={newTodo}
                         onChange={(e) => setNewTodo(e.target.value)}
-                        placeholder="Add a new task..."
+                        placeholder="Add a new task for the team..."
                         className="h-12"
                     />
                     <Button type="submit" variant="gradient" className="h-12" disabled={!newTodo.trim()}>
@@ -167,40 +189,90 @@ export default function TodoPage() {
                     <span>Pending: <span className="font-bold text-yellow-500">{pendingCount}</span></span>
                     <span>Completed: <span className="font-bold text-success">{completedCount}</span></span>
                 </div>
+            </div>
 
-                <div className="space-y-2">
-                    {loading ? (
-                        <p className="text-center text-muted-foreground py-8">Loading tasks...</p>
-                    ) : todos.length > 0 ? (
-                        todos.map(todo => (
-                            <div key={todo.id} className="flex items-center gap-3 p-3 bg-card rounded-md border hover:border-primary/50 transition-colors">
-                                <Checkbox 
-                                    id={`todo-${todo.id}`}
-                                    checked={todo.completed} 
-                                    onCheckedChange={() => handleToggleTodo(todo.id, todo.completed)}
-                                />
-                                <label
-                                    htmlFor={`todo-${todo.id}`}
-                                    className={cn(
-                                        "flex-grow font-medium cursor-pointer",
-                                        todo.completed && "line-through text-muted-foreground"
-                                    )}
-                                >
-                                    {todo.text}
-                                </label>
-                                <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDeleteTodo(todo.id)}>
-                                    <Trash2 className="h-4 w-4"/>
-                                </Button>
-                            </div>
-                        ))
-                    ) : (
-                         <div className="text-center py-12 text-muted-foreground">
-                            <Github className="h-12 w-12 mx-auto mb-4"/>
-                            <h3 className="font-semibold text-lg text-foreground">All Clear!</h3>
-                            <p>You have no pending tasks. Time to code!</p>
-                        </div>
-                    )}
-                </div>
+            <div className="overflow-x-auto">
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead className="w-[50px]">Status</TableHead>
+                            <TableHead>Task</TableHead>
+                            <TableHead>Added By</TableHead>
+                            <TableHead>Completed By</TableHead>
+                            <TableHead className="text-right">Actions</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {loading ? (
+                            <TableRow>
+                                <TableCell colSpan={5} className="text-center h-24">Loading tasks...</TableCell>
+                            </TableRow>
+                        ) : todos.length > 0 ? (
+                            todos.map(todo => (
+                                <TableRow key={todo.id} className={cn(todo.status === 'Completed' && 'bg-secondary/50')}>
+                                    <TableCell>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-8 w-8"
+                                            onClick={() => handleToggleStatus(todo.id, todo.status)}
+                                        >
+                                            {todo.status === 'Completed' ? (
+                                                <CheckCircle className="h-5 w-5 text-success"/>
+                                            ) : (
+                                                <Circle className="h-5 w-5 text-muted-foreground"/>
+                                            )}
+                                        </Button>
+                                    </TableCell>
+                                    <TableCell>
+                                        <p className={cn("font-medium", todo.status === 'Completed' && 'line-through text-muted-foreground')}>
+                                            {todo.text}
+                                        </p>
+                                        <p className="text-xs text-muted-foreground">
+                                            Added {formatDistanceToNow(todo.createdAt.toDate(), { addSuffix: true })}
+                                        </p>
+                                    </TableCell>
+                                    <TableCell>
+                                        <div className="flex items-center gap-2">
+                                            <User className="h-4 w-4 text-muted-foreground"/>
+                                            <span className="font-medium">{todo.addedBy}</span>
+                                        </div>
+                                    </TableCell>
+                                    <TableCell>
+                                        {todo.completedBy ? (
+                                            <div className="flex items-center gap-2">
+                                                <User className="h-4 w-4 text-muted-foreground"/>
+                                                <div>
+                                                    <p className="font-medium">{todo.completedBy}</p>
+                                                    {todo.completedAt && (
+                                                        <p className="text-xs text-muted-foreground">
+                                                            {formatDistanceToNow(todo.completedAt.toDate(), { addSuffix: true })}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <span className="text-muted-foreground">-</span>
+                                        )}
+                                    </TableCell>
+                                    <TableCell className="text-right">
+                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDeleteTodo(todo.id)}>
+                                            <Trash2 className="h-4 w-4"/>
+                                        </Button>
+                                    </TableCell>
+                                </TableRow>
+                            ))
+                        ) : (
+                             <TableRow>
+                                <TableCell colSpan={5} className="text-center h-48">
+                                    <ListTodo className="h-12 w-12 mx-auto text-muted-foreground mb-4"/>
+                                    <h3 className="font-semibold text-lg text-foreground">All Clear!</h3>
+                                    <p className="text-muted-foreground">There are no tasks on the board.</p>
+                                </TableCell>
+                             </TableRow>
+                        )}
+                    </TableBody>
+                </Table>
             </div>
         </div>
     </div>
