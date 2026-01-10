@@ -61,7 +61,10 @@ import {
   ListRestart,
   PictureInPicture,
   Keyboard,
-  Camera
+  Camera,
+  ScreenShare,
+  FileVideo,
+  FileSignature
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -147,15 +150,20 @@ const tools = [
   // File Tools
   { id: 38, name: "File Hash Checker", description: "Calculate hashes for uploaded files", icon: FileLock2, category: "File", status: "active", path: "/tools/file/hash-checker" },
   { id: 39, name: "ZIP File Creator", description: "Create ZIP archives from files", icon: FileArchive, category: "File", status: "active", path: "/tools/file/zip-creator" },
+  { id: 60, name: "Bulk File Renamer", description: "Rename multiple files at once", icon: FileSignature, category: "File", status: "inactive", path: "#" },
 
   // Productivity Tools
   { id: 52, name: "Pomodoro Timer", description: "Manage work/break intervals", icon: Timer, category: "Productivity", status: "active", path: "/tools/productivity/pomodoro-timer" },
   { id: 57, name: "Shortcut Cheatsheet", description: "Find common keyboard shortcuts", icon: Keyboard, category: "Productivity", status: "active", path: "/tools/productivity/shortcut-cheatsheet" },
 
+  // Recording Tools
+  { id: 61, name: "Screen Recorder", description: "Record your screen or a window", icon: ScreenShare, category: "Recording", status: "active", path: "/tools/recording/screen-recorder" },
+  { id: 62, name: "Video to GIF", description: "Convert video clips to animated GIFs", icon: FileVideo, category: "Recording", status: "inactive", path: "#" },
+
 ];
 
 
-const categories = ["All", "PDF", "Image", "Converter", "Developer", "Text", "Generator", "Financial", "File", "Productivity"];
+const categories = ["All", "PDF", "Image", "Converter", "Developer", "Text", "Generator", "Financial", "File", "Productivity", "Recording"];
 
 export default function ToolsPage() {
   const [searchQuery, setSearchQuery] = useState("");
