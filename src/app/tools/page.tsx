@@ -51,7 +51,17 @@ import {
   Ratio,
   FileSliders,
   FileLock2,
-  Barcode
+  Barcode,
+  Clock,
+  BookCopy,
+  PenSquare,
+  GraduationCap,
+  Scale,
+  Globe2,
+  ListRestart,
+  PictureInPicture,
+  Keyboard,
+  Camera
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -86,6 +96,7 @@ const tools = [
   { id: 31, name: "Image to Base64", description: "Convert image to Base64 string", icon: Binary, category: "Image", status: "active", path: "/tools/image/to-base64" },
   { id: 32, name: "Image Color Picker", description: "Pick colors from an image", icon: Droplet, category: "Image", status: "active", path: "/tools/image/color-picker" },
   { id: 47, name: "Aspect Ratio Calculator", description: "Calculate image/video dimensions", icon: Ratio, category: "Image", status: "active", path: "/tools/image/aspect-ratio-calculator" },
+  { id: 59, name: "EXIF Data Viewer", description: "View or remove EXIF data from images", icon: Camera, category: "Image", status: "active", path: "/tools/image/exif-viewer" },
   
   // Converter Tools
   { id: 14, name: "Image to PDF", description: "Convert images to PDF", icon: FileInput, category: "Converter", status: "active", path: "/tools/pdf/image-to-pdf" },
@@ -93,6 +104,8 @@ const tools = [
   { id: 22, name: "Date Converter", description: "Convert dates and timestamps", icon: Calendar, category: "Converter", status: "active", path: "/tools/converters/date-converter" },
   { id: 23, name: "PX to REM Converter", description: "Convert pixels to REM units", icon: BringToFront, category: "Converter", status: "active", path: "/tools/converters/px-to-rem" },
   { id: 44, name: "File Size Converter", description: "Convert between B, KB, MB, GB, TB", icon: Gauge, category: "Converter", status: "active", path: "/tools/converters/file-size-converter" },
+  { id: 50, name: "Unit Converter", description: "Convert length, weight, temp, etc.", icon: Scale, category: "Converter", status: "active", path: "/tools/converters/unit-converter" },
+  { id: 51, name: "Time Zone Converter", description: "Compare time across multiple zones", icon: Globe2, category: "Converter", status: "active", path: "/tools/converters/time-zone-converter" },
   { id: 12, name: "Word to PDF", description: "Convert DOCX to PDF format", icon: FileOutput, category: "Converter", status: "inactive", path: "#" },
   { id: 13, name: "Excel to PDF", description: "Convert XLSX to PDF format", icon: FileOutput, category: "Converter", status: "inactive", path: "#" },
   { id: 15, name: "HTML to PDF", description: "Convert HTML pages to PDF", icon: FileCode, category: "Converter", status: "inactive", path: "#" },
@@ -104,6 +117,10 @@ const tools = [
   { id: 27, name: "Hash Generator", description: "Generate MD5, SHA-1, SHA-256 hashes", icon: Fingerprint, category: "Developer", status: "active", path: "/tools/developer/hash-generator" },
   { id: 43, name: "Changelog Generator", description: "Format changelog entries easily", icon: BookOpen, category: "Developer", status: "active", path: "/tools/developer/changelog-generator" },
   { id: 40, name: "What Is My IP?", description: "Display your public IP address", icon: Network, category: "Developer", status: "active", path: "/tools/developer/ip-finder" },
+  { id: 53, name: "Regex Tester", description: "Test regular expressions in real-time", icon: ListRestart, category: "Developer", status: "active", path: "/tools/developer/regex-tester" },
+  { id: 54, name: "JWT Debugger", description: "Decode and inspect JSON Web Tokens", icon: Unlock, category: "Developer", status: "active", path: "/tools/developer/jwt-debugger" },
+  { id: 55, name: "Snippet Manager", description: "Save and search reusable code snippets", icon: BookCopy, category: "Developer", status: "active", path: "/tools/developer/snippet-manager" },
+  { id: 58, name: "CSS Gradient Generator", description: "Visually create CSS gradients", icon: Palette, category: "Developer", status: "active", path: "/tools/developer/css-gradient-generator" },
 
   // Text Tools
   { id: 19, name: "Text Counter", description: "Count words, characters, sentences", icon: Hash, category: "Text", status: "active", path: "/tools/text-counter" },
@@ -111,6 +128,7 @@ const tools = [
   { id: 33, name: "Text to Speech", description: "Convert text to spoken audio", icon: AudioLines, category: "Text", status: "inactive", path: "/tools/text-to-speech" },
   { id: 41, name: "Markdown Preview", description: "Write Markdown and see a live preview", icon: FileText, category: "Text", status: "active", path: "/tools/text/markdown-preview" },
   { id: 42, name: "Find and Replace", description: "Perform find and replace in text", icon: Replace, category: "Text", status: "active", path: "/tools/text/find-replace" },
+  { id: 56, name: "Notes & Scratchpad", description: "A simple pad for quick notes", icon: PenSquare, category: "Text", status: "active", path: "/tools/text/scratchpad" },
 
   // Generator Tools
   { id: 28, name: "Lorem Ipsum Generator", description: "Generate placeholder text", icon: CaseSensitive, category: "Generator", status: "active", path: "/tools/generators/lorem-ipsum" },
@@ -129,10 +147,15 @@ const tools = [
   // File Tools
   { id: 38, name: "File Hash Checker", description: "Calculate hashes for uploaded files", icon: FileLock2, category: "File", status: "active", path: "/tools/file/hash-checker" },
   { id: 39, name: "ZIP File Creator", description: "Create ZIP archives from files", icon: FileArchive, category: "File", status: "active", path: "/tools/file/zip-creator" },
+
+  // Productivity Tools
+  { id: 52, name: "Pomodoro Timer", description: "Manage work/break intervals", icon: Timer, category: "Productivity", status: "active", path: "/tools/productivity/pomodoro-timer" },
+  { id: 57, name: "Shortcut Cheatsheet", description: "Find common keyboard shortcuts", icon: Keyboard, category: "Productivity", status: "active", path: "/tools/productivity/shortcut-cheatsheet" },
+
 ];
 
 
-const categories = ["All", "PDF", "Image", "Converter", "Developer", "Text", "Generator", "Financial", "File"];
+const categories = ["All", "PDF", "Image", "Converter", "Developer", "Text", "Generator", "Financial", "File", "Productivity"];
 
 export default function ToolsPage() {
   const [searchQuery, setSearchQuery] = useState("");
