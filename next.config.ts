@@ -35,6 +35,13 @@ const nextConfig: NextConfig = {
     outputFileTracing: false,
   },
   output: 'export',
+  webpack: (config, { isServer }) => {
+    // In order to get pdf.js to work, we need to copy the worker file to the static assets folder.
+    if (!isServer) {
+      config.resolve.alias['pdfjs-dist'] = 'pdfjs-dist/build/pdf';
+    }
+    return config;
+  },
 };
 
 export default nextConfig;

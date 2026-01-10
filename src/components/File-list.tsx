@@ -12,19 +12,25 @@ interface FileListProps {
 }
 
 export function FileList({ files, onRemove, onDragStart, onDragEnter, onDragEnd }: FileListProps) {
+  // Only enable drag-and-drop if all the necessary handlers are provided.
+  const isDraggable = !!(onDragStart && onDragEnter && onDragEnd);
+
   return (
     <ul className="space-y-2">
       {files.map((file, index) => (
         <li
           key={index}
-          draggable
-          onDragStart={(e) => onDragStart(e, index)}
-          onDragEnter={(e) => onDragEnter(e, index)}
-          onDragEnd={onDragEnd}
-          onDragOver={(e) => e.preventDefault()}
-          className="flex items-center gap-4 p-3 bg-secondary rounded-lg cursor-grab active:cursor-grabbing"
+          draggable={isDraggable}
+          onDragStart={isDraggable ? (e) => onDragStart(e, index) : undefined}
+          onDragEnter={isDraggable ? (e) => onDragEnter(e, index) : undefined}
+          onDragEnd={isDraggable ? onDragEnd : undefined}
+          onDragOver={isDraggable ? (e) => e.preventDefault() : undefined}
+          className={cn(
+            "flex items-center gap-4 p-3 bg-secondary rounded-lg",
+            isDraggable && "cursor-grab active:cursor-grabbing"
+          )}
         >
-          <GripVertical className="h-5 w-5 text-muted-foreground" />
+          {isDraggable && <GripVertical className="h-5 w-5 text-muted-foreground" />}
           <File className="h-6 w-6 text-primary" />
           <div className="flex-1 truncate">
             <p className="font-semibold text-sm">{file.name}</p>

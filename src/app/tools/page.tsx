@@ -44,17 +44,17 @@ const tools = [
   { id: 5, name: "Rotate PDF", description: "Rotate PDF pages", icon: RotateCw, category: "PDF", status: "active", path: "/tools/pdf/rotate" },
   { id: 11, name: "Add Watermark", description: "Add text/image watermark to PDF", icon: Stamp, category: "PDF", status: "active", path: "/tools/pdf/watermark" },
   { id: 1, name: "Delete PDF Pages", description: "Remove specific pages from PDF files", icon: Trash2, category: "PDF", status: "active", path: "/tools/pdf/delete-pages" },
+  { id: 6, name: "Lock PDF", description: "Add password protection to PDF", icon: Lock, category: "PDF", status: "active", path: "/tools/pdf/lock" },
+  { id: 7, name: "Unlock PDF", description: "Remove password from PDF", icon: Unlock, category: "PDF", status: "active", path: "/tools/pdf/unlock" },
+  { id: 10, name: "PDF to Image", description: "Convert PDF pages to images", icon: FileImage, category: "PDF", status: "active", path: "/tools/pdf/pdf-to-image" },
   { id: 4, name: "Compress PDF", description: "Reduce PDF file size", icon: Archive, category: "PDF", status: "inactive", path: "#" },
-  { id: 6, name: "Lock PDF", description: "Add password protection to PDF", icon: Lock, category: "PDF", status: "inactive", path: "#" },
-  { id: 7, name: "Unlock PDF", description: "Remove password from PDF", icon: Unlock, category: "PDF", status: "inactive", path: "#" },
   { id: 8, name: "PDF to Word", description: "Convert PDF to DOCX format", icon: FileText, category: "PDF", status: "inactive", path: "#" },
   { id: 9, name: "PDF to Excel", description: "Convert PDF to XLSX format", icon: FileSpreadsheet, category: "PDF", status: "inactive", path: "#" },
-  { id: 10, name: "PDF to Image", description: "Convert PDF pages to images", icon: FileImage, category: "PDF", status: "inactive", path: "#" },
   
   // Document Converters
+  { id: 14, name: "Image to PDF", description: "Convert images to PDF", icon: FileInput, category: "Converter", status: "active", path: "/tools/pdf/image-to-pdf" },
   { id: 12, name: "Word to PDF", description: "Convert DOCX to PDF format", icon: FileOutput, category: "Converter", status: "inactive", path: "#" },
   { id: 13, name: "Excel to PDF", description: "Convert XLSX to PDF format", icon: FileOutput, category: "Converter", status: "inactive", path: "#" },
-  { id: 14, name: "Image to PDF", description: "Convert images to PDF", icon: FileInput, category: "Converter", status: "inactive", path: "#" },
   { id: 15, name: "HTML to PDF", description: "Convert HTML pages to PDF", icon: FileCode, category: "Converter", status: "inactive", path: "#" },
   
   // Image Tools
