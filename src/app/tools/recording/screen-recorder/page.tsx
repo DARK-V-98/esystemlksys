@@ -2,11 +2,11 @@
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ScreenShare, Video, Play, StopCircle, Download, Pause, Timer } from 'lucide-react';
+import { ArrowLeft, ScreenShare, Video, Play, StopCircle, Download, Pause, Timer, MousePointerClick } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
-type RecordingState = 'idle' | 'recording' | 'paused' | 'stopped';
+type RecordingState = 'idle' | 'previewing' | 'recording' | 'paused' | 'stopped';
 
 export default function ScreenRecorderPage() {
   const [recordingState, setRecordingState] = useState<RecordingState>('idle');
@@ -29,74 +29,107 @@ export default function ScreenRecorderPage() {
         clearInterval(timerIntervalRef.current);
       }
     }
+
+    // Cleanup function
     return () => {
       if (timerIntervalRef.current) {
         clearInterval(timerIntervalRef.current);
       }
-      // Cleanup stream on component unmount
-      stream?.getTracks().forEach(track => track.stop());
     };
-  }, [recordingState, stream]);
+  }, [recordingState]);
 
-  const stopRecording = () => {
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
-      mediaRecorderRef.current.stop();
-      toast.info('Screen recording stopped.');
+  useEffect(() => {
+      // Ensure stream is stopped when component unmounts
+      return () => {
+          stream?.getTracks().forEach(track => track.stop());
+      }
+  }, [stream]);
+
+  const selectSource = async () => {
+    // Clean up previous state
+    if (stream) {
+        stream.getTracks().forEach(track => track.stop());
     }
-    stream?.getTracks().forEach(track => track.stop());
-    setStream(null);
-  };
-  
-  const startRecording = async () => {
     setVideoUrl(null);
-    recordedChunksRef.current = [];
     setRecordingTime(0);
+    setRecordingState('idle');
+
     try {
       const displayStream = await navigator.mediaDevices.getDisplayMedia({
         video: true,
         audio: true,
       });
       setStream(displayStream);
+      setRecordingState('previewing');
 
-      // Handle user stopping sharing via browser UI
-      displayStream.getVideoTracks()[0].onended = () => {
-        stopRecording();
-      };
-      
       if (videoRef.current) {
         videoRef.current.srcObject = displayStream;
       }
       
-      const options = { mimeType: 'video/webm; codecs=vp9' };
-      const mediaRecorder = new MediaRecorder(displayStream, options);
-      mediaRecorderRef.current = mediaRecorder;
-
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          recordedChunksRef.current.push(event.data);
+      // Listen for user stopping sharing via browser UI
+      displayStream.getVideoTracks()[0].onended = () => {
+        if(mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+            mediaRecorderRef.current.stop();
+        } else {
+            setRecordingState('idle');
+            setStream(null);
+            setVideoUrl(null);
         }
+        toast.info('Screen sharing stopped.');
       };
-
-      mediaRecorder.onstop = () => {
-        const blob = new Blob(recordedChunksRef.current, { type: 'video/webm' });
-        const url = URL.createObjectURL(blob);
-        setVideoUrl(url);
-        setRecordingState('stopped');
-        if (videoRef.current) {
-            videoRef.current.srcObject = null;
-            videoRef.current.src = url;
-            videoRef.current.load();
-        }
-      };
-
-      mediaRecorder.start();
-      setRecordingState('recording');
-      toast.success('Screen recording started!');
 
     } catch (err) {
-      console.error("Error: " + err);
-      toast.error('Could not start screen recording. Please grant permissions.');
+      console.error("Error selecting source: ", err);
+      toast.error('Could not get permission to share screen.');
       setRecordingState('idle');
+    }
+  };
+  
+  const startRecording = () => {
+    if (!stream) {
+        toast.error("No screen source selected.");
+        return;
+    }
+
+    recordedChunksRef.current = [];
+    setRecordingTime(0);
+      
+    try {
+        const options = { mimeType: 'video/webm; codecs=vp9' };
+        const mediaRecorder = new MediaRecorder(stream, options);
+        mediaRecorderRef.current = mediaRecorder;
+
+        mediaRecorder.ondataavailable = (event) => {
+            if (event.data.size > 0) {
+            recordedChunksRef.current.push(event.data);
+            }
+        };
+
+        mediaRecorder.onstop = () => {
+            const blob = new Blob(recordedChunksRef.current, { type: 'video/webm' });
+            const url = URL.createObjectURL(blob);
+            setVideoUrl(url);
+            setRecordingState('stopped');
+            if (videoRef.current) {
+                videoRef.current.srcObject = null;
+                videoRef.current.src = url;
+                videoRef.current.load();
+            }
+        };
+
+        mediaRecorder.start();
+        setRecordingState('recording');
+        toast.success('Recording started!');
+    } catch(err) {
+        console.error("Error starting recording: ", err);
+        toast.error("Failed to start recording.");
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      mediaRecorderRef.current.stop();
+      toast.info('Recording stopped.');
     }
   };
 
@@ -131,18 +164,6 @@ export default function ScreenRecorderPage() {
     }
   };
 
-  const MainButton = () => {
-    switch (recordingState) {
-        case 'recording':
-            return <Button onClick={pauseRecording} size="lg" className="flex-1" variant="destructive"><Pause className="mr-2 h-5 w-5"/>Pause</Button>;
-        case 'paused':
-            return <Button onClick={resumeRecording} size="lg" className="flex-1"><Play className="mr-2 h-5 w-5"/>Resume</Button>;
-        case 'stopped':
-            return <Button onClick={startRecording} size="lg" className="flex-1" variant="gradient"><Play className="mr-2 h-5 w-5"/>Record Again</Button>;
-        default: // idle
-            return <Button onClick={startRecording} size="lg" className="flex-1" variant="gradient"><Play className="mr-2 h-5 w-5"/>Start Recording</Button>;
-    }
-  }
 
   return (
     <div className="space-y-6 animate-fade-in p-8">
@@ -188,11 +209,33 @@ export default function ScreenRecorderPage() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4">
-                <MainButton />
-                {recordingState !== 'idle' && recordingState !== 'stopped' && (
-                   <Button onClick={stopRecording} size="lg" variant="outline"><StopCircle className="mr-2 h-5 w-5"/>Stop</Button>
+                {recordingState === 'idle' || recordingState === 'stopped' ? (
+                    <Button onClick={selectSource} size="lg" className="flex-1" variant="gradient">
+                        <MousePointerClick className="mr-2 h-5 w-5"/> Select Screen to Record
+                    </Button>
+                ) : (
+                    <>
+                        {recordingState === 'previewing' && (
+                            <Button onClick={startRecording} size="lg" className="flex-1" variant="gradient">
+                                <Play className="mr-2 h-5 w-5"/> Start Recording
+                            </Button>
+                        )}
+                        {recordingState === 'recording' && (
+                            <Button onClick={pauseRecording} size="lg" className="flex-1" variant="destructive">
+                                <Pause className="mr-2 h-5 w-5"/> Pause
+                            </Button>
+                        )}
+                        {recordingState === 'paused' && (
+                            <Button onClick={resumeRecording} size="lg" className="flex-1">
+                                <Play className="mr-2 h-5 w-5"/> Resume
+                            </Button>
+                        )}
+                        <Button onClick={stopRecording} size="lg" variant="outline" disabled={recordingState === 'previewing'}>
+                            <StopCircle className="mr-2 h-5 w-5"/> Stop
+                        </Button>
+                    </>
                 )}
-                <Button onClick={handleDownload} size="lg" disabled={recordingState !== 'stopped'}>
+                <Button onClick={handleDownload} size="lg" disabled={!videoUrl}>
                     <Download className="mr-2 h-5 w-5"/>
                     Download
                 </Button>
