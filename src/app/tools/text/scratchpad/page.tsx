@@ -27,6 +27,14 @@ export default function ScratchpadPage() {
     toast.error("Scratchpad cleared!");
   };
 
+  useEffect(() => {
+    // This is an alternative to a save button, auto-saving on change.
+    // It's commented out to keep the explicit save button functionality.
+    // if (text) {
+    //   localStorage.setItem('scratchpadText', text);
+    // }
+  }, [text]);
+
   return (
     <div className="space-y-6 animate-fade-in p-8">
       <div className="relative overflow-hidden gradient-dark p-8">
@@ -60,7 +68,7 @@ export default function ScratchpadPage() {
         
         <div className="bg-secondary/50 border rounded-lg p-2">
             <Textarea
-                placeholder="Start typing your notes here... Your text is saved automatically in your browser."
+                placeholder="Start typing your notes here... Your text is saved in your browser when you click Save."
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 className="min-h-[60vh] text-base font-mono resize-none border-0 focus-visible:ring-0"

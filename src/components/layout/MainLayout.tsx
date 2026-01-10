@@ -24,7 +24,7 @@ export function MainLayout({ children }: MainLayoutProps) {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-full bg-background">
       <Sidebar />
       <div className="flex flex-col pt-10 md:pl-64">
         <main className="flex-grow">

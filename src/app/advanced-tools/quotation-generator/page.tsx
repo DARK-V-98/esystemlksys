@@ -65,6 +65,9 @@ export default function QuotationGeneratorPage() {
 
   // Load data from localStorage on initial render
   useEffect(() => {
+    setInvoiceNumber(getInitialQuotationNumber());
+    setInvoiceDate(getInitialQuotationDate());
+    setDueDate(getInitialExpiryDate());
     try {
         const savedData = localStorage.getItem('quotationGeneratorData');
         if (savedData) {
@@ -80,17 +83,10 @@ export default function QuotationGeneratorPage() {
             setTax(parsedData.tax || initialTax);
             setAccentColor(parsedData.accentColor || initialAccentColor);
             setLogo(parsedData.logo || null);
-        } else {
-            setInvoiceNumber(getInitialQuotationNumber());
-            setInvoiceDate(getInitialQuotationDate());
-            setDueDate(getInitialExpiryDate());
         }
     } catch (error) {
         console.error("Failed to load data from local storage", error);
         toast.error("Could not load your saved data.");
-        setInvoiceNumber(getInitialQuotationNumber());
-        setInvoiceDate(getInitialQuotationDate());
-        setDueDate(getInitialExpiryDate());
     }
   }, []);
 

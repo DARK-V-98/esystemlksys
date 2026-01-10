@@ -64,6 +64,9 @@ export default function InvoiceGeneratorPage() {
 
   // Load data from localStorage on initial render
   useEffect(() => {
+    setInvoiceNumber(getInitialInvoiceNumber());
+    setInvoiceDate(getInitialInvoiceDate());
+    setDueDate(getInitialDueDate());
     try {
         const savedData = localStorage.getItem('billGeneratorData');
         if (savedData) {
@@ -78,25 +81,15 @@ export default function InvoiceGeneratorPage() {
             setItems(parsedData.items && parsedData.items.length > 0 ? parsedData.items : initialItems);
             setTax(parsedData.tax || initialTax);
             setAccentColor(parsedData.accentColor || initialAccentColor);
-        } else {
-            // Set initial date-dependent values only on the client
-            setInvoiceNumber(getInitialInvoiceNumber());
-            setInvoiceDate(getInitialInvoiceDate());
-            setDueDate(getInitialDueDate());
         }
     } catch (error) {
         console.error("Failed to load data from local storage", error);
         toast.error("Could not load your saved data.");
-        // Fallback to client-side generation
-        setInvoiceNumber(getInitialInvoiceNumber());
-        setInvoiceDate(getInitialInvoiceDate());
-        setDueDate(getInitialDueDate());
     }
   }, []);
 
   // Save data to localStorage whenever it changes
   useEffect(() => {
-    // Don't run this on the initial server render
     if (!invoiceNumber) return;
 
     const dataToSave = {

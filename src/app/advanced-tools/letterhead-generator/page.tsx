@@ -57,6 +57,7 @@ export default function LetterheadGeneratorPage() {
   }, []);
 
   useEffect(() => {
+    setLetterContent(getInitialLetterContent());
     try {
       const savedData = localStorage.getItem('letterheadGeneratorData');
       if (savedData) {
@@ -67,12 +68,9 @@ export default function LetterheadGeneratorPage() {
         setLetterContent(data.letterContent || getInitialLetterContent());
         setAccentColor(data.accentColor || '#333333');
         setSelectedDesign(data.selectedDesign || 0);
-      } else {
-        setLetterContent(getInitialLetterContent());
       }
     } catch (error) {
       console.error("Failed to load from local storage", error);
-      setLetterContent(getInitialLetterContent());
     }
   }, []);
 
@@ -271,5 +269,3 @@ export default function LetterheadGeneratorPage() {
     </div>
   );
 }
-
-    

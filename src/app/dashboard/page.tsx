@@ -111,7 +111,10 @@ export default function DashboardPage() {
     });
 
     // Check local storage on initial load
-    setUserRole(localStorage.getItem('userRole'));
+    const storedRole = localStorage.getItem('userRole');
+    if (storedRole) {
+        setUserRole(storedRole);
+    }
     
     return () => unsubscribe();
   }, [router]);
