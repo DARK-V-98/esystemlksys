@@ -17,7 +17,8 @@ import {
   Menu,
   UserCog,
   Sparkles,
-  Receipt
+  Receipt,
+  RefreshCw
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getAuth, onAuthStateChanged, User as FirebaseUser, signOut } from "firebase/auth";
@@ -126,6 +127,10 @@ export default function DashboardPage() {
     }
   };
 
+  const handleRefresh = () => {
+    window.location.reload();
+  }
+
 
   return (
       <div className="flex flex-col gap-6 p-4 md:p-6">
@@ -147,6 +152,15 @@ export default function DashboardPage() {
                 </div>
                 <div className="flex items-center gap-2 md:gap-4 self-end md:self-start">
                   <PingMonitor />
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-12 w-12 rounded-full border-2 border-border bg-card/80 backdrop-blur-sm shadow-card transition-all duration-300 hover:border-primary hover:shadow-glow"
+                    onClick={handleRefresh}
+                  >
+                    <RefreshCw className="h-6 w-6" />
+                    <span className="sr-only">Refresh System</span>
+                  </Button>
                   <ThemeSwitcher />
                   <DropdownMenu>
                       <DropdownMenuTrigger asChild>
