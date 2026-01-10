@@ -35,36 +35,36 @@ import {
   PaginationPrevious,
   PaginationEllipsis,
 } from "@/components/ui/pagination";
-
+import { cn } from "@/lib/utils";
 
 const tools = [
   // PDF Tools
-  { id: 1, name: "Delete PDF Pages", description: "Remove specific pages from PDF files", icon: Trash2, category: "PDF" },
-  { id: 2, name: "Merge PDFs", description: "Combine multiple PDF files into one", icon: Merge, category: "PDF" },
-  { id: 3, name: "Split PDF", description: "Split PDF into multiple files", icon: SplitSquareVertical, category: "PDF" },
-  { id: 4, name: "Compress PDF", description: "Reduce PDF file size", icon: Archive, category: "PDF" },
-  { id: 5, name: "Rotate PDF", description: "Rotate PDF pages", icon: RotateCw, category: "PDF" },
-  { id: 6, name: "Lock PDF", description: "Add password protection to PDF", icon: Lock, category: "PDF" },
-  { id: 7, name: "Unlock PDF", description: "Remove password from PDF", icon: Unlock, category: "PDF" },
-  { id: 8, name: "PDF to Word", description: "Convert PDF to DOCX format", icon: FileText, category: "PDF" },
-  { id: 9, name: "PDF to Excel", description: "Convert PDF to XLSX format", icon: FileSpreadsheet, category: "PDF" },
-  { id: 10, name: "PDF to Image", description: "Convert PDF pages to images", icon: FileImage, category: "PDF" },
-  { id: 11, name: "Add Watermark", description: "Add text/image watermark to PDF", icon: Stamp, category: "PDF" },
+  { id: 1, name: "Delete PDF Pages", description: "Remove specific pages from PDF files", icon: Trash2, category: "PDF", status: "inactive", path: "#" },
+  { id: 2, name: "Merge PDFs", description: "Combine multiple PDF files into one", icon: Merge, category: "PDF", status: "inactive", path: "#" },
+  { id: 3, name: "Split PDF", description: "Split PDF into multiple files", icon: SplitSquareVertical, category: "PDF", status: "inactive", path: "#" },
+  { id: 4, name: "Compress PDF", description: "Reduce PDF file size", icon: Archive, category: "PDF", status: "inactive", path: "#" },
+  { id: 5, name: "Rotate PDF", description: "Rotate PDF pages", icon: RotateCw, category: "PDF", status: "inactive", path: "#" },
+  { id: 6, name: "Lock PDF", description: "Add password protection to PDF", icon: Lock, category: "PDF", status: "inactive", path: "#" },
+  { id: 7, name: "Unlock PDF", description: "Remove password from PDF", icon: Unlock, category: "PDF", status: "inactive", path: "#" },
+  { id: 8, name: "PDF to Word", description: "Convert PDF to DOCX format", icon: FileText, category: "PDF", status: "inactive", path: "#" },
+  { id: 9, name: "PDF to Excel", description: "Convert PDF to XLSX format", icon: FileSpreadsheet, category: "PDF", status: "inactive", path: "#" },
+  { id: 10, name: "PDF to Image", description: "Convert PDF pages to images", icon: FileImage, category: "PDF", status: "inactive", path: "#" },
+  { id: 11, name: "Add Watermark", description: "Add text/image watermark to PDF", icon: Stamp, category: "PDF", status: "inactive", path: "#" },
   
   // Document Converters
-  { id: 12, name: "Word to PDF", description: "Convert DOCX to PDF format", icon: FileOutput, category: "Converter" },
-  { id: 13, name: "Excel to PDF", description: "Convert XLSX to PDF format", icon: FileOutput, category: "Converter" },
-  { id: 14, name: "Image to PDF", description: "Convert images to PDF", icon: FileInput, category: "Converter" },
-  { id: 15, name: "HTML to PDF", description: "Convert HTML pages to PDF", icon: FileCode, category: "Converter" },
+  { id: 12, name: "Word to PDF", description: "Convert DOCX to PDF format", icon: FileOutput, category: "Converter", status: "inactive", path: "#" },
+  { id: 13, name: "Excel to PDF", description: "Convert XLSX to PDF format", icon: FileOutput, category: "Converter", status: "inactive", path: "#" },
+  { id: 14, name: "Image to PDF", description: "Convert images to PDF", icon: FileInput, category: "Converter", status: "inactive", path: "#" },
+  { id: 15, name: "HTML to PDF", description: "Convert HTML pages to PDF", icon: FileCode, category: "Converter", status: "inactive", path: "#" },
   
   // Image Tools
-  { id: 16, name: "Image Compressor", description: "Reduce image file size", icon: Image, category: "Image" },
-  { id: 17, name: "Image Resizer", description: "Resize images to any dimension", icon: Image, category: "Image" },
-  { id: 18, name: "Image Format Converter", description: "Convert between image formats", icon: Palette, category: "Image" },
+  { id: 16, name: "Image Compressor", description: "Reduce image file size", icon: Image, category: "Image", status: "inactive", path: "#" },
+  { id: 17, name: "Image Resizer", description: "Resize images to any dimension", icon: Image, category: "Image", status: "inactive", path: "#" },
+  { id: 18, name: "Image Format Converter", description: "Convert between image formats", icon: Palette, category: "Image", status: "inactive", path: "#" },
   
   // Text Tools
-  { id: 19, name: "Text Counter", description: "Count words, characters, sentences", icon: Hash, category: "Text" },
-  { id: 20, name: "Text Case Converter", description: "Convert text case styles", icon: Type, category: "Text" },
+  { id: 19, name: "Text Counter", description: "Count words, characters, sentences", icon: Hash, category: "Text", status: "active", path: "/tools/text-counter" },
+  { id: 20, name: "Text Case Converter", description: "Convert text case styles", icon: Type, category: "Text", status: "active", path: "/tools/text-case-converter" },
 ];
 
 const categories = ["All", "PDF", "Converter", "Image", "Text"];
@@ -157,8 +157,38 @@ export default function ToolsPage() {
     return items;
   }
 
+  const ToolCard = ({ tool }: { tool: typeof tools[0] }) => (
+    <div
+        className={cn(
+            "system-card group rounded-xl p-5 text-center shadow-card animate-slide-up h-full flex flex-col items-center justify-center relative",
+            tool.status === 'active' ? 'border-green-500/50 hover:border-green-500' : ''
+        )}
+        onClick={tool.status === 'inactive' ? () => toast.info("Coming soon!", { description: `The '${tool.name}' tool is under development.`}) : undefined}
+    >
+        {tool.status === 'inactive' && (
+            <div className="absolute top-3 right-3 h-3 w-3 rounded-full bg-destructive shadow-md animate-pulse" />
+        )}
+
+        <div className={cn(
+            "flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-all duration-300 group-hover:shadow-glow group-hover:scale-110",
+            tool.status === 'active' ? 'group-hover:gradient-primary group-hover:text-primary-foreground' : 'group-hover:bg-primary/20'
+        )}>
+            <tool.icon className="h-8 w-8" />
+        </div>
+        <h3 className={cn(
+            "mt-4 font-bold text-foreground transition-colors text-base",
+            tool.status === 'active' ? 'group-hover:text-primary' : ''
+        )}>
+            {tool.name}
+        </h3>
+        <p className="mt-1 text-xs text-muted-foreground line-clamp-2">
+            {tool.description}
+        </p>
+    </div>
+  );
+
   return (
-      <div className="space-y-6 animate-fade-in">
+      <div className="space-y-6 animate-fade-in p-8">
         <div className="relative overflow-hidden gradient-dark p-8">
           <div className="absolute -right-20 -top-20 h-60 w-60 rounded-full bg-primary/20 blur-3xl" />
           <div className="relative flex items-center gap-4">
@@ -219,22 +249,15 @@ export default function ToolsPage() {
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 min-h-[460px]">
             {currentTools.map((tool, index) => (
-              <button
-                key={tool.id}
-                className="system-card group rounded-xl p-5 text-center shadow-card animate-slide-up h-full flex flex-col items-center justify-center"
-                style={{ animationDelay: `${index * 50}ms` }}
-                onClick={() => toast.info("Coming soon!", { description: `The '${tool.name}' tool is under development.`})}
-              >
-                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-all duration-300 group-hover:gradient-primary group-hover:text-primary-foreground group-hover:shadow-glow group-hover:scale-110">
-                    <tool.icon className="h-8 w-8" />
-                  </div>
-                  <h3 className="mt-4 font-bold text-foreground group-hover:text-primary transition-colors text-base">
-                      {tool.name}
-                  </h3>
-                  <p className="mt-1 text-xs text-muted-foreground line-clamp-2">
-                      {tool.description}
-                  </p>
-              </button>
+              tool.status === 'active' ? (
+                <Link key={tool.id} href={tool.path} className="contents">
+                  <ToolCard tool={tool} />
+                </Link>
+              ) : (
+                <div key={tool.id} className="cursor-pointer">
+                   <ToolCard tool={tool} />
+                </div>
+              )
             ))}
           </div>
 
