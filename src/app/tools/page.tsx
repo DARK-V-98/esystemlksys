@@ -25,7 +25,7 @@ import {
   Wrench,
   ArrowLeft
 } from "lucide-react";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "sonner";
 import {
   Pagination,
   PaginationContent,
@@ -39,17 +39,17 @@ import { cn } from "@/lib/utils";
 
 const tools = [
   // PDF Tools
+  { id: 2, name: "Merge PDFs", description: "Combine multiple PDF files into one", icon: Merge, category: "PDF", status: "active", path: "/tools/pdf/merge" },
+  { id: 3, name: "Split PDF", description: "Split PDF into multiple files", icon: SplitSquareVertical, category: "PDF", status: "active", path: "/tools/pdf/split" },
+  { id: 5, name: "Rotate PDF", description: "Rotate PDF pages", icon: RotateCw, category: "PDF", status: "active", path: "/tools/pdf/rotate" },
+  { id: 11, name: "Add Watermark", description: "Add text/image watermark to PDF", icon: Stamp, category: "PDF", status: "active", path: "/tools/pdf/watermark" },
   { id: 1, name: "Delete PDF Pages", description: "Remove specific pages from PDF files", icon: Trash2, category: "PDF", status: "inactive", path: "#" },
-  { id: 2, name: "Merge PDFs", description: "Combine multiple PDF files into one", icon: Merge, category: "PDF", status: "inactive", path: "#" },
-  { id: 3, name: "Split PDF", description: "Split PDF into multiple files", icon: SplitSquareVertical, category: "PDF", status: "inactive", path: "#" },
   { id: 4, name: "Compress PDF", description: "Reduce PDF file size", icon: Archive, category: "PDF", status: "inactive", path: "#" },
-  { id: 5, name: "Rotate PDF", description: "Rotate PDF pages", icon: RotateCw, category: "PDF", status: "inactive", path: "#" },
   { id: 6, name: "Lock PDF", description: "Add password protection to PDF", icon: Lock, category: "PDF", status: "inactive", path: "#" },
   { id: 7, name: "Unlock PDF", description: "Remove password from PDF", icon: Unlock, category: "PDF", status: "inactive", path: "#" },
   { id: 8, name: "PDF to Word", description: "Convert PDF to DOCX format", icon: FileText, category: "PDF", status: "inactive", path: "#" },
   { id: 9, name: "PDF to Excel", description: "Convert PDF to XLSX format", icon: FileSpreadsheet, category: "PDF", status: "inactive", path: "#" },
   { id: 10, name: "PDF to Image", description: "Convert PDF pages to images", icon: FileImage, category: "PDF", status: "inactive", path: "#" },
-  { id: 11, name: "Add Watermark", description: "Add text/image watermark to PDF", icon: Stamp, category: "PDF", status: "inactive", path: "#" },
   
   // Document Converters
   { id: 12, name: "Word to PDF", description: "Convert DOCX to PDF format", icon: FileOutput, category: "Converter", status: "inactive", path: "#" },
@@ -161,14 +161,12 @@ export default function ToolsPage() {
     <div
         className={cn(
             "system-card group rounded-xl p-5 text-center shadow-card animate-slide-up h-full flex flex-col items-center justify-center relative",
-            tool.status === 'active' ? 'border-green-500/50 hover:border-green-500' : ''
+             tool.status === 'active' ? 'border-transparent' : ''
         )}
         onClick={tool.status === 'inactive' ? () => toast.info("Coming soon!", { description: `The '${tool.name}' tool is under development.`}) : undefined}
     >
-        {tool.status === 'inactive' && (
-            <div className="absolute top-3 right-3 h-3 w-3 rounded-full bg-destructive shadow-md animate-pulse" />
-        )}
-
+        <div className={cn("absolute top-2 right-2 h-2.5 w-2.5 rounded-full shadow-md", tool.status === 'active' ? 'bg-success' : 'bg-destructive animate-pulse')} />
+        
         <div className={cn(
             "flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-all duration-300 group-hover:shadow-glow group-hover:scale-110",
             tool.status === 'active' ? 'group-hover:gradient-primary group-hover:text-primary-foreground' : 'group-hover:bg-primary/20'
