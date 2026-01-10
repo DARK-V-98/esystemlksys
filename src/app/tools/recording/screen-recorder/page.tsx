@@ -1,5 +1,5 @@
 'use client';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ScreenShare, Video, Play, StopCircle, Download, Pause, Timer, MousePointerClick } from 'lucide-react';
@@ -19,6 +19,33 @@ export default function ScreenRecorderPage() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
+  const cleanup = useCallback(() => {
+    // Stop all tracks on the stream
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop());
+    }
+    // Revoke the old video URL to free up memory
+    if (videoUrl) {
+      URL.revokeObjectURL(videoUrl);
+    }
+    // Clear refs
+    mediaRecorderRef.current = null;
+    recordedChunksRef.current = [];
+    
+    // Reset states
+    setStream(null);
+    setVideoUrl(null);
+    setRecordingTime(0);
+    setRecordingState('idle');
+
+    if(videoRef.current) {
+        videoRef.current.src = "";
+        videoRef.current.srcObject = null;
+    }
+
+  }, [stream, videoUrl]);
+
+
   useEffect(() => {
     if (recordingState === 'recording') {
       timerIntervalRef.current = setInterval(() => {
@@ -30,7 +57,6 @@ export default function ScreenRecorderPage() {
       }
     }
 
-    // Cleanup function
     return () => {
       if (timerIntervalRef.current) {
         clearInterval(timerIntervalRef.current);
@@ -46,13 +72,8 @@ export default function ScreenRecorderPage() {
   }, [stream]);
 
   const selectSource = async () => {
-    // Clean up previous state
-    if (stream) {
-        stream.getTracks().forEach(track => track.stop());
-    }
-    setVideoUrl(null);
-    setRecordingTime(0);
-    setRecordingState('idle');
+    // Clean up any previous session before starting a new one
+    cleanup();
 
     try {
       const displayStream = await navigator.mediaDevices.getDisplayMedia({
@@ -66,14 +87,11 @@ export default function ScreenRecorderPage() {
         videoRef.current.srcObject = displayStream;
       }
       
-      // Listen for user stopping sharing via browser UI
       displayStream.getVideoTracks()[0].onended = () => {
         if(mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
             mediaRecorderRef.current.stop();
         } else {
-            setRecordingState('idle');
-            setStream(null);
-            setVideoUrl(null);
+            cleanup();
         }
         toast.info('Screen sharing stopped.');
       };
@@ -81,7 +99,7 @@ export default function ScreenRecorderPage() {
     } catch (err) {
       console.error("Error selecting source: ", err);
       toast.error('Could not get permission to share screen.');
-      setRecordingState('idle');
+      cleanup();
     }
   };
   
@@ -110,6 +128,11 @@ export default function ScreenRecorderPage() {
             const url = URL.createObjectURL(blob);
             setVideoUrl(url);
             setRecordingState('stopped');
+
+            // Stop the stream tracks after recording is fully stopped
+            stream.getTracks().forEach(track => track.stop());
+            setStream(null);
+
             if (videoRef.current) {
                 videoRef.current.srcObject = null;
                 videoRef.current.src = url;
