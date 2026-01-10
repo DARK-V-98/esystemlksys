@@ -23,7 +23,16 @@ import {
   Stamp,
   Palette,
   Wrench,
-  ArrowLeft
+  ArrowLeft,
+  Braces,
+  Link2,
+  Binary,
+  Fingerprint,
+  CaseSensitive,
+  Sparkles,
+  KeyRound,
+  Calendar,
+  BringToFront
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -51,29 +60,43 @@ const tools = [
   { id: 8, name: "PDF to Word", description: "Convert PDF to DOCX format", icon: FileText, category: "PDF", status: "inactive", path: "#" },
   { id: 9, name: "PDF to Excel", description: "Convert PDF to XLSX format", icon: FileSpreadsheet, category: "PDF", status: "inactive", path: "#" },
   
-  // Document Converters
+  // Converter Tools
   { id: 14, name: "Image to PDF", description: "Convert images to PDF", icon: FileInput, category: "Converter", status: "active", path: "/tools/pdf/image-to-pdf" },
+  { id: 21, name: "Color Converter", description: "Convert HEX, RGB, HSL colors", icon: Palette, category: "Converter", status: "active", path: "/tools/converters/color-converter" },
+  { id: 22, name: "Date Converter", description: "Convert dates and timestamps", icon: Calendar, category: "Converter", status: "active", path: "/tools/converters/date-converter" },
+  { id: 23, name: "PX to REM Converter", description: "Convert pixels to REM units", icon: BringToFront, category: "Converter", status: "active", path: "/tools/converters/px-to-rem" },
   { id: 12, name: "Word to PDF", description: "Convert DOCX to PDF format", icon: FileOutput, category: "Converter", status: "inactive", path: "#" },
   { id: 13, name: "Excel to PDF", description: "Convert XLSX to PDF format", icon: FileOutput, category: "Converter", status: "inactive", path: "#" },
   { id: 15, name: "HTML to PDF", description: "Convert HTML pages to PDF", icon: FileCode, category: "Converter", status: "inactive", path: "#" },
-  
-  // Image Tools
-  { id: 16, name: "Image Compressor", description: "Reduce image file size", icon: Image, category: "Image", status: "inactive", path: "#" },
-  { id: 17, name: "Image Resizer", description: "Resize images to any dimension", icon: Image, category: "Image", status: "inactive", path: "#" },
-  { id: 18, name: "Image Format Converter", description: "Convert between image formats", icon: Palette, category: "Image", status: "inactive", path: "#" },
-  
+
+  // Developer Tools
+  { id: 24, name: "JSON Formatter", description: "Format and validate JSON data", icon: Braces, category: "Developer", status: "active", path: "/tools/developer/json-formatter" },
+  { id: 25, name: "URL Encoder/Decoder", description: "Encode or decode URL components", icon: Link2, category: "Developer", status: "active", path: "/tools/developer/url-encoder" },
+  { id: 26, name: "Base64 Encoder/Decoder", description: "Encode or decode Base64 strings", icon: Binary, category: "Developer", status: "active", path: "/tools/developer/base64-encoder" },
+  { id: 27, name: "Hash Generator", description: "Generate MD5, SHA-1, SHA-256 hashes", icon: Fingerprint, category: "Developer", status: "active", path: "/tools/developer/hash-generator" },
+
   // Text Tools
   { id: 19, name: "Text Counter", description: "Count words, characters, sentences", icon: Hash, category: "Text", status: "active", path: "/tools/text-counter" },
   { id: 20, name: "Text Case Converter", description: "Convert text case styles", icon: Type, category: "Text", status: "active", path: "/tools/text-case-converter" },
+  
+  // Generator Tools
+  { id: 28, name: "Lorem Ipsum Generator", description: "Generate placeholder text", icon: CaseSensitive, category: "Generator", status: "active", path: "/tools/generators/lorem-ipsum" },
+  { id: 29, name: "UUID Generator", description: "Generate unique identifiers", icon: Sparkles, category: "Generator", status: "active", path: "/tools/generators/uuid-generator" },
+  { id: 30, name: "Password Generator", description: "Create strong random passwords", icon: KeyRound, category: "Generator", status: "active", path: "/tools/generators/password-generator" },
+  
+  // Image Tools (Currently Inactive)
+  { id: 16, name: "Image Compressor", description: "Reduce image file size", icon: Image, category: "Image", status: "inactive", path: "#" },
+  { id: 17, name: "Image Resizer", description: "Resize images to any dimension", icon: Image, category: "Image", status: "inactive", path: "#" },
+  { id: 18, name: "Image Format Converter", description: "Convert between image formats", icon: Palette, category: "Image", status: "inactive", path: "#" },
 ];
 
-const categories = ["All", "PDF", "Converter", "Image", "Text"];
+const categories = ["All", "PDF", "Converter", "Developer", "Text", "Generator", "Image"];
 
 export default function ToolsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
-  const toolsPerPage = 8;
+  const toolsPerPage = 12;
 
   const filteredTools = tools.filter((tool) => {
     const matchesSearch = tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -198,7 +221,7 @@ export default function ToolsPage() {
                 File <span className="text-primary neon-text">Tools</span>
               </h1>
               <p className="mt-1 text-primary-foreground/70">
-                20+ powerful utilities for file management and conversion
+                A collection of powerful utilities for daily tasks.
               </p>
             </div>
           </div>
@@ -233,7 +256,7 @@ export default function ToolsPage() {
                         setActiveCategory(category);
                         setCurrentPage(1);
                       }}
-                      className={`rounded-xl px-5 py-2.5 text-sm font-bold transition-all duration-200 ${
+                      className={`rounded-xl px-4 py-2 text-sm font-bold transition-all duration-200 ${
                       activeCategory === category
                           ? "gradient-primary text-primary-foreground shadow-glow"
                           : "bg-secondary text-secondary-foreground hover:bg-secondary/80 hover:text-primary"
@@ -245,8 +268,8 @@ export default function ToolsPage() {
               </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 min-h-[460px]">
-            {currentTools.map((tool, index) => (
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 min-h-[460px]">
+            {currentTools.map((tool) => (
               tool.status === 'active' ? (
                 <Link key={tool.id} href={tool.path} className="contents">
                   <ToolCard tool={tool} />
