@@ -32,7 +32,16 @@ import {
   Sparkles,
   KeyRound,
   Calendar,
-  BringToFront
+  BringToFront,
+  Scissors,
+  FlipHorizontal,
+  Droplet,
+  QrCode,
+  Landmark,
+  Calculator,
+  Percent,
+  CircleDollarSign,
+  AudioLines
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -60,6 +69,13 @@ const tools = [
   { id: 8, name: "PDF to Word", description: "Convert PDF to DOCX format", icon: FileText, category: "PDF", status: "inactive", path: "#" },
   { id: 9, name: "PDF to Excel", description: "Convert PDF to XLSX format", icon: FileSpreadsheet, category: "PDF", status: "inactive", path: "#" },
   
+  // Image Tools
+  { id: 16, name: "Image Compressor", description: "Reduce image file size", icon: Archive, category: "Image", status: "active", path: "/tools/image/compress" },
+  { id: 17, name: "Image Resizer", description: "Resize images to any dimension", icon: Scissors, category: "Image", status: "active", path: "/tools/image/resize" },
+  { id: 18, name: "Image Format Converter", description: "Convert between image formats", icon: FlipHorizontal, category: "Image", status: "active", path: "/tools/image/convert" },
+  { id: 31, name: "Image to Base64", description: "Convert image to Base64 string", icon: Binary, category: "Image", status: "active", path: "/tools/image/to-base64" },
+  { id: 32, name: "Image Color Picker", description: "Pick colors from an image", icon: Droplet, category: "Image", status: "active", path: "/tools/image/color-picker" },
+  
   // Converter Tools
   { id: 14, name: "Image to PDF", description: "Convert images to PDF", icon: FileInput, category: "Converter", status: "active", path: "/tools/pdf/image-to-pdf" },
   { id: 21, name: "Color Converter", description: "Convert HEX, RGB, HSL colors", icon: Palette, category: "Converter", status: "active", path: "/tools/converters/color-converter" },
@@ -78,19 +94,22 @@ const tools = [
   // Text Tools
   { id: 19, name: "Text Counter", description: "Count words, characters, sentences", icon: Hash, category: "Text", status: "active", path: "/tools/text-counter" },
   { id: 20, name: "Text Case Converter", description: "Convert text case styles", icon: Type, category: "Text", status: "active", path: "/tools/text-case-converter" },
-  
+  { id: 33, name: "Text to Speech", description: "Convert text to spoken audio", icon: AudioLines, category: "Text", status: "active", path: "/tools/text-to-speech" },
+
   // Generator Tools
   { id: 28, name: "Lorem Ipsum Generator", description: "Generate placeholder text", icon: CaseSensitive, category: "Generator", status: "active", path: "/tools/generators/lorem-ipsum" },
   { id: 29, name: "UUID Generator", description: "Generate unique identifiers", icon: Sparkles, category: "Generator", status: "active", path: "/tools/generators/uuid-generator" },
   { id: 30, name: "Password Generator", description: "Create strong random passwords", icon: KeyRound, category: "Generator", status: "active", path: "/tools/generators/password-generator" },
+  { id: 34, name: "QR Code Generator", description: "Create QR codes from text or URLs", icon: QrCode, category: "Generator", status: "active", path: "/tools/generators/qr-code-generator" },
   
-  // Image Tools (Currently Inactive)
-  { id: 16, name: "Image Compressor", description: "Reduce image file size", icon: Image, category: "Image", status: "inactive", path: "#" },
-  { id: 17, name: "Image Resizer", description: "Resize images to any dimension", icon: Image, category: "Image", status: "inactive", path: "#" },
-  { id: 18, name: "Image Format Converter", description: "Convert between image formats", icon: Palette, category: "Image", status: "inactive", path: "#" },
+  // Financial Tools
+  { id: 35, name: "Loan Calculator", description: "Calculate loan payments and interest", icon: Landmark, category: "Financial", status: "active", path: "/tools/financial/loan-calculator" },
+  { id: 36, name: "Discount Calculator", description: "Calculate final price after discounts", icon: CircleDollarSign, category: "Financial", status: "active", path: "/tools/financial/discount-calculator" },
+  { id: 37, name: "Percentage Calculator", description: "Calculate percentages", icon: Percent, category: "Financial", status: "active", path: "/tools/financial/percentage-calculator" },
+
 ];
 
-const categories = ["All", "PDF", "Converter", "Developer", "Text", "Generator", "Image"];
+const categories = ["All", "PDF", "Image", "Converter", "Developer", "Text", "Generator", "Financial"];
 
 export default function ToolsPage() {
   const [searchQuery, setSearchQuery] = useState("");
