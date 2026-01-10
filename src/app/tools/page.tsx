@@ -41,7 +41,17 @@ import {
   Calculator,
   Percent,
   CircleDollarSign,
-  AudioLines
+  AudioLines,
+  FileArchive,
+  Network,
+  BookOpen,
+  Replace,
+  Gauge,
+  Timer,
+  Ratio,
+  FileSliders,
+  FileLock2,
+  Barcode
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -75,12 +85,14 @@ const tools = [
   { id: 18, name: "Image Format Converter", description: "Convert between image formats", icon: FlipHorizontal, category: "Image", status: "active", path: "/tools/image/convert" },
   { id: 31, name: "Image to Base64", description: "Convert image to Base64 string", icon: Binary, category: "Image", status: "active", path: "/tools/image/to-base64" },
   { id: 32, name: "Image Color Picker", description: "Pick colors from an image", icon: Droplet, category: "Image", status: "active", path: "/tools/image/color-picker" },
+  { id: 47, name: "Aspect Ratio Calculator", description: "Calculate image/video dimensions", icon: Ratio, category: "Image", status: "active", path: "/tools/image/aspect-ratio-calculator" },
   
   // Converter Tools
   { id: 14, name: "Image to PDF", description: "Convert images to PDF", icon: FileInput, category: "Converter", status: "active", path: "/tools/pdf/image-to-pdf" },
   { id: 21, name: "Color Converter", description: "Convert HEX, RGB, HSL colors", icon: Palette, category: "Converter", status: "active", path: "/tools/converters/color-converter" },
   { id: 22, name: "Date Converter", description: "Convert dates and timestamps", icon: Calendar, category: "Converter", status: "active", path: "/tools/converters/date-converter" },
   { id: 23, name: "PX to REM Converter", description: "Convert pixels to REM units", icon: BringToFront, category: "Converter", status: "active", path: "/tools/converters/px-to-rem" },
+  { id: 44, name: "File Size Converter", description: "Convert between B, KB, MB, GB, TB", icon: Gauge, category: "Converter", status: "active", path: "/tools/converters/file-size-converter" },
   { id: 12, name: "Word to PDF", description: "Convert DOCX to PDF format", icon: FileOutput, category: "Converter", status: "inactive", path: "#" },
   { id: 13, name: "Excel to PDF", description: "Convert XLSX to PDF format", icon: FileOutput, category: "Converter", status: "inactive", path: "#" },
   { id: 15, name: "HTML to PDF", description: "Convert HTML pages to PDF", icon: FileCode, category: "Converter", status: "inactive", path: "#" },
@@ -90,26 +102,37 @@ const tools = [
   { id: 25, name: "URL Encoder/Decoder", description: "Encode or decode URL components", icon: Link2, category: "Developer", status: "active", path: "/tools/developer/url-encoder" },
   { id: 26, name: "Base64 Encoder/Decoder", description: "Encode or decode Base64 strings", icon: Binary, category: "Developer", status: "active", path: "/tools/developer/base64-encoder" },
   { id: 27, name: "Hash Generator", description: "Generate MD5, SHA-1, SHA-256 hashes", icon: Fingerprint, category: "Developer", status: "active", path: "/tools/developer/hash-generator" },
+  { id: 43, name: "Changelog Generator", description: "Format changelog entries easily", icon: BookOpen, category: "Developer", status: "active", path: "/tools/developer/changelog-generator" },
+  { id: 40, name: "What Is My IP?", description: "Display your public IP address", icon: Network, category: "Developer", status: "active", path: "/tools/developer/ip-finder" },
 
   // Text Tools
   { id: 19, name: "Text Counter", description: "Count words, characters, sentences", icon: Hash, category: "Text", status: "active", path: "/tools/text-counter" },
   { id: 20, name: "Text Case Converter", description: "Convert text case styles", icon: Type, category: "Text", status: "active", path: "/tools/text-case-converter" },
   { id: 33, name: "Text to Speech", description: "Convert text to spoken audio", icon: AudioLines, category: "Text", status: "active", path: "/tools/text-to-speech" },
+  { id: 41, name: "Markdown Preview", description: "Write Markdown and see a live preview", icon: FileText, category: "Text", status: "active", path: "/tools/text/markdown-preview" },
+  { id: 42, name: "Find and Replace", description: "Perform find and replace in text", icon: Replace, category: "Text", status: "active", path: "/tools/text/find-replace" },
 
   // Generator Tools
   { id: 28, name: "Lorem Ipsum Generator", description: "Generate placeholder text", icon: CaseSensitive, category: "Generator", status: "active", path: "/tools/generators/lorem-ipsum" },
   { id: 29, name: "UUID Generator", description: "Generate unique identifiers", icon: Sparkles, category: "Generator", status: "active", path: "/tools/generators/uuid-generator" },
   { id: 30, name: "Password Generator", description: "Create strong random passwords", icon: KeyRound, category: "Generator", status: "active", path: "/tools/generators/password-generator" },
   { id: 34, name: "QR Code Generator", description: "Create QR codes from text or URLs", icon: QrCode, category: "Generator", status: "active", path: "/tools/generators/qr-code-generator" },
+  { id: 45, name: "Barcode Generator", description: "Generate various types of barcodes", icon: Barcode, category: "Generator", status: "active", path: "/tools/generators/barcode-generator" },
+  { id: 46, name: "Random Number Generator", description: "Generate random numbers in a range", icon: Sparkles, category: "Generator", status: "active", path: "/tools/generators/random-number-generator" },
   
   // Financial Tools
   { id: 35, name: "Loan Calculator", description: "Calculate loan payments and interest", icon: Landmark, category: "Financial", status: "active", path: "/tools/financial/loan-calculator" },
   { id: 36, name: "Discount Calculator", description: "Calculate final price after discounts", icon: CircleDollarSign, category: "Financial", status: "active", path: "/tools/financial/discount-calculator" },
   { id: 37, name: "Percentage Calculator", description: "Calculate percentages", icon: Percent, category: "Financial", status: "active", path: "/tools/financial/percentage-calculator" },
+  { id: 48, name: "Tip Calculator", description: "Calculate tips for bills easily", icon: Calculator, category: "Financial", status: "active", path: "/tools/financial/tip-calculator" },
 
+  // File Tools
+  { id: 38, name: "File Hash Checker", description: "Calculate hashes for uploaded files", icon: FileLock2, category: "File", status: "active", path: "/tools/file/hash-checker" },
+  { id: 39, name: "ZIP File Creator", description: "Create ZIP archives from files", icon: FileArchive, category: "File", status: "active", path: "/tools/file/zip-creator" },
 ];
 
-const categories = ["All", "PDF", "Image", "Converter", "Developer", "Text", "Generator", "Financial"];
+
+const categories = ["All", "PDF", "Image", "Converter", "Developer", "Text", "Generator", "Financial", "File"];
 
 export default function ToolsPage() {
   const [searchQuery, setSearchQuery] = useState("");
