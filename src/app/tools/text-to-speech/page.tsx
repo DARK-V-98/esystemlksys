@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ArrowLeft, AudioLines, Download, Cpu, Play } from 'lucide-react';
 import { toast } from 'sonner';
-import { textToSpeech } from '@/ai/flows/text-to-speech';
+// import { textToSpeech } from '@/ai/flows/text-to-speech';
 
 export default function TextToSpeechPage() {
   const [text, setText] = useState('Hello, this is a test of the text to speech system.');
@@ -21,16 +21,18 @@ export default function TextToSpeechPage() {
     setAudioUrl('');
     toast.info("Generating audio, please wait...");
     try {
-      const result = await textToSpeech(text);
+      // const result = await textToSpeech(text);
+      // NOTE: AI functionality is temporarily disabled.
+      const result: {media: string} | null = null;
       if (result?.media) {
         setAudioUrl(result.media);
         toast.success("Audio generated successfully!");
       } else {
-        throw new Error("No media returned from the service.");
+        throw new Error("Text-to-speech functionality is temporarily disabled.");
       }
-    } catch(e) {
+    } catch(e: any) {
       console.error(e);
-      toast.error("Failed to generate audio. The service may be unavailable.");
+      toast.error(e.message || "Failed to generate audio. The service may be unavailable.");
     } finally {
       setIsGenerating(false);
     }

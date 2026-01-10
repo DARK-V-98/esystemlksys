@@ -108,7 +108,7 @@ const tools = [
   // Text Tools
   { id: 19, name: "Text Counter", description: "Count words, characters, sentences", icon: Hash, category: "Text", status: "active", path: "/tools/text-counter" },
   { id: 20, name: "Text Case Converter", description: "Convert text case styles", icon: Type, category: "Text", status: "active", path: "/tools/text-case-converter" },
-  { id: 33, name: "Text to Speech", description: "Convert text to spoken audio", icon: AudioLines, category: "Text", status: "active", path: "/tools/text-to-speech" },
+  { id: 33, name: "Text to Speech", description: "Convert text to spoken audio", icon: AudioLines, category: "Text", status: "inactive", path: "/tools/text-to-speech" },
   { id: 41, name: "Markdown Preview", description: "Write Markdown and see a live preview", icon: FileText, category: "Text", status: "active", path: "/tools/text/markdown-preview" },
   { id: 42, name: "Find and Replace", description: "Perform find and replace in text", icon: Replace, category: "Text", status: "active", path: "/tools/text/find-replace" },
 
