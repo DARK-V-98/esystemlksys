@@ -41,7 +41,12 @@ export default function AppLayout({
                 }
                 
                 // Update last active timestamp
-                await updateDoc(userDocRef, { lastActive: serverTimestamp() });
+                try {
+                    await updateDoc(userDocRef, { lastActive: serverTimestamp() });
+                } catch(e) {
+                    // This can fail if the user doc doesn't exist yet, which is fine
+                    console.warn("Could not update lastActive timestamp for new user.");
+                }
 
                 setLoading(false);
             } else {

@@ -86,8 +86,8 @@ function AuthForm() {
     setError("");
     setLoading(true);
 
-    if (maintenanceMode && !['admin', 'developer'].includes(userRole)) {
-      setError("The system is currently under maintenance. Please try again later.");
+    if (maintenanceMode && !isLogin) {
+      setError("The system is currently under maintenance. New account registration is disabled.");
       setLoading(false);
       return;
     }
@@ -327,7 +327,7 @@ function AuthForm() {
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       className="pl-12 h-12"
-                      disabled={loading || maintenanceMode}
+                      disabled={loading || (maintenanceMode && !isLogin)}
                     />
                   </div>
                 </div>
@@ -388,7 +388,7 @@ function AuthForm() {
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       className="pl-12 pr-12 h-12"
-                      disabled={loading || maintenanceMode}
+                      disabled={loading || (maintenanceMode && !isLogin)}
                     />
                     <button
                       type="button"

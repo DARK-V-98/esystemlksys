@@ -11,6 +11,7 @@ import {
   PlayCircle,
   Sparkles,
   Receipt,
+  LayoutDashboard
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
@@ -38,11 +39,11 @@ export function Sidebar() {
   }, []);
 
   const SidebarContent = () => (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full flex-col bg-sidebar">
       {/* Logo */}
-      <div className="flex h-20 items-center border-b border-sidebar-border px-6">
+      <Link href="/dashboard" className="flex h-20 items-center border-b border-sidebar-border px-6">
         <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl gradient-primary shadow-glow animate-pulse-glow p-1">
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl gradient-primary shadow-glow p-1">
             <Image src="/logo.png" alt="ESYSTEMLK Logo" width={36} height={36} />
           </div>
           <div>
@@ -50,7 +51,7 @@ export function Sidebar() {
             <p className="text-xs font-medium text-muted-foreground">Multipurpose System</p>
           </div>
         </div>
-      </div>
+      </Link>
 
       {/* Navigation */}
       <nav className="flex-1 space-y-1 p-4">
@@ -66,8 +67,8 @@ export function Sidebar() {
                   : "text-foreground hover:bg-secondary hover:text-primary"
               )}
             >
-              <Menu className="h-5 w-5" />
-              Main Menu
+              <LayoutDashboard className="h-5 w-5" />
+              Dashboard
             </Link>
         {menuItems.map((item) => {
           const isActive = pathname.startsWith(item.path);
@@ -110,7 +111,7 @@ export function Sidebar() {
   if (isMobile) {
     return (
       <>
-        <button onClick={() => setSidebarOpen(!isSidebarOpen)} className="md:hidden fixed top-4 left-4 z-50 p-2 rounded-md bg-card/80 backdrop-blur-sm">
+        <button onClick={() => setSidebarOpen(!isSidebarOpen)} className="md:hidden fixed top-12 left-4 z-50 p-2 rounded-md bg-card/80 backdrop-blur-sm">
           <Menu className="h-6 w-6 text-foreground" />
         </button>
         {isSidebarOpen && (
@@ -120,7 +121,7 @@ export function Sidebar() {
           />
         )}
         <aside className={cn(
-          "md:hidden fixed left-0 top-0 z-40 h-screen w-64 border-r border-sidebar-border bg-sidebar shadow-card transition-transform duration-300 ease-in-out",
+          "md:hidden fixed left-0 top-0 z-40 h-screen w-64 border-r border-sidebar-border bg-card shadow-lg transition-transform duration-300 ease-in-out",
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}>
           <SidebarContent />
@@ -130,7 +131,7 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="hidden md:block fixed left-0 top-0 z-40 h-screen w-64 border-r border-sidebar-border bg-sidebar shadow-card">
+    <aside className="hidden md:block fixed left-0 top-10 z-40 h-[calc(100vh-2.5rem)] w-64 border-r border-sidebar-border bg-card">
       <SidebarContent />
     </aside>
   );

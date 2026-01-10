@@ -16,10 +16,7 @@ export function MainLayout({ children }: MainLayoutProps) {
   const handleLogout = async () => {
     try {
         await signOut(auth);
-        localStorage.removeItem("isAuthenticated");
-        localStorage.removeItem("userName");
-        localStorage.removeItem("userEmail");
-        localStorage.removeItem("userRole");
+        localStorage.clear();
         router.push("/auth");
     } catch (error) {
         console.error("Logout failed:", error);
@@ -29,8 +26,8 @@ export function MainLayout({ children }: MainLayoutProps) {
   return (
     <div className="min-h-screen bg-background">
       <Sidebar />
-      <div className="flex flex-col md:pl-64">
-        <main className="flex-grow p-4 sm:p-6 md:p-8">
+      <div className="flex flex-col pt-10 md:pl-64">
+        <main className="flex-grow">
             {children}
         </main>
       </div>

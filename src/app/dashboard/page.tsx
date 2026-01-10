@@ -16,7 +16,8 @@ import {
   PlayCircle,
   Menu,
   UserCog,
-  Sparkles
+  Sparkles,
+  Receipt
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getAuth, onAuthStateChanged, User as FirebaseUser, signOut } from "firebase/auth";
@@ -60,6 +61,12 @@ const menuCards = [
     title: "Advanced Tools",
     description: "Specialized utilities like the Bill Generator",
     path: "/advanced-tools",
+  },
+   {
+    icon: Receipt,
+    title: "My Invoices",
+    description: "View and manage your saved invoices",
+    path: "/my-bills",
   },
   {
     icon: Globe,
@@ -112,10 +119,7 @@ export default function DashboardPage() {
     const auth = getAuth(app);
     try {
         await signOut(auth);
-        localStorage.removeItem("isAuthenticated");
-        localStorage.removeItem("userName");
-        localStorage.removeItem("userEmail");
-        localStorage.removeItem("userRole");
+        localStorage.clear();
         router.push("/auth");
     } catch (error) {
         console.error("Logout failed:", error);
@@ -124,8 +128,8 @@ export default function DashboardPage() {
 
 
   return (
-      <div className="flex flex-col gap-6">
-        <div className="relative overflow-hidden gradient-dark p-6 md:p-8">
+      <div className="flex flex-col gap-6 p-4 md:p-6">
+        <div className="relative overflow-hidden gradient-dark p-6 md:p-8 rounded-lg">
             <div className="absolute -right-20 -top-20 h-60 w-60 rounded-full bg-primary/20 blur-3xl" />
             <div className="absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-primary/10 blur-2xl" />
             <div className="relative flex justify-between items-start">
@@ -179,7 +183,7 @@ export default function DashboardPage() {
             </div>
         </div>
         <div className="bg-card rounded-lg border shadow-sm p-6">
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
                 {menuCards.map((card, index) => (
                 <Link
                     key={card.path}
