@@ -33,25 +33,34 @@ export default function ScreenRecorderPage() {
       if (timerIntervalRef.current) {
         clearInterval(timerIntervalRef.current);
       }
+      // Cleanup stream on component unmount
+      stream?.getTracks().forEach(track => track.stop());
     };
-  }, [recordingState]);
+  }, [recordingState, stream]);
 
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      mediaRecorderRef.current.stop();
+      toast.info('Screen recording stopped.');
+    }
+    stream?.getTracks().forEach(track => track.stop());
+    setStream(null);
+  };
+  
   const startRecording = async () => {
     setVideoUrl(null);
     recordedChunksRef.current = [];
     setRecordingTime(0);
     try {
       const displayStream = await navigator.mediaDevices.getDisplayMedia({
-        video: { mediaSource: "screen" } as any,
+        video: true,
         audio: true,
       });
       setStream(displayStream);
 
-      // Handle user closing the share modal
+      // Handle user stopping sharing via browser UI
       displayStream.getVideoTracks()[0].onended = () => {
-        if (recordingState !== 'stopped') {
-            stopRecording(true);
-        }
+        stopRecording();
       };
       
       if (videoRef.current) {
@@ -76,9 +85,8 @@ export default function ScreenRecorderPage() {
         if (videoRef.current) {
             videoRef.current.srcObject = null;
             videoRef.current.src = url;
+            videoRef.current.load();
         }
-        stream?.getTracks().forEach(track => track.stop());
-        setStream(null);
       };
 
       mediaRecorder.start();
@@ -89,17 +97,6 @@ export default function ScreenRecorderPage() {
       console.error("Error: " + err);
       toast.error('Could not start screen recording. Please grant permissions.');
       setRecordingState('idle');
-    }
-  };
-
-  const stopRecording = (streamEnded = false) => {
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
-      mediaRecorderRef.current.stop();
-      if (streamEnded) {
-        toast.info('Screen sharing stopped.');
-      } else {
-        toast.info('Screen recording stopped.');
-      }
     }
   };
 
@@ -193,7 +190,7 @@ export default function ScreenRecorderPage() {
             <div className="flex flex-col sm:flex-row gap-4">
                 <MainButton />
                 {recordingState !== 'idle' && recordingState !== 'stopped' && (
-                   <Button onClick={() => stopRecording()} size="lg" variant="outline"><StopCircle className="mr-2 h-5 w-5"/>Stop</Button>
+                   <Button onClick={stopRecording} size="lg" variant="outline"><StopCircle className="mr-2 h-5 w-5"/>Stop</Button>
                 )}
                 <Button onClick={handleDownload} size="lg" disabled={recordingState !== 'stopped'}>
                     <Download className="mr-2 h-5 w-5"/>
