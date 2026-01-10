@@ -32,7 +32,7 @@ export default function RootLayout({
           strategy="beforeInteractive"
         />
       </head>
-      <body className="flex flex-col h-screen overflow-hidden">
+      <body className="h-screen">
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
@@ -42,7 +42,7 @@ export default function RootLayout({
             <TitleBar />
             <AdminNotificationListener />
             <TooltipProvider>
-              <div className="flex-grow overflow-y-auto">
+              <div className="flex-grow h-[calc(100%-2.5rem)] overflow-y-auto">
                 <Toaster />
                 <Sonner />
                 {children}

@@ -200,7 +200,7 @@ function AuthForm() {
   );
 
   return (
-    <div className="flex h-full min-h-screen">
+    <div className="flex h-full">
       {/* Left Panel - Branding */}
       <div className="hidden w-1/2 flex-col justify-between gradient-dark p-12 lg:flex overflow-hidden relative">
         <div className="absolute top-8 right-8">
