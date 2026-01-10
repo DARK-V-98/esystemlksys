@@ -200,7 +200,7 @@ function AuthForm() {
   );
 
   return (
-    <div className="flex h-full">
+    <div className="flex h-full min-h-screen">
       {/* Left Panel - Branding */}
       <div className="hidden w-1/2 flex-col justify-between gradient-dark p-12 lg:flex overflow-hidden relative">
         <div className="absolute top-8 right-8">
@@ -277,13 +277,13 @@ function AuthForm() {
       </div>
 
       {/* Right Panel - Auth Form */}
-      <div className="flex w-full items-center justify-center bg-background p-8 lg:w-1/2 relative">
-        <div className="absolute top-8 right-8 lg:hidden">
+      <div className="flex w-full items-center justify-center bg-background p-4 sm:p-8 lg:w-1/2 relative">
+        <div className="absolute top-4 right-4 sm:top-8 sm:right-8 lg:hidden">
             <ThemeSwitcher />
         </div>
-        <div className="w-full max-w-md space-y-8">
+        <div className="w-full max-w-md space-y-6">
           {/* Mobile Logo */}
-          <div className="flex items-center justify-center gap-3 lg:hidden">
+          <div className="flex flex-col items-center justify-center gap-3 lg:hidden">
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl gradient-primary shadow-glow p-2">
               <Image src="/logo.png" alt="ESYSTEMLK Logo" width={48} height={48} />
             </div>
@@ -291,7 +291,7 @@ function AuthForm() {
           </div>
 
           <div className="text-center">
-            <h2 className="text-4xl font-black text-foreground">
+            <h2 className="text-3xl md:text-4xl font-black text-foreground">
               {isLogin ? "Welcome Back" : "Create Account"}
             </h2>
             <p className="mt-2 text-muted-foreground">

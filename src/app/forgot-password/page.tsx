@@ -67,10 +67,10 @@ export default function ForgotPasswordPage() {
       </div>
 
       {/* Right Panel - Form */}
-      <div className="flex w-full items-center justify-center bg-background p-8 lg:w-1/2">
+      <div className="flex w-full items-center justify-center bg-background p-4 sm:p-8 lg:w-1/2">
         <div className="w-full max-w-md space-y-8 animate-fade-in">
           <div className="text-center">
-            <h2 className="text-4xl font-black text-foreground">
+            <h2 className="text-3xl md:text-4xl font-black text-foreground">
               Reset Password
             </h2>
             <p className="mt-2 text-muted-foreground">

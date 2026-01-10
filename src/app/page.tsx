@@ -111,7 +111,7 @@ export default function SplashScreen() {
       </div>
 
       {/* Main Content */}
-      <div className={`relative z-10 flex flex-col items-center transition-opacity duration-500`}>
+      <div className={`relative z-10 flex flex-col items-center p-4 transition-opacity duration-500`}>
         {/* Logo Container */}
         <div 
           className={`relative transition-all duration-1000 ${
@@ -119,41 +119,41 @@ export default function SplashScreen() {
           }`}
         >
           {/* Outer ring */}
-          <div className="absolute -inset-8 rounded-full border-2 border-primary/30 animate-spin" style={{ animationDuration: '8s' }} />
-          <div className="absolute -inset-12 rounded-full border border-primary/20 animate-spin" style={{ animationDuration: '12s', animationDirection: 'reverse' }} />
+          <div className="absolute -inset-4 md:-inset-8 rounded-full border-2 border-primary/30 animate-spin" style={{ animationDuration: '8s' }} />
+          <div className="absolute -inset-6 md:-inset-12 rounded-full border border-primary/20 animate-spin" style={{ animationDuration: '12s', animationDirection: 'reverse' }} />
           
           {/* Inner pulsing glow */}
-          <div className="absolute -inset-4 rounded-3xl bg-primary/30 blur-2xl animate-pulse" />
+          <div className="absolute -inset-2 md:-inset-4 rounded-3xl bg-primary/30 blur-2xl animate-pulse" />
           
           {/* Logo */}
-          <div className="relative flex h-32 w-32 items-center justify-center rounded-3xl gradient-primary shadow-glow-intense p-4">
+          <div className="relative flex h-24 w-24 md:h-32 md:w-32 items-center justify-center rounded-3xl gradient-primary shadow-glow-intense p-3 md:p-4">
             <Image src="/logo.png" alt="ESYSTEMLK Logo" width={96} height={96} />
             
             {/* Corner accents */}
-            <div className="absolute -right-2 -top-2 h-4 w-4 rounded-full bg-primary shadow-glow animate-ping" />
-            <div className="absolute -bottom-2 -left-2 h-3 w-3 rounded-full bg-primary shadow-glow animate-ping" style={{ animationDelay: '0.5s' }} />
+            <div className="absolute -right-1 -top-1 md:-right-2 md:-top-2 h-3 w-3 md:h-4 md:w-4 rounded-full bg-primary shadow-glow animate-ping" />
+            <div className="absolute -bottom-1 -left-1 md:-bottom-2 md:-left-2 h-2 w-2 md:h-3 md:w-3 rounded-full bg-primary shadow-glow animate-ping" style={{ animationDelay: '0.5s' }} />
           </div>
         </div>
 
         {/* Brand Text */}
         <div 
-          className={`mt-12 text-center transition-all duration-1000 ${
+          className={`mt-8 md:mt-12 text-center transition-all duration-1000 ${
             phase >= 2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           }`}
         >
-          <h1 className="text-6xl font-black tracking-tight">
+          <h1 className="text-4xl md:text-6xl font-black tracking-tight">
             <span className="text-white">E</span>
             <span className="text-primary neon-text">SYSTEM</span>
             <span className="text-white">LK</span>
           </h1>
-          <p className="mt-3 text-xl font-medium text-white/60 tracking-widest uppercase">
+          <p className="mt-2 md:mt-3 text-base md:text-xl font-medium text-white/60 tracking-widest uppercase">
             Multipurpose System
           </p>
         </div>
 
-        {/* Feature Icons */}
+        {/* Feature Icons - Hidden on mobile */}
         <div 
-          className={`mt-10 flex items-center gap-6 transition-all duration-1000 ${
+          className={`mt-10 hidden md:flex items-center gap-6 transition-all duration-1000 ${
             phase >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           }`}
           style={{ transitionDelay: '300ms' }}
@@ -179,7 +179,7 @@ export default function SplashScreen() {
 
         {/* Loading Bar */}
         <div 
-          className={`mt-12 w-96 transition-all duration-500 ${
+          className={`mt-10 md:mt-12 w-full max-w-xs md:max-w-md transition-all duration-500 ${
             phase >= 3 ? 'opacity-100' : 'opacity-0'
           }`}
         >
