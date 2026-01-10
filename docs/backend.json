@@ -108,6 +108,31 @@
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["id", "userId", "data", "createdAt"]
+    },
+    "Todo": {
+      "title": "Todo Item",
+      "description": "Represents a single task in a developer's todo list.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the todo item."
+        },
+        "text": {
+          "type": "string",
+          "description": "The content of the todo item."
+        },
+        "completed": {
+          "type": "boolean",
+          "description": "Whether the todo item is completed."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The timestamp when the todo was created."
+        }
+      },
+      "required": ["id", "text", "completed", "createdAt"]
     }
   },
   "auth": {
@@ -137,6 +162,12 @@
         "$ref": "#/entities/Letterhead"
       },
       "description": "Letterhead documents created by a specific user."
+    },
+    "/users/{userId}/todos/{todoId}": {
+      "schema": {
+        "$ref": "#/entities/Todo"
+      },
+      "description": "Todo items for a specific developer."
     },
     "/app-status/maintenance": {
         "schema": {

@@ -34,6 +34,11 @@ service cloud.firestore {
     match /users/{userId}/letterheads/{letterheadId} {
         allow read, write, delete: if isOwner(userId);
     }
+    
+    // Developers can manage their own todos.
+    match /users/{userId}/todos/{todoId} {
+        allow read, write, delete: if isOwner(userId);
+    }
 
     // Maintenance status can be read by anyone, but only modified by privileged users.
     match /app-status/maintenance {

@@ -9,7 +9,8 @@ import {
   SlidersHorizontal,
   Bell,
   UserCog,
-  Users
+  Users,
+  ListTodo
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { getAuth, onAuthStateChanged, User as FirebaseUser, signOut } from 'firebase/auth';
@@ -32,18 +33,28 @@ const adminMenuCards = [
     title: "Maintenance",
     description: "Toggle system maintenance mode",
     path: "/admin/maintenance",
+    roles: ['admin', 'developer']
   },
   {
     icon: Bell,
     title: "Notifications",
     description: "Send system-wide notifications",
     path: "/admin/notifications",
+    roles: ['admin', 'developer']
   },
   {
     icon: Users,
     title: "User Management",
     description: "Manage user roles and access",
     path: "/admin/user-management",
+    roles: ['admin', 'developer']
+  },
+  {
+    icon: ListTodo,
+    title: "Developer Todos",
+    description: "Manage your personal task list",
+    path: "/admin/todo",
+    roles: ['developer']
   },
 ];
 
@@ -88,12 +99,14 @@ export default function AdminDashboardPage() {
         console.error("Logout failed:", error);
     }
   };
+  
+  const visibleCards = adminMenuCards.filter(card => userRole && card.roles.includes(userRole));
 
   return (
-    <div className="flex flex-col gap-6 p-8">
-      <div className="relative overflow-hidden gradient-dark p-6 md:p-8">
+    <div className="flex flex-col gap-6 p-4 md:p-8">
+      <div className="relative overflow-hidden gradient-dark p-6 md:p-8 rounded-lg">
         <div className="absolute -right-20 -top-20 h-60 w-60 rounded-full bg-primary/20 blur-3xl" />
-        <div className="relative flex justify-between items-start">
+        <div className="relative flex flex-col md:flex-row justify-between items-start gap-4">
           <div>
             <div className="flex items-center gap-2 mb-2">
               <Zap className="h-5 w-5 text-primary" />
@@ -106,16 +119,16 @@ export default function AdminDashboardPage() {
               Manage your application and users from here.
             </p>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 md:gap-4 self-end md:self-start">
             <ThemeSwitcher />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="outline"
                   size="icon"
-                  className="overflow-hidden rounded-full h-12 w-12 gradient-primary text-primary-foreground shadow-glow"
+                  className="overflow-hidden rounded-full h-10 w-10 md:h-12 md:w-12 gradient-primary text-primary-foreground shadow-glow"
                 >
-                  <User className="h-6 w-6" />
+                  <User className="h-5 w-5 md:h-6 md:w-6" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-64">
@@ -141,8 +154,8 @@ export default function AdminDashboardPage() {
         </div>
       </div>
       <div className="bg-card rounded-lg border shadow-sm p-6">
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {adminMenuCards.map((card, index) => (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {visibleCards.map((card, index) => (
             <Link
               key={card.path}
               href={card.path}
