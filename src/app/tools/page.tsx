@@ -43,7 +43,7 @@ const tools = [
   { id: 3, name: "Split PDF", description: "Split PDF into multiple files", icon: SplitSquareVertical, category: "PDF", status: "active", path: "/tools/pdf/split" },
   { id: 5, name: "Rotate PDF", description: "Rotate PDF pages", icon: RotateCw, category: "PDF", status: "active", path: "/tools/pdf/rotate" },
   { id: 11, name: "Add Watermark", description: "Add text/image watermark to PDF", icon: Stamp, category: "PDF", status: "active", path: "/tools/pdf/watermark" },
-  { id: 1, name: "Delete PDF Pages", description: "Remove specific pages from PDF files", icon: Trash2, category: "PDF", status: "inactive", path: "#" },
+  { id: 1, name: "Delete PDF Pages", description: "Remove specific pages from PDF files", icon: Trash2, category: "PDF", status: "active", path: "/tools/pdf/delete-pages" },
   { id: 4, name: "Compress PDF", description: "Reduce PDF file size", icon: Archive, category: "PDF", status: "inactive", path: "#" },
   { id: 6, name: "Lock PDF", description: "Add password protection to PDF", icon: Lock, category: "PDF", status: "inactive", path: "#" },
   { id: 7, name: "Unlock PDF", description: "Remove password from PDF", icon: Unlock, category: "PDF", status: "inactive", path: "#" },
