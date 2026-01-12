@@ -72,7 +72,7 @@ export default function SplashScreen() {
   }, [router, handleNavigation]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-black">
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-black h-full">
       {/* Animated Background */}
       <div className="absolute inset-0">
         {/* Grid pattern */}
@@ -147,7 +147,7 @@ export default function SplashScreen() {
             <span className="text-white">LK</span>
           </h1>
           <p className="mt-2 md:mt-3 text-base md:text-xl font-medium text-white/60 tracking-widest uppercase">
-            Multipurpose System
+            E central system V 1.1
           </p>
         </div>
 

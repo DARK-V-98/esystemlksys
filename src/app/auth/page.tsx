@@ -213,7 +213,7 @@ function AuthForm() {
             </div>
             <div>
                 <h1 className="text-3xl font-black text-primary-foreground">ESYSTEMLK</h1>
-                <p className="text-sm font-medium text-primary-foreground/70">Multipurpose System</p>
+                <p className="text-sm font-medium text-primary-foreground/70">E central system V 1.1</p>
             </div>
             </div>
         </div>
@@ -288,6 +288,7 @@ function AuthForm() {
               <Image src="/logo.png" alt="ESYSTEMLK Logo" width={48} height={48} />
             </div>
             <h1 className="text-2xl font-black text-gradient">ESYSTEMLK</h1>
+             <p className="text-sm font-medium text-muted-foreground">E central system V 1.1</p>
           </div>
 
           <div className="text-center">

@@ -89,7 +89,7 @@ export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<FirebaseUser | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
-  const isPrivileged = userRole === 'admin' || userRole === 'developer';
+  
 
   useEffect(() => {
     const auth = getAuth(app);
@@ -118,6 +118,8 @@ export default function DashboardPage() {
     
     return () => unsubscribe();
   }, [router]);
+  
+  const isPrivileged = userRole === 'admin' || userRole === 'developer';
 
   const handleLogout = async () => {
     const auth = getAuth(app);
@@ -136,7 +138,7 @@ export default function DashboardPage() {
 
 
   return (
-      <div className="flex flex-col gap-6 p-4 md:p-6">
+      <div className="flex flex-col gap-4 p-4 md:gap-6 md:p-6">
         <div className="relative overflow-hidden gradient-dark p-6 md:p-8 rounded-lg">
             <div className="absolute -right-20 -top-20 h-60 w-60 rounded-full bg-primary/20 blur-3xl" />
             <div className="absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-primary/10 blur-2xl" />
@@ -144,9 +146,9 @@ export default function DashboardPage() {
                 <div>
                     <div className="flex items-center gap-2 mb-2">
                         <Zap className="h-5 w-5 text-primary" />
-                        <span className="text-sm font-semibold text-primary">MULTIPURPOSE SYSTEM</span>
+                        <span className="text-sm font-semibold text-primary uppercase">E central system V 1.1</span>
                     </div>
-                    <h1 className="text-3xl md:text-4xl font-black text-primary-foreground">
+                    <h1 className="text-2xl md:text-4xl font-black text-primary-foreground">
                         Welcome back, <span className="text-primary neon-text">{user?.displayName || 'User'}</span>
                     </h1>
                     <p className="mt-2 text-primary-foreground/70 text-base md:text-lg">
@@ -199,7 +201,7 @@ export default function DashboardPage() {
                 </div>
             </div>
         </div>
-        <div className="bg-card rounded-lg border shadow-sm p-6">
+        <div className="bg-card rounded-lg border shadow-sm p-4 md:p-6">
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
                 {menuCards.map((card, index) => (
                 <Link

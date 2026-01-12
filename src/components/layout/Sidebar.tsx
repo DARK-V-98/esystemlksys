@@ -49,7 +49,7 @@ export function Sidebar() {
           </div>
           <div>
             <h1 className="text-xl font-black text-gradient">ESYSTEMLK</h1>
-            <p className="text-xs font-medium text-muted-foreground">Multipurpose System</p>
+            <p className="text-xs font-medium text-muted-foreground">E central system V 1.1</p>
           </div>
         </div>
       </Link>

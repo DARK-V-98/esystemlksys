@@ -27,7 +27,7 @@ export default function TitleBar() {
     >
       <div className="flex items-center gap-2">
         <Image src="/logo.png" alt="ESYSTEMLK Logo" width={20} height={20} />
-        <span className="text-sm font-bold text-gradient">ESYSTEMLK</span>
+        <span className="text-sm font-bold text-gradient">E central system V 1.1</span>
       </div>
 
       <div className="flex items-center" style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}>
